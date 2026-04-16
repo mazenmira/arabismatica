@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "home": "Home",
+    "catalogue": "Catalogue",
+    "knowledge": "Knowledge Portal",
+    "grading": "Grading Tools",
+    "about": "About Arab Collector",
+    "publications": "Publications",
+    "articles": "Articles & News",
+    "tools": "Tools Center",
+    "shop": "Shop",
+    "authors": "Editors & Authors",
+    "backToSite": "Back to Arabismatica"
+  },
+  "hero": {
+    "title": "أرابيزماتيكا - Arabismatica",
+    "subtitle": "The Arab Coin Catalogue",
+    "total": "coins indexed",
+    "countries": "Arab countries",
+    "years": "1500–2026"
+  },
+  "search": {
+    "placeholder": "Search by name, KM#, N#, metal, year...",
+    "identify": "Identify Coin by Image",
+    "uploadHint": "Upload a coin image to identify it with AI",
+    "results": "results",
+    "noResults": "No results found",
+    "noResultsHint": "Try adjusting your search or filters"
+  },
+  "filters": {
+    "era": "Era",
+    "allEras": "All Eras",
+    "metal": "Metal",
+    "allMetals": "All Metals",
+    "type": "Type",
+    "circulation": "Circulation",
+    "commemorative": "Commemorative",
+    "withMintage": "With Mintage",
+    "all": "All",
+    "country": "Country"
+  },
+  "timeline": {
+    "label": "Timeline",
+    "from": "From",
+    "to": "To",
+    "drag": "Drag to filter coins by year"
+  },
+  "coin": {
+    "obverse": "Obverse",
+    "reverse": "Reverse",
+    "metal": "Metal",
+    "weight": "Weight",
+    "diameter": "Diameter",
+    "type": "Type",
+    "mintage": "Mintage",
+    "pieces": "pieces",
+    "dynasty": "Dynasty / Era",
+    "mint": "Mint",
+    "viewOnNumista": "View on Numista",
+    "close": "Close"
+  },
+  "tools": {
+    "title": "Professional Tools",
+    "tab_encyclopedias": "Encyclopedias & Glossary",
+    "tab_analysis": "Inspection & Grading",
+    "tab_value": "Value & Sales",
+    "glossary": "Numismatic Glossary",
+    "islamicEnc": "Islamic Coins Encyclopedia",
+    "errorsEnc": "Minting Errors & Forgeries",
+    "hijriConverter": "Hijri Date Converter for Coins",
+    "coinParts": "Parts of a Coin",
+    "coinInspection": "Coin Inspection Guide",
+    "gradingGuide": "Coin Grading Guide",
+    "gradingSites": "Coin Grading Services",
+    "metalCalc": "Precious Metals Calculator",
+    "arabPrices": "Arab Graded Coin Prices",
+    "sellGuide": "How to Sell Your Old Coins",
+    "hijriDesc": "Convert Islamic calendar dates found on coins to Gregorian with precision",
+    "open": "Open Professional Tools"
+  },
+  "metals": {
+    "Gold": "Gold", "Silver": "Silver", "Copper": "Copper",
+    "Bronze": "Bronze", "Cupro-Nickel": "Cupro-Nickel",
+    "Bimetallic": "Bimetallic", "Aluminium": "Aluminium",
+    "Billon": "Billon", "Brass": "Brass", "Nickel": "Nickel",
+    "Steel": "Steel", "Other": "Other"
+  },
+  "eras": {
+    "1500-1800": "1500–1800 Early Ottoman",
+    "1800-1863": "1800–1863",
+    "1863-1914": "1863–1914",
+    "1914-1952": "1914–1952",
+    "1952-1970": "1952–1970",
+    "1971-2000": "1971–2000",
+    "2001-2026": "2001–2026"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
+  },
+  "footer": {
+    "tagline": "The Comprehensive Encyclopedia of Arab Coins",
+    "source": "Data source: Numista",
+    "backlink": "arabcollector.com"
+  },
+  "identify": {
+    "title": "Identify Coin by Image",
+    "subtitle": "Upload a coin image for automatic identification",
+    "upload": "Upload Image",
+    "drop": "Or drag image here",
+    "processing": "Analyzing...",
+    "disclaimer": "This is an experimental feature — accuracy is not guaranteed"
+  }
+}
