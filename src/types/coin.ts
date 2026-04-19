@@ -1,3 +1,11 @@
+export interface MintageEntry {
+  YearGregorian: number | null;
+  YearHijri: string | null;
+  Mintmark: string | null;
+  MintageCount: number | null;
+  Note: string | null;
+  Rarity: 'Common' | 'Uncommon' | 'Scarce' | 'Rare' | null;
+}
 export interface Coin {
   id: string;
   cc: string;           // country code e.g. "EG"
@@ -16,6 +24,8 @@ export interface Coin {
   nid: string;          // Numista numeric ID
   type: string;         // "Circulation" | "Commemorative" | "Pattern"
   mint: string;         // mintage number as string
+  mintageData?: MintageEntry[];
+  mint?: number;
   o: string;            // obverse image URL
   r: string;            // reverse image URL
 }

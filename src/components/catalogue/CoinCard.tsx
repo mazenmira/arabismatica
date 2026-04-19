@@ -1,8 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import type { Coin } from '@/types/coin';
-import { getDiscGradient, getMetalSymbol, METAL_BADGE_CLASSES, COUNTRY_FLAGS, formatMintage, isValidImageUrl, getCoinName } from '@/lib/coins';
+import type { Coin, MintageEntry } from '@/types/coin';
+import {
+  getDiscGradient,
+  getMetalSymbol,
+  METAL_BADGE_CLASSES,
+  COUNTRY_FLAGS,
+  formatMintage,
+  isValidImageUrl,
+  getCoinName,
+  getCoinYear,
+} from '@/lib/coins';
 
 interface CoinCardProps {
   coin: Coin;
@@ -11,15 +20,68 @@ interface CoinCardProps {
   onClick: () => void;
 }
 
-function CoinImage({ src, alt, metal, side }: { src: string; alt: string; metal: string; side: 'obverse' | 'reverse' }) {
+// ─── Year range helper ────────────────────────────────────────────────────────
+
+function getCardYearRange(coin: Coin, locale: string): string {
+  const isAr = locale === 'ar';
+  const data: MintageEntry[] = Array.isArray((coin as any).mintageData)
+    ? (coin as any).mintageData
+    : [];
+
+  const years = data
+    .map((d: MintageEntry) => d.YearGregorian)
+    .filter((y): y is number => y != null);
+
+  if (years.length === 0) return getCoinYear(coin, locale);
+
+  const min = Math.min(...years);
+  const max = Math.max(...years);
+
+  const hijriYears = [...new Set(data.map((d: MintageEntry) => d.YearHijri).filter(Boolean))];
+  const hijriLabel = hijriYears.length === 1 ? ` / ${hijriYears[0]} هـ` : '';
+
+  if (min === max) return isAr ? `${min} م${hijriLabel}` : `${min}${hijriLabel}`;
+  return isAr ? `${min} – ${max} م${hijriLabel}` : `${min} – ${max}${hijriLabel}`;
+}
+
+// ─── Variety pill ─────────────────────────────────────────────────────────────
+
+function VarietyPill({ coin, locale }: { coin: Coin; locale: string }) {
+  const isAr = locale === 'ar';
+  const data: MintageEntry[] = Array.isArray((coin as any).mintageData)
+    ? (coin as any).mintageData
+    : [];
+  const hasVarieties = data.some(
+    (d: MintageEntry) => d.Mintmark && d.Mintmark !== 'None'
+  );
+  if (!hasVarieties) return null;
+  return (
+    <span
+      title={isAr ? 'يحتوي على علامات ضرب متعددة' : 'Multiple mintmark varieties'}
+      className="inline-flex items-center gap-0.5 text-[9px] text-amber-400/80 bg-amber-900/20 border border-amber-700/30 rounded-full px-1.5 py-0.5"
+    >
+      ◈ {isAr ? 'متعدد' : 'Varieties'}
+    </span>
+  );
+}
+
+// ─── Coin image ───────────────────────────────────────────────────────────────
+
+function CoinImage({
+  src, alt, metal, side,
+}: {
+  src: string; alt: string; metal: string; side: 'obverse' | 'reverse';
+}) {
   const [error, setError] = useState(false);
   const sideLabel = side === 'obverse' ? 'و' : 'ظ';
 
   if (!isValidImageUrl(src) || error) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
-        <div className="w-[70px] h-[70px] rounded-full flex items-center justify-center font-amiri font-bold text-xl text-ink border-2 border-parch/50"
-          style={{ background: getDiscGradient(metal) }}>
+        <div
+          className="w-[70px] h-[70px] rounded-full flex items-center justify-center font-amiri font-bold text-xl text-ink border-2 border-parch/50"
+          style={{ background: getDiscGradient(metal) }}
+        >
           {getMetalSymbol(metal)}
         </div>
         <span className="text-[9px] text-ink/40">{sideLabel}</span>
@@ -45,23 +107,40 @@ function CoinImage({ src, alt, metal, side }: { src: string; alt: string; metal:
   );
 }
 
+// ─── CoinCard ─────────────────────────────────────────────────────────────────
+
 export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps) {
   const isAr = locale === 'ar';
   const metalBadgeClass = METAL_BADGE_CLASSES[coin.metal] ?? METAL_BADGE_CLASSES.Other;
   const coinName = getCoinName(coin, locale);
+  const yearRange = getCardYearRange(coin, locale);
+
   const metaLabel = isAr
-    ? (coin.metal === 'Gold' ? 'ذهب' : coin.metal === 'Silver' ? 'فضة' : coin.metal === 'Copper' || coin.metal === 'Bronze' ? 'نحاس' : coin.metal)
+    ? (coin.metal === 'Gold' ? 'ذهب'
+      : coin.metal === 'Silver' ? 'فضة'
+      : coin.metal === 'Copper' || coin.metal === 'Bronze' ? 'نحاس'
+      : coin.metal)
     : coin.metal;
 
+  // Mintage display: sum mintageData if available, else legacy scalar
+  const mintageData: MintageEntry[] = Array.isArray((coin as any).mintageData)
+    ? (coin as any).mintageData
+    : [];
+  const totalMintage = mintageData.length > 0
+    ? mintageData.reduce((s, d) => s + (d.MintageCount ?? 0), 0)
+    : (coin.mint ?? null);
+
+  // ── List view ──────────────────────────────────────────────────────────────
   if (view === 'list') {
     return (
       <button
         onClick={onClick}
-        className="w-full flex items-center gap-3 bg-parch-cream rounded-xl border border-gold-700/15 hover:border-gold-500/50 hover:shadow-md transition-all group text-right px-3 py-2.5 cursor-pointer">
-        {/* Obverse only in list view */}
+        className="w-full flex items-center gap-3 bg-parch-cream rounded-xl border border-gold-700/15 hover:border-gold-500/50 hover:shadow-md transition-all group text-right px-3 py-2.5 cursor-pointer"
+      >
         <div className="shrink-0">
           <CoinImage src={coin.o} alt={coinName} metal={coin.metal} side="obverse" />
         </div>
+
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 mb-0.5">
             <span className="text-[11px]">{COUNTRY_FLAGS[coin.cc] ?? ''}</span>
@@ -70,14 +149,13 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
           <div className="text-[14px] font-amiri text-ink truncate">{coinName}</div>
           <div className="text-[10px] text-ink/40 truncate">{coin.dyn}</div>
         </div>
-        <div className="shrink-0 text-right">
-          <div className="text-[11px] text-gold-600 font-medium">
-            {coin.yce ? `${coin.yce}${isAr ? ' م' : ''}` : ''}
-            {coin.yah ? ` · ${coin.yah}${isAr ? ' هـ' : ''}` : ''}
-          </div>
-          {coin.mint && (
-            <div className="text-[10px] text-gold-500/60 mt-0.5">
-              📊 {formatMintage(coin.mint, locale)}
+
+        <div className="shrink-0 flex flex-col items-end gap-0.5">
+          <div className="text-[11px] text-gold-600 font-medium">{yearRange}</div>
+          <VarietyPill coin={coin} locale={locale} />
+          {totalMintage != null && totalMintage > 0 && (
+            <div className="text-[10px] text-gold-500/60">
+              📊 {formatMintage(totalMintage, locale)}
             </div>
           )}
         </div>
@@ -85,30 +163,37 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
     );
   }
 
+  // ── Grid view ──────────────────────────────────────────────────────────────
   return (
     <button
       onClick={onClick}
       className="group w-full bg-parch-cream rounded-xl border border-gold-700/15 hover:border-gold-500 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex flex-col text-right animate-fade-in"
-      style={{ boxShadow: '0 1px 8px rgba(80,50,10,.06)' }}>
-
+      style={{ boxShadow: '0 1px 8px rgba(80,50,10,.06)' }}
+    >
       {/* Images row */}
       <div className="relative flex bg-parch-dark/60 h-[96px] overflow-hidden">
-        {/* Metal badge */}
         <span className={`absolute top-2 right-2 z-10 text-[8px] font-bold px-1.5 py-0.5 rounded-full ${metalBadgeClass}`}>
           {metaLabel}
         </span>
 
-        {/* Obverse */}
         <div className="flex-1 flex items-center justify-center">
-          <CoinImage src={coin.o} alt={`${coinName} — ${isAr ? 'الوجه' : 'Obverse'}`} metal={coin.metal} side="obverse" />
+          <CoinImage
+            src={coin.o}
+            alt={`${coinName} — ${isAr ? 'الوجه' : 'Obverse'}`}
+            metal={coin.metal}
+            side="obverse"
+          />
         </div>
 
-        {/* Divider */}
         <div className="w-px bg-gold-700/20 my-3" />
 
-        {/* Reverse */}
         <div className="flex-1 flex items-center justify-center">
-          <CoinImage src={coin.r} alt={`${coinName} — ${isAr ? 'الظهر' : 'Reverse'}`} metal={coin.metal} side="reverse" />
+          <CoinImage
+            src={coin.r}
+            alt={`${coinName} — ${isAr ? 'الظهر' : 'Reverse'}`}
+            metal={coin.metal}
+            side="reverse"
+          />
         </div>
       </div>
 
@@ -118,14 +203,19 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
           <span className="text-[11px]">{COUNTRY_FLAGS[coin.cc] ?? ''}</span>
           <span className="text-[9px] text-ink/35 truncate">{isAr ? coin.co_ar : coin.co}</span>
         </div>
+
         <div className="text-[14px] font-amiri text-ink leading-tight truncate" title={coinName}>
           {coinName}
         </div>
+
         <div className="text-[9px] text-ink/40 truncate">{coin.dyn}</div>
-        <div className="text-[10px] text-gold-600 font-medium mt-0.5">
-          {coin.yce ? `${coin.yce}${isAr ? ' م' : ''}` : ''}
-          {coin.yah ? ` · ${coin.yah}${isAr ? ' هـ' : ''}` : ''}
-        </div>
+
+        {/* Year range — replaces old yce/yah display */}
+        <div className="text-[10px] text-gold-600 font-medium mt-0.5">{yearRange}</div>
+
+        {/* Variety pill */}
+        <VarietyPill coin={coin} locale={locale} />
+
         {coin.km && (
           <div className="text-[8px] text-ink/25 font-mono">
             {coin.km}{coin.nref ? ` · ${coin.nref}` : ''}
@@ -135,15 +225,21 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
 
       {/* Footer */}
       <div className="flex items-center justify-between px-2.5 py-1.5 border-t border-gold-700/10">
-        {coin.mint ? (
+        {totalMintage != null && totalMintage > 0 ? (
           <span className="text-[9px] text-ink/50 flex items-center gap-0.5">
-            📊 <span className="font-medium text-ink/70">{formatMintage(coin.mint, locale)}</span>
+            📊 <span className="font-medium text-ink/70">{formatMintage(totalMintage, locale)}</span>
           </span>
         ) : (
           <span />
         )}
-        <span className={`text-[8px] px-1.5 py-0.5 rounded-full border ${coin.type === 'Commemorative' ? 'border-amber-300/50 text-amber-600' : 'border-gold-700/20 text-ink/30'}`}>
-          {coin.type === 'Commemorative' ? (isAr ? 'تذكارية' : 'Comm.') : (isAr ? 'تداول' : 'Circ.')}
+        <span className={`text-[8px] px-1.5 py-0.5 rounded-full border ${
+          coin.type === 'Commemorative'
+            ? 'border-amber-300/50 text-amber-600'
+            : 'border-gold-700/20 text-ink/30'
+        }`}>
+          {coin.type === 'Commemorative'
+            ? (isAr ? 'تذكارية' : 'Comm.')
+            : (isAr ? 'تداول' : 'Circ.')}
         </span>
       </div>
     </button>
