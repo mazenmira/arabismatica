@@ -341,7 +341,7 @@ export default function CataloguePage({ locale }: { locale: string }) {
 
       {/* ── FOOTER ── */}
       <footer className="bg-ink border-t border-gold-700/40 py-6 text-center">
-        <div className="font-amiri text-gold-300 text-base mb-1">جامع العرب · The Arab Collector</div>
+        <div className="font-amiri text-gold-300 text-base mb-1">المقتني العربي · The Arab Collector</div>
         <p className="text-gold-600/60 text-[11px] mb-2">{t('footer.tagline')}</p>
         <p className="text-[11px] text-gold-700/50">
           {t('footer.source')} ·{' '}

@@ -20,17 +20,22 @@ type CoinWithVarieties = Coin & { mintageData?: MintageEntry[] };
 // ─── Rarity badge ─────────────────────────────────────────────────────────────
 
 const RARITY_STYLES: Record<string, string> = {
-  Common:   'bg-emerald-900/40 text-emerald-300 border-emerald-700/40',
-  Uncommon: 'bg-sky-900/40    text-sky-300    border-sky-700/40',
-  Scarce:   'bg-amber-900/40  text-amber-300  border-amber-700/40',
-  Rare:     'bg-red-900/40    text-red-300    border-red-700/40',
+  Common:   'bg-emerald-600 text-white border-emerald-700',
+  Uncommon: 'bg-sky-600     text-white border-sky-700',
+  Scarce:   'bg-amber-500   text-amber-950 border-amber-600',
+  Rare:     'bg-red-600     text-white border-red-700',
 };
 
-function RarityBadge({ rarity }: { rarity: string | null }) {
+const RARITY_AR: Record<string, string> = {
+  Common: 'شائع', Uncommon: 'غير شائع', Scarce: 'نادر نسبياً', Rare: 'نادر',
+};
+
+function RarityBadge({ rarity, locale }: { rarity: string | null; locale?: string }) {
   if (!rarity) return null;
+  const label = locale === 'ar' ? (RARITY_AR[rarity] ?? rarity) : rarity;
   return (
     <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${RARITY_STYLES[rarity] ?? 'bg-parch-dark text-ink/50 border-gold-700/20'}`}>
-      {rarity}
+      {label}
     </span>
   );
 }
@@ -142,7 +147,7 @@ function MintageTable({ data, locale }: { data: MintageEntry[]; locale: string }
                     )}
                   </td>
                   <td className="px-3 py-2.5 text-center">
-                    <RarityBadge rarity={entry.Rarity} />
+                    <RarityBadge rarity={entry.Rarity} locale={locale} />
                   </td>
                   <td className="px-3 py-2.5 text-start hidden sm:table-cell">
                     {entry.Note && (
