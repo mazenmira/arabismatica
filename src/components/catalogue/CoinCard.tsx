@@ -13,6 +13,9 @@ import {
   getCoinYear,
 } from '@/lib/coins';
 
+// Extend Coin locally to include mintageData without touching the shared type yet
+type CoinWithVarieties = Coin & { mintageData?: MintageEntry[] };
+
 interface CoinCardProps {
   coin: Coin;
   locale: string;
@@ -22,11 +25,9 @@ interface CoinCardProps {
 
 // ─── Year range helper ────────────────────────────────────────────────────────
 
-function getCardYearRange(coin: Coin, locale: string): string {
+function getCardYearRange(coin: CoinWithVarieties, locale: string): string {
   const isAr = locale === 'ar';
-  const data: MintageEntry[] = Array.isArray((coin as any).mintageData)
-    ? (coin as any).mintageData
-    : [];
+  const data: MintageEntry[] = coin.mintageData ?? [];
 
   const years = data
     .map((d: MintageEntry) => d.YearGregorian)
@@ -37,7 +38,7 @@ function getCardYearRange(coin: Coin, locale: string): string {
   const min = Math.min(...years);
   const max = Math.max(...years);
 
-  const hijriYears = [...new Set(data.map((d: MintageEntry) => d.YearHijri).filter(Boolean))];
+  const hijriYears = [...new Set(data.map((d: MintageEntry) => d.YearHijri).filter((h): h is string => h != null))];
   const hijriLabel = hijriYears.length === 1 ? ` / ${hijriYears[0]} هـ` : '';
 
   if (min === max) return isAr ? `${min} م${hijriLabel}` : `${min}${hijriLabel}`;
@@ -46,11 +47,9 @@ function getCardYearRange(coin: Coin, locale: string): string {
 
 // ─── Variety pill ─────────────────────────────────────────────────────────────
 
-function VarietyPill({ coin, locale }: { coin: Coin; locale: string }) {
+function VarietyPill({ coin, locale }: { coin: CoinWithVarieties; locale: string }) {
   const isAr = locale === 'ar';
-  const data: MintageEntry[] = Array.isArray((coin as any).mintageData)
-    ? (coin as any).mintageData
-    : [];
+  const data: MintageEntry[] = coin.mintageData ?? [];
   const hasVarieties = data.some(
     (d: MintageEntry) => d.Mintmark && d.Mintmark !== 'None'
   );
@@ -110,10 +109,11 @@ function CoinImage({
 // ─── CoinCard ─────────────────────────────────────────────────────────────────
 
 export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps) {
+  const c = coin as CoinWithVarieties;
   const isAr = locale === 'ar';
   const metalBadgeClass = METAL_BADGE_CLASSES[coin.metal] ?? METAL_BADGE_CLASSES.Other;
   const coinName = getCoinName(coin, locale);
-  const yearRange = getCardYearRange(coin, locale);
+  const yearRange = getCardYearRange(c, locale);
 
   const metaLabel = isAr
     ? (coin.metal === 'Gold' ? 'ذهب'
@@ -122,13 +122,10 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
       : coin.metal)
     : coin.metal;
 
-  // Mintage display: sum mintageData if available, else legacy scalar
-  const mintageData: MintageEntry[] = Array.isArray((coin as any).mintageData)
-    ? (coin as any).mintageData
-    : [];
+  const mintageData: MintageEntry[] = c.mintageData ?? [];
   const totalMintage = mintageData.length > 0
     ? mintageData.reduce((s, d) => s + (d.MintageCount ?? 0), 0)
-    : (coin.mint ?? null);
+    : (coin.mint ? parseInt(coin.mint, 10) : null);
 
   // ── List view ──────────────────────────────────────────────────────────────
   if (view === 'list') {
@@ -140,7 +137,6 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
         <div className="shrink-0">
           <CoinImage src={coin.o} alt={coinName} metal={coin.metal} side="obverse" />
         </div>
-
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 mb-0.5">
             <span className="text-[11px]">{COUNTRY_FLAGS[coin.cc] ?? ''}</span>
@@ -149,13 +145,12 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
           <div className="text-[14px] font-amiri text-ink truncate">{coinName}</div>
           <div className="text-[10px] text-ink/40 truncate">{coin.dyn}</div>
         </div>
-
         <div className="shrink-0 flex flex-col items-end gap-0.5">
           <div className="text-[11px] text-gold-600 font-medium">{yearRange}</div>
-          <VarietyPill coin={coin} locale={locale} />
+          <VarietyPill coin={c} locale={locale} />
           {totalMintage != null && totalMintage > 0 && (
             <div className="text-[10px] text-gold-500/60">
-              📊 {formatMintage(totalMintage, locale)}
+              📊 {formatMintage(String(totalMintage), locale)}
             </div>
           )}
         </div>
@@ -170,52 +165,30 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
       className="group w-full bg-parch-cream rounded-xl border border-gold-700/15 hover:border-gold-500 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex flex-col text-right animate-fade-in"
       style={{ boxShadow: '0 1px 8px rgba(80,50,10,.06)' }}
     >
-      {/* Images row */}
       <div className="relative flex bg-parch-dark/60 h-[96px] overflow-hidden">
         <span className={`absolute top-2 right-2 z-10 text-[8px] font-bold px-1.5 py-0.5 rounded-full ${metalBadgeClass}`}>
           {metaLabel}
         </span>
-
         <div className="flex-1 flex items-center justify-center">
-          <CoinImage
-            src={coin.o}
-            alt={`${coinName} — ${isAr ? 'الوجه' : 'Obverse'}`}
-            metal={coin.metal}
-            side="obverse"
-          />
+          <CoinImage src={coin.o} alt={`${coinName} — ${isAr ? 'الوجه' : 'Obverse'}`} metal={coin.metal} side="obverse" />
         </div>
-
         <div className="w-px bg-gold-700/20 my-3" />
-
         <div className="flex-1 flex items-center justify-center">
-          <CoinImage
-            src={coin.r}
-            alt={`${coinName} — ${isAr ? 'الظهر' : 'Reverse'}`}
-            metal={coin.metal}
-            side="reverse"
-          />
+          <CoinImage src={coin.r} alt={`${coinName} — ${isAr ? 'الظهر' : 'Reverse'}`} metal={coin.metal} side="reverse" />
         </div>
       </div>
 
-      {/* Card body */}
       <div className="px-2.5 pt-2 pb-1 flex-1 flex flex-col gap-0.5">
         <div className="flex items-center gap-1">
           <span className="text-[11px]">{COUNTRY_FLAGS[coin.cc] ?? ''}</span>
           <span className="text-[9px] text-ink/35 truncate">{isAr ? coin.co_ar : coin.co}</span>
         </div>
-
         <div className="text-[14px] font-amiri text-ink leading-tight truncate" title={coinName}>
           {coinName}
         </div>
-
         <div className="text-[9px] text-ink/40 truncate">{coin.dyn}</div>
-
-        {/* Year range — replaces old yce/yah display */}
         <div className="text-[10px] text-gold-600 font-medium mt-0.5">{yearRange}</div>
-
-        {/* Variety pill */}
-        <VarietyPill coin={coin} locale={locale} />
-
+        <VarietyPill coin={c} locale={locale} />
         {coin.km && (
           <div className="text-[8px] text-ink/25 font-mono">
             {coin.km}{coin.nref ? ` · ${coin.nref}` : ''}
@@ -223,11 +196,10 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
         )}
       </div>
 
-      {/* Footer */}
       <div className="flex items-center justify-between px-2.5 py-1.5 border-t border-gold-700/10">
         {totalMintage != null && totalMintage > 0 ? (
           <span className="text-[9px] text-ink/50 flex items-center gap-0.5">
-            📊 <span className="font-medium text-ink/70">{formatMintage(totalMintage, locale)}</span>
+            📊 <span className="font-medium text-ink/70">{formatMintage(String(totalMintage), locale)}</span>
           </span>
         ) : (
           <span />

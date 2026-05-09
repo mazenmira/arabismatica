@@ -6,31 +6,31 @@ export interface MintageEntry {
   Note: string | null;
   Rarity: 'Common' | 'Uncommon' | 'Scarce' | 'Rare' | null;
 }
+
 export interface Coin {
   id: string;
-  cc: string;           // country code e.g. "EG"
-  co: string;           // country English
-  co_ar: string;        // country Arabic
-  dyn: string;          // dynasty Arabic
-  name: string;         // coin name English
-  nar: string;          // coin name Arabic
-  yce: string;          // year CE
-  yah: string;          // year AH
-  metal: string;        // e.g. "Silver"
-  wt: number | null;    // weight grams
-  dia: number | null;   // diameter mm
-  km: string;           // KM reference
-  nref: string;         // N# Numista reference
-  nid: string;          // Numista numeric ID
-  type: string;         // "Circulation" | "Commemorative" | "Pattern"
-  mint: string;         // mintage number as string
+  cc: string;
+  co: string;
+  co_ar: string;
+  dyn: string;
+  name: string;
+  nar: string;
+  yce: string;
+  yah: string;
+  metal: string;
+  wt: number | null;
+  dia: number | null;
+  km: string;
+  nref: string;
+  nid: string;
+  type: string;
+  mint: string;             // legacy mintage as string
   mintageData?: MintageEntry[];
-  mint?: number;
-  o: string;            // obverse image URL
-  r: string;            // reverse image URL
+  o: string;
+  r: string;
 }
 
-export type Metal = 
+export type Metal =
   | 'Gold' | 'Silver' | 'Copper' | 'Bronze' | 'Cupro-Nickel'
   | 'Bimetallic' | 'Aluminium' | 'Billon' | 'Brass' | 'Nickel'
   | 'Steel' | 'Other';
