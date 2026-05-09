@@ -38,7 +38,7 @@ function getCardYearRange(coin: CoinWithVarieties, locale: string): string {
   const min = Math.min(...years);
   const max = Math.max(...years);
 
-  const hijriYears = [...new Set(data.map((d: MintageEntry) => d.YearHijri).filter((h): h is string => h != null))];
+  const hijriYears = Array.from(new Set(data.map((d: MintageEntry) => d.YearHijri).filter((h): h is string => h != null)));
   const hijriLabel = hijriYears.length === 1 ? ` / ${hijriYears[0]} هـ` : '';
 
   if (min === max) return isAr ? `${min} م${hijriLabel}` : `${min}${hijriLabel}`;
