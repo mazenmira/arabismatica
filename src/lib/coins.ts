@@ -1,59 +1,135 @@
 import type { Coin } from '@/types/coin';
-
 // ─── Inline translation dictionary ───────────────────────────────────────────
+
+// Phrases ordered longest → shortest to avoid partial clobber
 const PHRASE_MAP: [RegExp, string][] = [
-  [/Facing Right/gi,                    'الزي الملكي'],
-  [/Civic Attire/gi,                    'الزي الملكي'],
-  [/Facing Left/gi,                     'زي التشريفة العسكرية'],
-  [/Reverse Trial/gi,                   'نموذج معكوس'],
-  [/Type 1\b/gi,                        'نوع أول'],
-  [/Type 2\b/gi,                        'نوع ثاني'],
-  [/Type 3\b/gi,                        'نوع ثالث'],
-  [/Type I\b/gi,                        'نوع أول'],
-  [/Type II\b/gi,                       'نوع ثاني'],
-  [/Type III\b/gi,                      'نوع ثالث'],
-  [/Gold Pattern/gi,                    'نموذج ذهب'],
-  [/Bronze Pattern/gi,                  'نموذج برونز'],
-  [/Trial Strike/gi,                    'نسخة تجريبية'],
-  [/Pattern/gi,                         'نموذج'],
-  [/Piastres/gi,                        'قرش'],
-  [/Piastre/gi,                         'قرش'],
-  [/With Hole/gi,                       'مثقوب'],
-  [/With Flower/gi,                     'بالوردة'],
-  [/Royal Wedding/gi,                   'الزواج الملكي'],
-  [/Old Design/gi,                      'تصميم قديم'],
-  [/French Occupation/gi,               'الاحتلال الفرنسي'],
-  [/Zeri Mahbub/gi,                     'زر محبوب'],
-  [/Zari Mahbub/gi,                     'زر محبوب'],
-  [/Coyrek Rumi/gi,                     'كويريك رومي'],
-  [/Mangir/gi,                          'مانجير'],
-  [/Mahbub/gi,                          'محبوب'],
-  [/Abdul Hamid/gi,                     'عبدالحميد'],
-  [/Abdulhamid/gi,                      'عبدالحميد'],
-  [/Abdulaziz/gi,                       'عبدالعزيز'],
-  [/Abdul Aziz/gi,                      'عبدالعزيز'],
-  [/Abdulmecid/gi,                      'عبدالمجيد'],
-  [/Abdul Mecid/gi,                     'عبدالمجيد'],
-  [/Said Pasha/gi,                      'سعيد باشا'],
-  [/Ali Bey/gi,                         'علي بك'],
-  [/Hussein Kamel/gi,                   'حسين كامل'],
-  [/Fuad/gi,                            'فؤاد'],
-  [/Farouk/gi,                          'فاروق'],
-  [/Faruq/gi,                           'فاروق'],
+
+  // ── Commemorative subjects ──────────────────────────────────────────────────
+  [/Grand Egyptian Museum/gi,           'المتحف المصري الكبير'],
+  [/\bGEM\b/g,                          'م.م.ك'],
+  [/Khofo Solar Boat/gi,               'مركب خوفو الشمسية'],
+  [/Ramesses II Hanging Obelisk/gi,    'مسلة رمسيس الثاني المعلقة'],
+  [/Ramesses II Statue/gi,             'تمثال رمسيس الثاني'],
+  [/Hatshepsut Statue/gi,              'تمثال حتشبسوت'],
+  [/Tut Gold Mask/gi,                  'قناع توت الذهبي'],
+  [/Tut\b/gi,                          'توت عنخ آمون'],
+  [/Hatshepsut/gi,                     'حتشبسوت'],
+  [/Ramesses/gi,                       'رمسيس'],
+  [/Karnak/gi,                         'الكرنك'],
+  [/Luxor/gi,                          'الأقصر'],
+  [/Aswan High Dam/gi,                 'السد العالي بأسوان'],
+  [/Aswan/gi,                          'أسوان'],
+  [/Cairo University/gi,               'جامعة القاهرة'],
+  [/Cairo Stadium/gi,                  'استاد القاهرة'],
+  [/Cairo/gi,                          'القاهرة'],
+  [/Alexandria University/gi,          'جامعة الإسكندرية'],
+  [/Alexandria/gi,                     'الإسكندرية'],
+  [/School of Agriculture/gi,          'مدرسة الزراعة'],
+  [/Egyptian Radio Broadcasting/gi,    'الإذاعة المصرية'],
+  [/State Lawsuits/gi,                 'قضايا الدولة'],
+  [/Saving for Development/gi,         'الادخار للتنمية'],
+  [/Agriculture\b/gi,                  'الزراعة'],
+  [/Broadcasting\b/gi,                 'البث الإذاعي'],
+  [/Development\b/gi,                  'التنمية'],
+  [/University\b/gi,                   'الجامعة'],
+  [/Stadium\b/gi,                      'الاستاد'],
+  [/Museum\b/gi,                       'المتحف'],
+  [/Obelisk\b/gi,                      'المسلة'],
+  [/Statue\b/gi,                       'التمثال'],
+  [/Mask\b/gi,                         'القناع'],
+  [/Boat\b/gi,                         'القارب'],
+  [/Dam\b/gi,                          'السد'],
+  [/Radio\b/gi,                        'الراديو'],
+  [/Solar\b/gi,                        'الشمسية'],
+
+  // ── People (commemorative) ──────────────────────────────────────────────────
+  [/Abbas Al-Aqqad/gi,                 'عباس العقاد'],
+  [/Taha Hussein/gi,                   'طه حسين'],
+  [/Georgi Zidan/gi,                   'جرجي زيدان'],
+  [/Abbas\b/gi,                        'عباس'],
+  [/Aqqad\b/gi,                        'العقاد'],
+  [/Taha\b/gi,                         'طه'],
+  [/Zidan\b/gi,                        'زيدان'],
+  [/Georgi\b/gi,                       'جرجي'],
+
+  // ── Royal/Type descriptors ──────────────────────────────────────────────────
+  [/Facing Right/gi,                   'الزي الملكي'],
+  [/Civic Attire/gi,                   'الزي الملكي'],
+  [/Facing Left/gi,                    'زي التشريفة العسكرية'],
+  [/Reverse Trial/gi,                  'نموذج معكوس'],
+  [/Trial Strike/gi,                   'نسخة تجريبية'],
+  [/Gold Pattern/gi,                   'نموذج ذهب'],
+  [/Bronze Pattern/gi,                 'نموذج برونز'],
+  [/Pattern\b/gi,                      'نموذج'],
+  [/Type 1\b/gi,                       'نوع أول'],
+  [/Type 2\b/gi,                       'نوع ثاني'],
+  [/Type 3\b/gi,                       'نوع ثالث'],
+  [/Type I\b/gi,                       'نوع أول'],
+  [/Type II\b/gi,                      'نوع ثاني'],
+  [/Type III\b/gi,                     'نوع ثالث'],
+  [/With Hole/gi,                      'مثقوب'],
+  [/With Flower/gi,                    'بالوردة'],
+  [/Royal Wedding/gi,                  'الزواج الملكي'],
+  [/Old Design/gi,                     'تصميم قديم'],
+  [/French Occupation/gi,              'الاحتلال الفرنسي'],
+  [/Mule\b/gi,                         'قطعة خطأ'],
+  [/\bND\b/gi,                         'غير مؤرخ'],
+  [/\bnd\b/g,                          'غير مؤرخ'],
+
+  // ── Coin types / denominations ──────────────────────────────────────────────
+  [/Gold Pounds?/gi,                   'جنيه ذهب'],
+  [/Gold Pound/gi,                     'جنيه ذهب'],
+  [/Pounds?\b/gi,                      'جنيه'],
+  [/Piastres?\b/gi,                    'قرش'],
+  [/Milliemes?\b/gi,                   'مليم'],
+  [/Zeri Mahbub/gi,                    'زر محبوب'],
+  [/Zari Mahbub/gi,                    'زر محبوب'],
+  [/Coyrek Rumi/gi,                    'كويريك رومي'],
+  [/Manghir\b/gi,                      'مانجير'],
+  [/Mangir\b/gi,                       'مانجير'],
+  [/Mahbub\b/gi,                       'محبوب'],
+  [/Qirsh\b/gi,                        'قرش'],
+  [/Para\b/gi,                         'بارة'],
+  [/Sultani\b/gi,                      'سلطاني'],
+  [/Jadid\b/gi,                        'جديد'],
+  [/Medini\b|Medin\b/gi,               'مديني'],
+  [/Akche\b|Akce\b/gi,                 'أقجة'],
+  [/Asper\b/gi,                        'أسبر'],
+
+  // ── Rulers ──────────────────────────────────────────────────────────────────
+  [/Hussein Kamel/gi,                  'حسين كامل'],
+  [/Abdul Hamid/gi,                    'عبدالحميد'],
+  [/Abdulhamid/gi,                     'عبدالحميد'],
+  [/Abdulaziz/gi,                      'عبدالعزيز'],
+  [/Abdul Aziz/gi,                     'عبدالعزيز'],
+  [/Abdulmecid/gi,                     'عبدالمجيد'],
+  [/Abdul Mecid/gi,                    'عبدالمجيد'],
+  [/Said Pasha/gi,                     'سعيد باشا'],
+  [/Salim ibn Sulayman/gi,             'سليم بن سليمان'],
+  [/Ali Bey/gi,                        'علي بك'],
+  [/Fuad\b/gi,                         'فؤاد'],
+  [/Farouk\b/gi,                       'فاروق'],
+  [/Faruq\b/gi,                        'فاروق'],
+  [/Osman\b/gi,                        'عثمان'],
+  [/Ahmed\b/gi,                        'أحمد'],
+  [/Salim\b/gi,                        'سليم'],
+  [/Sulayman\b/gi,                     'سليمان'],
+  [/\bibn\b/gi,                        'بن'],
+  [/Hussein\b/gi,                      'حسين'],
+  [/Ali\b/gi,                          'علي'],
+
+  // ── Locations ───────────────────────────────────────────────────────────────
   [/the magnificent Misr al-Mahrusa/gi, 'مصر المحروسة'],
-  [/Misr al-Mahrusa/gi,                 'مصر المحروسة'],
-  [/Misr/gi,                            'مصر'],
-  [/Milliemes?\b/gi,                    'مليم'],
-  [/Pound/gi,                           'جنيه'],
-  [/Qirsh/gi,                           'قرش'],
-  [/Para\b/gi,                          'بارة'],
-  [/Sultani/gi,                         'سلطاني'],
-  [/Jadid/gi,                           'جديد'],
-  [/Medini|Medin\b/gi,                  'مديني'],
-  [/Akche|Akce\b/gi,                    'أقجة'],
-  [/Manghir/gi,                         'مانجير'],
-  [/Mangir/gi,                          'مانجير'],
+  [/Misr al-Mahrusa/gi,                'مصر المحروسة'],
+  [/Misr\b/gi,                         'مصر'],
+  [/Egyptian\b/gi,                     'المصري'],
+
+  // ── Misc ────────────────────────────────────────────────────────────────────
+  [/\bYears?\b/gi,                     'سنة'],
+  [/\bof\b/gi,                         'من'],
+  [/\bfor\b/gi,                        'لـ'],
 ];
+
 const ROMAN_END: [RegExp, string][] = [
   [/ VIII(?=$|\s*[)\]])/gi, ' الثامن'],
   [/ VII(?=$|\s*[)\]])/gi,  ' السابع'],
@@ -66,12 +142,14 @@ const ROMAN_END: [RegExp, string][] = [
   [/ V(?=$|\s*[)\]])/gi,    ' الخامس'],
   [/ X(?=$|\s*[)\]])/gi,    ' العاشر'],
 ];
+
 function translateCoinName(name: string): string {
   let s = name;
   for (const [re, ar] of PHRASE_MAP) s = s.replace(re, ar);
   for (const [re, ar] of ROMAN_END)  s = s.replace(re, ar);
   return s.trim();
 }
+
 export const RARITY_AR: Record<string, string> = {
   Common: 'شائع', Uncommon: 'غير شائع', Scarce: 'نادر نسبياً', Rare: 'نادر',
 };
@@ -160,7 +238,7 @@ export function isValidImageUrl(url: string): boolean {
 
 export function getCoinName(coin: Coin, locale: string): string {
   if (locale !== 'ar') return coin.name;
-  // Run translation over nar (may be partial) or fall back to name
+  // Always run translator — nar may be partial (e.g. "Akce · محمد")
   const base = (coin.nar && coin.nar.trim()) ? coin.nar : coin.name;
   return translateCoinName(base);
 }
