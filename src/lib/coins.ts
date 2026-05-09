@@ -82,7 +82,11 @@ export function isValidImageUrl(url: string): boolean {
 }
 
 export function getCoinName(coin: Coin, locale: string): string {
-  return locale === 'ar' ? (coin.nar || coin.name) : coin.name;
+  if (locale !== 'ar') return coin.name;
+  // Use stored Arabic name only if it's genuinely different from the English name
+  if (coin.nar && coin.nar !== coin.name) return coin.nar;
+  // Otherwise run the translation dictionary on the English name
+  return translateCoinName(coin.name);
 }
 
 export function getCoinYear(coin: Coin, locale: string): string {
