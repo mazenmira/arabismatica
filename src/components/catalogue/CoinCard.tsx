@@ -57,7 +57,7 @@ function VarietyPill({ coin, locale }: { coin: CoinWithVarieties; locale: string
   return (
     <span
       title={isAr ? 'يحتوي على علامات ضرب متعددة' : 'Multiple mintmark varieties'}
-      className="inline-flex items-center gap-0.5 text-[9px] text-amber-400/80 bg-amber-900/20 border border-amber-700/30 rounded-full px-1.5 py-0.5"
+      className="inline-flex items-center gap-0.5 text-[9px] text-amber-900 bg-amber-400 border border-amber-500 rounded-full px-1.5 py-0.5 font-semibold"
     >
       ◈ {isAr ? 'متعدد' : 'Varieties'}
     </span>
@@ -165,10 +165,13 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
       className="group w-full bg-parch-cream rounded-xl border border-gold-700/15 hover:border-gold-500 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex flex-col text-right animate-fade-in"
       style={{ boxShadow: '0 1px 8px rgba(80,50,10,.06)' }}
     >
-      <div className="relative flex bg-parch-dark/60 h-[96px] overflow-hidden">
-        <span className={`absolute top-2 right-2 z-10 text-[8px] font-bold px-1.5 py-0.5 rounded-full ${metalBadgeClass}`}>
+      {/* Metal label — above coin images, full width */}
+      <div className="flex justify-end px-2.5 pt-2">
+        <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${metalBadgeClass}`}>
           {metaLabel}
         </span>
+      </div>
+      <div className="relative flex bg-parch-dark/60 h-[96px] overflow-hidden">
         <div className="flex-1 flex items-center justify-center">
           <CoinImage src={coin.o} alt={`${coinName} — ${isAr ? 'الوجه' : 'Obverse'}`} metal={coin.metal} side="obverse" />
         </div>

@@ -69,7 +69,7 @@ function MintageTable({ data, locale }: { data: MintageEntry[]; locale: string }
       </div>
 
       {data.some(d => d.Mintmark && d.Mintmark !== 'None') && (
-        <div className="flex items-start gap-2 bg-amber-900/20 border border-amber-700/30 rounded-lg px-3 py-2 mb-3 text-[11px] text-amber-300/90">
+        <div className="flex items-start gap-2 bg-amber-400 border border-amber-500 rounded-lg px-3 py-2 mb-3 text-[11px] text-amber-950 font-medium">
           <span className="text-base leading-none mt-0.5">⚠️</span>
           <span>
             {isAr
