@@ -179,10 +179,10 @@ function MintageTable({ data, locale }: { data: MintageEntry[]; locale: string }
 function RarityBar({ coin, locale }: { coin: Coin; locale: string }) {
   const isAr = locale === 'ar';
   const mints = ALL_COINS
-    .map(c => parseInt((c as Record<string,string>).mint || '0', 10))
+    .map(c => parseInt((c as unknown as Record<string,string>).mint || '0', 10))
     .filter(n => n > 0)
     .sort((a, b) => a - b);
-  const coinMint = parseInt((coin as Record<string,string>).mint || '0', 10);
+  const coinMint = parseInt((coin as unknown as Record<string,string>).mint || '0', 10);
   if (!coinMint || mints.length === 0) return null;
 
   const rank = mints.filter(m => m <= coinMint).length;
