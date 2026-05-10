@@ -689,9 +689,7 @@ export const RARITY_AR: Record<string, string> = {
   Common: 'شائع', Uncommon: 'غير شائع', Scarce: 'نادر نسبياً', Rare: 'نادر',
 };
 
-export const RARITY_AR: Record<string, string> = {
-  Common: 'شائع', Uncommon: 'غير شائع', Scarce: 'نادر نسبياً', Rare: 'نادر',
-};
+
 
 
 export const DISC_GRADIENTS: Record<string, string> = {
