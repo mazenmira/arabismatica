@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Camera, Grid3X3, List, X } from 'lucide-react';
@@ -15,6 +15,19 @@ import COINS_DATA from '@/data/coins.json';
 const COINS = COINS_DATA as unknown as Coin[];
 
 const PER_PAGE = 60;
+
+const DYNASTY_PILLS = [
+  { key: 'ottoman',   label_ar: 'العثمانيون',           label_en: 'Ottoman',         match: ['الدولة العثمانية', 'Ottoman'] },
+  { key: 'muhali',    label_ar: 'أسرة محمد علي',        label_en: 'Muhammad Ali',    match: ['محمد علي', 'Muhammad Ali', 'أسرة'] },
+  { key: 'sultanate', label_ar: 'السلطنة المصرية',      label_en: 'Sultanate',       match: ['السلطنة'] },
+  { key: 'kingdom',   label_ar: 'المملكة المصرية',      label_en: 'Kingdom',         match: ['المملكة'] },
+  { key: 'republic',  label_ar: 'الجمهورية',            label_en: 'Republic',        match: ['الجمهورية', 'Republic'] },
+  { key: 'saudi',     label_ar: 'المملكة العربية',      label_en: 'Saudi',           match: ['سعودية', 'Saudi', 'Hejaz', 'الحجاز'] },
+  { key: 'gulf',      label_ar: 'دول الخليج',           label_en: 'Gulf States',     match: ['الإمارات', 'قطر', 'الكويت', 'عُمان', 'UAE', 'Qatar', 'Kuwait', 'Oman'] },
+  { key: 'maghreb',   label_ar: 'المغرب العربي',        label_en: 'Maghreb',         match: ['المغرب', 'الجزائر', 'تونس', 'ليبيا', 'Morocco', 'Algeria', 'Tunisia', 'Libya'] },
+];
+
+
 
 const METAL_OPTIONS = [
   'Gold','Silver','Copper','Bronze','Cupro-Nickel',
@@ -59,8 +72,38 @@ export default function CataloguePage({ locale }: { locale: string }) {
   const [page, setPage] = useState(1);
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
+  const [dynasty, setDynasty]         = useState('');
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const autocompleteRef = useRef<HTMLDivElement>(null);
   // filtersOpen panel reserved for future use
   const searchRef = useRef<HTMLInputElement>(null);
+
+  // Close autocomplete on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (autocompleteRef.current && !autocompleteRef.current.contains(e.target as Node))
+        setShowAutocomplete(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const suggestions = useMemo(() => {
+    if (!filters.query || filters.query.length < 2) return [];
+    const q = filters.query.toLowerCase();
+    const seen = new Set<string>();
+    return COINS.reduce<string[]>((acc, c) => {
+      const name = c.name;
+      const nar  = c.nar || '';
+      for (const candidate of [name, nar]) {
+        if (candidate.toLowerCase().includes(q) && !seen.has(candidate)) {
+          seen.add(candidate);
+          acc.push(candidate);
+        }
+      }
+      return acc;
+    }, []).slice(0, 8);
+  }, [filters.query]);
 
   const updateFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -78,8 +121,14 @@ export default function CataloguePage({ locale }: { locale: string }) {
     if (filters.type === 'Circulation') result = result.filter(c => c.type === 'Circulation');
     if (filters.type === 'Commemorative') result = result.filter(c => c.type === 'Commemorative');
     if (filters.type === 'has-mint') result = result.filter(c => Boolean(c.mint));
+    if (dynasty) {
+      const pill = DYNASTY_PILLS.find(p => p.key === dynasty);
+      if (pill) result = result.filter(c =>
+        pill.match.some(m => c.dyn?.includes(m) || c.co?.includes(m) || c.co_ar?.includes(m))
+      );
+    }
     return result;
-  }, [filters]);
+  }, [filters, dynasty]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
@@ -87,7 +136,7 @@ export default function CataloguePage({ locale }: { locale: string }) {
   const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query;
 
   const clearFilters = () => {
-    setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 1500, yearTo: 2026 });
+    setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 1500, yearTo: 2026 }); setDynasty('');
     setPage(1);
   };
 
@@ -151,8 +200,10 @@ export default function CataloguePage({ locale }: { locale: string }) {
                 dir={isAr ? 'rtl' : 'ltr'}
                 placeholder={t('search.placeholder')}
                 value={filters.query}
-                onChange={e => updateFilter('query', e.target.value)}
+                onChange={e => { updateFilter('query', e.target.value); setShowAutocomplete(true); }}
+                onFocus={() => setShowAutocomplete(true)}
                 className="flex-1 py-3.5 text-[14px] bg-transparent text-ink placeholder:text-ink/30 outline-none font-cairo"
+                autoComplete="off"
               />
               {filters.query && (
                 <button onClick={() => updateFilter('query', '')} className="mx-2 text-ink/30 hover:text-ink/60">
@@ -167,6 +218,30 @@ export default function CataloguePage({ locale }: { locale: string }) {
                 <span className="hidden sm:block">{isAr ? 'تحديد' : 'Identify'}</span>
               </button>
             </div>
+          {/* Autocomplete dropdown */}
+          {showAutocomplete && suggestions.length > 0 && (
+            <div
+              ref={autocompleteRef}
+              className="max-w-2xl mx-auto mt-1 bg-parch-cream rounded-xl border border-gold-700/30 shadow-2xl overflow-hidden z-50 relative"
+            >
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => {
+                    updateFilter('query', s);
+                    setShowAutocomplete(false);
+                    searchRef.current?.blur();
+                  }}
+                  className="w-full text-right px-4 py-2.5 text-[13px] text-ink/80 hover:bg-gold-500/10 border-b border-gold-700/10 last:border-0 transition-colors font-cairo flex items-center gap-2"
+                  dir={isAr ? 'rtl' : 'ltr'}
+                >
+                  <span className="text-gold-500/50 text-[10px]">🔍</span>
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
           </motion.div>
         </div>
 
@@ -198,6 +273,37 @@ export default function CataloguePage({ locale }: { locale: string }) {
                 </button>
               );
             })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── DYNASTY PILLS ── */}
+      <div className="bg-parch-dark/40 border-b border-gold-700/15 overflow-x-auto">
+        <div className="max-w-[1440px] mx-auto px-4">
+          <div className="flex items-center gap-1.5 py-2 min-w-max">
+            <span className="text-[9px] text-ink/30 uppercase tracking-wider shrink-0 ml-1">
+              {isAr ? 'الحقبة:' : 'Era:'}
+            </span>
+            {DYNASTY_PILLS.map(pill => (
+              <button
+                key={pill.key}
+                onClick={() => { setDynasty(dynasty === pill.key ? '' : pill.key); setPage(1); }}
+                className={`text-[11px] px-3 py-1 rounded-full border transition-colors shrink-0 font-medium
+                  ${dynasty === pill.key
+                    ? 'bg-gold-600 border-gold-600 text-ink'
+                    : 'border-gold-700/25 text-ink/50 hover:border-gold-500/50 hover:text-ink/75 hover:bg-gold-500/8'}`}
+              >
+                {isAr ? pill.label_ar : pill.label_en}
+              </button>
+            ))}
+            {dynasty && (
+              <button
+                onClick={() => { setDynasty(''); setPage(1); }}
+                className="text-[10px] text-gold-600 hover:text-gold-400 px-2 py-1 transition-colors"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
       </div>

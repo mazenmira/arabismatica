@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, ExternalLink, ZoomIn } from 'lucide-react';
+import { X, ExternalLink, ZoomIn, Copy, Share2, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Coin, MintageEntry } from '@/types/coin';
+import COINS_RAW from '@/data/coins.json';
+import { RARITY_AR } from '@/lib/coins';
+const ALL_COINS = COINS_RAW as unknown as Coin[];
 import {
   getDiscGradient,
   getMetalSymbol,
@@ -20,22 +23,17 @@ type CoinWithVarieties = Coin & { mintageData?: MintageEntry[] };
 // ─── Rarity badge ─────────────────────────────────────────────────────────────
 
 const RARITY_STYLES: Record<string, string> = {
-  Common:   'bg-emerald-600 text-white border-emerald-700',
-  Uncommon: 'bg-sky-600     text-white border-sky-700',
-  Scarce:   'bg-amber-500   text-amber-950 border-amber-600',
-  Rare:     'bg-red-600     text-white border-red-700',
+  Common:   'bg-emerald-900/40 text-emerald-300 border-emerald-700/40',
+  Uncommon: 'bg-sky-900/40    text-sky-300    border-sky-700/40',
+  Scarce:   'bg-amber-900/40  text-amber-300  border-amber-700/40',
+  Rare:     'bg-red-900/40    text-red-300    border-red-700/40',
 };
 
-const RARITY_AR: Record<string, string> = {
-  Common: 'شائع', Uncommon: 'غير شائع', Scarce: 'نادر نسبياً', Rare: 'نادر',
-};
-
-function RarityBadge({ rarity, locale }: { rarity: string | null; locale?: string }) {
+function RarityBadge({ rarity }: { rarity: string | null }) {
   if (!rarity) return null;
-  const label = locale === 'ar' ? (RARITY_AR[rarity] ?? rarity) : rarity;
   return (
     <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${RARITY_STYLES[rarity] ?? 'bg-parch-dark text-ink/50 border-gold-700/20'}`}>
-      {label}
+      {rarity}
     </span>
   );
 }
@@ -147,7 +145,7 @@ function MintageTable({ data, locale }: { data: MintageEntry[]; locale: string }
                     )}
                   </td>
                   <td className="px-3 py-2.5 text-center">
-                    <RarityBadge rarity={entry.Rarity} locale={locale} />
+                    <RarityBadge rarity={entry.Rarity} />
                   </td>
                   <td className="px-3 py-2.5 text-start hidden sm:table-cell">
                     {entry.Note && (
@@ -172,6 +170,119 @@ function MintageTable({ data, locale }: { data: MintageEntry[]; locale: string }
           </span>
         </div>
       )}
+    </div>
+  );
+}
+
+
+// ─── Rarity Bar ───────────────────────────────────────────────────────────────
+
+function RarityBar({ coin, locale }: { coin: Coin; locale: string }) {
+  const isAr = locale === 'ar';
+  const mints = ALL_COINS
+    .map(c => parseInt((c as Record<string,string>).mint || '0', 10))
+    .filter(n => n > 0)
+    .sort((a, b) => a - b);
+  const coinMint = parseInt((coin as Record<string,string>).mint || '0', 10);
+  if (!coinMint || mints.length === 0) return null;
+
+  const rank = mints.filter(m => m <= coinMint).length;
+  const pct  = Math.round((rank / mints.length) * 100);
+  // Invert: low mintage = rare = high on scale
+  const rarityPct = 100 - pct;
+
+  const label =
+    rarityPct >= 80 ? (isAr ? 'نادر جداً'    : 'Very Rare')  :
+    rarityPct >= 60 ? (isAr ? 'نادر'          : 'Rare')       :
+    rarityPct >= 40 ? (isAr ? 'غير شائع'      : 'Scarce')     :
+    rarityPct >= 20 ? (isAr ? 'شائع نسبياً'   : 'Uncommon')   :
+                      (isAr ? 'شائع'           : 'Common');
+
+  const color =
+    rarityPct >= 80 ? '#ef4444' :
+    rarityPct >= 60 ? '#f97316' :
+    rarityPct >= 40 ? '#eab308' :
+    rarityPct >= 20 ? '#22d3ee' : '#22c55e';
+
+  return (
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[9px] text-ink/40 uppercase tracking-wider">
+          {isAr ? 'مستوى الندرة' : 'Rarity Index'}
+        </span>
+        <span className="text-[11px] font-semibold" style={{ color }}>{label}</span>
+      </div>
+      <div className="h-2 rounded-full bg-parch-dark overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-700"
+          style={{ width: `${rarityPct}%`, background: `linear-gradient(90deg, #22c55e, #eab308, #ef4444)` }}
+        />
+      </div>
+      <div className="flex justify-between mt-0.5">
+        <span className="text-[8px] text-ink/25">{isAr ? 'شائع' : 'Common'}</span>
+        <span className="text-[8px] text-ink/25">{isAr ? 'نادر' : 'Rare'}</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Copy + Share bar ─────────────────────────────────────────────────────────
+
+function ActionBar({ coin, locale }: { coin: Coin; locale: string }) {
+  const isAr = locale === 'ar';
+  const [copied, setCopied]     = useState<string | null>(null);
+  const [shared, setShared]     = useState(false);
+
+  const copy = (text: string, key: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(key);
+      setTimeout(() => setCopied(null), 1800);
+    });
+  };
+
+  const shareLink = () => {
+    const url = `${window.location.origin}${window.location.pathname}?coin=${coin.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setShared(true);
+      setTimeout(() => setShared(false), 1800);
+    });
+  };
+
+  return (
+    <div className="flex items-center gap-2 flex-wrap mb-4 pb-4 border-b border-gold-700/15">
+      {/* Copy KM# */}
+      {coin.km && (
+        <button
+          onClick={() => copy(coin.km, 'km')}
+          className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border border-gold-700/25 text-ink/50 hover:border-gold-500/60 hover:text-ink/80 transition-colors"
+        >
+          {copied === 'km'
+            ? <><Check size={11} className="text-emerald-500" /> {isAr ? 'تم النسخ' : 'Copied!'}</>
+            : <><Copy size={11} /> {coin.km}</>}
+        </button>
+      )}
+
+      {/* Copy N# */}
+      {coin.nref && (
+        <button
+          onClick={() => copy(coin.nref, 'nref')}
+          className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border border-gold-700/25 text-ink/50 hover:border-gold-500/60 hover:text-ink/80 transition-colors"
+        >
+          {copied === 'nref'
+            ? <><Check size={11} className="text-emerald-500" /> {isAr ? 'تم النسخ' : 'Copied!'}</>
+            : <><Copy size={11} /> {coin.nref}</>}
+        </button>
+      )}
+
+      {/* Share link */}
+      <button
+        onClick={shareLink}
+        className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border border-gold-700/25 text-ink/50 hover:border-gold-500/60 hover:text-ink/80 transition-colors"
+      >
+        {shared
+          ? <><Check size={11} className="text-emerald-500" /> {isAr ? 'تم نسخ الرابط' : 'Link copied!'}</>
+          : <><Share2 size={11} /> {isAr ? 'مشاركة' : 'Share'}</>}
+      </button>
     </div>
   );
 }
@@ -375,6 +486,12 @@ export default function CoinModal({
               </div>
               <div className="text-[12px] text-gold-600 font-medium mt-1">{coin.dyn} · {yearRangeLabel}</div>
             </div>
+
+            {/* Action bar — copy refs + share */}
+            <ActionBar coin={coin} locale={locale} />
+
+            {/* Rarity bar */}
+            <RarityBar coin={coin} locale={locale} />
 
             {/* Mintage table or legacy */}
             {mintageData.length > 0 ? (
