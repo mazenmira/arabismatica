@@ -6,7 +6,6 @@ import { X, ExternalLink, ZoomIn, Copy, Share2, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Coin, MintageEntry } from '@/types/coin';
 import COINS_RAW from '@/data/coins.json';
-import { RARITY_AR } from '@/lib/coins';
 const ALL_COINS = COINS_RAW as unknown as Coin[];
 import {
   getDiscGradient,
