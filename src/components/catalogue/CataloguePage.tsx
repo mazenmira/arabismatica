@@ -128,7 +128,7 @@ export default function CataloguePage({ locale }: { locale: string }) {
     }, []).slice(0, 8);
   }, [filters.query]);
 
-  const updateFilter = useCallback(<K extends keyof FilterState,>(key: K, value: FilterState[K]) => {
+  const updateFilter = useCallback((key: string, value: string | number) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     setPage(1);
   }, []);
