@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, ExternalLink, ZoomIn, Copy, Share2, Check } from 'lucide-react';
+import { X, ExternalLink, ZoomIn } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Coin, MintageEntry } from '@/types/coin';
-import COINS_RAW from '@/data/coins.json';
-const ALL_COINS = COINS_RAW as unknown as Coin[];
 import {
   getDiscGradient,
   getMetalSymbol,
@@ -18,6 +16,22 @@ import {
 } from '@/lib/coins';
 
 type CoinWithVarieties = Coin & { mintageData?: MintageEntry[] };
+
+// ─── Print styles injected as <style> in modal ───────────────────────────────
+const PRINT_CSS = `
+@media print {
+  body > *:not(#coin-print-root) { display: none !important; }
+  #coin-print-root {
+    display: block !important;
+    position: fixed; inset: 0; background: white; z-index: 9999;
+    padding: 24px; font-family: 'Amiri', serif; direction: rtl;
+  }
+  .no-print { display: none !important; }
+  .print-card { display: block !important; }
+}
+`;
+
+
 
 // ─── Rarity badge ─────────────────────────────────────────────────────────────
 
@@ -173,119 +187,6 @@ function MintageTable({ data, locale }: { data: MintageEntry[]; locale: string }
   );
 }
 
-
-// ─── Rarity Bar ───────────────────────────────────────────────────────────────
-
-function RarityBar({ coin, locale }: { coin: Coin; locale: string }) {
-  const isAr = locale === 'ar';
-  const mints = ALL_COINS
-    .map(c => parseInt((c as unknown as Record<string,string>).mint || '0', 10))
-    .filter(n => n > 0)
-    .sort((a, b) => a - b);
-  const coinMint = parseInt((coin as unknown as Record<string,string>).mint || '0', 10);
-  if (!coinMint || mints.length === 0) return null;
-
-  const rank = mints.filter(m => m <= coinMint).length;
-  const pct  = Math.round((rank / mints.length) * 100);
-  // Invert: low mintage = rare = high on scale
-  const rarityPct = 100 - pct;
-
-  const label =
-    rarityPct >= 80 ? (isAr ? 'نادر جداً'    : 'Very Rare')  :
-    rarityPct >= 60 ? (isAr ? 'نادر'          : 'Rare')       :
-    rarityPct >= 40 ? (isAr ? 'غير شائع'      : 'Scarce')     :
-    rarityPct >= 20 ? (isAr ? 'شائع نسبياً'   : 'Uncommon')   :
-                      (isAr ? 'شائع'           : 'Common');
-
-  const color =
-    rarityPct >= 80 ? '#ef4444' :
-    rarityPct >= 60 ? '#f97316' :
-    rarityPct >= 40 ? '#eab308' :
-    rarityPct >= 20 ? '#22d3ee' : '#22c55e';
-
-  return (
-    <div className="mb-4">
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[9px] text-ink/40 uppercase tracking-wider">
-          {isAr ? 'مستوى الندرة' : 'Rarity Index'}
-        </span>
-        <span className="text-[11px] font-semibold" style={{ color }}>{label}</span>
-      </div>
-      <div className="h-2 rounded-full bg-parch-dark overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-700"
-          style={{ width: `${rarityPct}%`, background: `linear-gradient(90deg, #22c55e, #eab308, #ef4444)` }}
-        />
-      </div>
-      <div className="flex justify-between mt-0.5">
-        <span className="text-[8px] text-ink/25">{isAr ? 'شائع' : 'Common'}</span>
-        <span className="text-[8px] text-ink/25">{isAr ? 'نادر' : 'Rare'}</span>
-      </div>
-    </div>
-  );
-}
-
-// ─── Copy + Share bar ─────────────────────────────────────────────────────────
-
-function ActionBar({ coin, locale }: { coin: Coin; locale: string }) {
-  const isAr = locale === 'ar';
-  const [copied, setCopied]     = useState<string | null>(null);
-  const [shared, setShared]     = useState(false);
-
-  const copy = (text: string, key: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(key);
-      setTimeout(() => setCopied(null), 1800);
-    });
-  };
-
-  const shareLink = () => {
-    const url = `${window.location.origin}${window.location.pathname}?coin=${coin.id}`;
-    navigator.clipboard.writeText(url).then(() => {
-      setShared(true);
-      setTimeout(() => setShared(false), 1800);
-    });
-  };
-
-  return (
-    <div className="flex items-center gap-2 flex-wrap mb-4 pb-4 border-b border-gold-700/15">
-      {/* Copy KM# */}
-      {coin.km && (
-        <button
-          onClick={() => copy(coin.km, 'km')}
-          className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border border-gold-700/25 text-ink/50 hover:border-gold-500/60 hover:text-ink/80 transition-colors"
-        >
-          {copied === 'km'
-            ? <><Check size={11} className="text-emerald-500" /> {isAr ? 'تم النسخ' : 'Copied!'}</>
-            : <><Copy size={11} /> {coin.km}</>}
-        </button>
-      )}
-
-      {/* Copy N# */}
-      {coin.nref && (
-        <button
-          onClick={() => copy(coin.nref, 'nref')}
-          className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border border-gold-700/25 text-ink/50 hover:border-gold-500/60 hover:text-ink/80 transition-colors"
-        >
-          {copied === 'nref'
-            ? <><Check size={11} className="text-emerald-500" /> {isAr ? 'تم النسخ' : 'Copied!'}</>
-            : <><Copy size={11} /> {coin.nref}</>}
-        </button>
-      )}
-
-      {/* Share link */}
-      <button
-        onClick={shareLink}
-        className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border border-gold-700/25 text-ink/50 hover:border-gold-500/60 hover:text-ink/80 transition-colors"
-      >
-        {shared
-          ? <><Check size={11} className="text-emerald-500" /> {isAr ? 'تم نسخ الرابط' : 'Link copied!'}</>
-          : <><Share2 size={11} /> {isAr ? 'مشاركة' : 'Share'}</>}
-      </button>
-    </div>
-  );
-}
-
 // ─── Lightbox ─────────────────────────────────────────────────────────────────
 
 interface LightboxProps {
@@ -416,6 +317,7 @@ export default function CoinModal({
 
   return (
     <>
+      <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
       <motion.div
         className="fixed inset-0 z-[150]"
         style={{ background: 'rgba(22,16,10,.82)', backdropFilter: 'blur(4px)' }}
@@ -454,8 +356,8 @@ export default function CoinModal({
                       {isValidImageUrl(src) ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={src} alt={`${coinName} — ${t(side)}`}
-                          className="w-[130px] h-[130px] rounded-full object-cover transition-all duration-200 group-hover:scale-105 group-hover:shadow-2xl"
-                          style={{ border: '3px solid #F0E8D4', outline: '2px solid #8B6D2E', boxShadow: '0 4px 20px rgba(80,50,10,.18)' }} />
+                          className="w-[130px] h-[130px] rounded-full object-cover transition-all duration-300 group-hover:scale-110 group-hover:shadow-2xl group-hover:rounded-none group-hover:w-[200px] group-hover:h-[200px] group-hover:z-30 group-hover:relative"
+                          style={{ border: '3px solid #F0E8D4', outline: '2px solid #8B6D2E', boxShadow: '0 4px 20px rgba(80,50,10,.18)', transformOrigin: 'center' }} />
                       ) : (
                         <div className="w-[130px] h-[130px] rounded-full flex items-center justify-center font-amiri font-bold text-3xl text-ink"
                           style={{ background: getDiscGradient(coin.metal), border: '3px solid #F0E8D4', outline: '2px solid #8B6D2E' }}>
@@ -485,12 +387,6 @@ export default function CoinModal({
               </div>
               <div className="text-[12px] text-gold-600 font-medium mt-1">{coin.dyn} · {yearRangeLabel}</div>
             </div>
-
-            {/* Action bar — copy refs + share */}
-            <ActionBar coin={coin} locale={locale} />
-
-            {/* Rarity bar */}
-            <RarityBar coin={coin} locale={locale} />
 
             {/* Mintage table or legacy */}
             {mintageData.length > 0 ? (

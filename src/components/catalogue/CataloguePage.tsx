@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { Camera, Grid3X3, List, X } from 'lucide-react';
+import { Camera, Grid3X3, List, X, ArrowUpDown, Printer, CalendarDays } from 'lucide-react';
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
 import type { Coin, FilterState } from '@/types/coin';
@@ -29,6 +29,18 @@ const DYNASTY_PILLS = [
 
 
 
+
+const DYNASTY_HISTORY: Record<string, { ar: string; en: string }> = {
+  ottoman:   { ar: 'حكمت الدولة العثمانية مصر والعالم العربي من 1517 حتى 1798م. ضربت عملاتها في دور الضرب بالقسطنطينية ومصر وتتميز بالخط العربي والطغراء.', en: 'The Ottoman Empire ruled Egypt and much of the Arab world from 1517–1798. Their coins bear Arabic calligraphy and the Sultan's tughra monogram.' },
+  muhali:    { ar: 'أسس محمد علي باشا أسرة حاكمة في مصر (1805–1914) حدّثت نظام العملة وأدخلت المليم والقرش الحديثين.', en: 'Muhammad Ali Pasha founded a dynasty (1805–1914) that modernized Egypt's coinage, introducing the modern millieme and piastre system.' },
+  sultanate: { ar: 'السلطنة المصرية (1914–1922): أُعلنت في خضم الحرب العالمية الأولى تحت الحماية البريطانية. حكمها السلطان حسين كامل ثم فؤاد الأول.', en: 'The Egyptian Sultanate (1914–1922) was declared during WWI under British protectorate. Sultans Hussein Kamel and Fuad I issued distinctive cupro-nickel coins.' },
+  kingdom:   { ar: 'المملكة المصرية (1922–1953): أُعلنت الاستقلال الرسمي وحكمها الملك فؤاد الأول ثم فاروق الأول. تتميز عملاتها بصورة الملك وشعار المملكة.', en: 'The Kingdom of Egypt (1922–1953) saw formal independence. Kings Fuad I and Farouk I issued silver and cupro-nickel coins bearing royal portraits.' },
+  republic:  { ar: 'الجمهورية المصرية (1953–حتى الآن): أصدرت عملات تذكارية كثيرة تعكس إنجازات مصر من السد العالي إلى المتحف المصري الكبير.', en: 'The Egyptian Republic (1953–present) issued commemorative coins marking milestones like the Aswan Dam, Suez Canal, and the Grand Egyptian Museum.' },
+  saudi:     { ar: 'المملكة العربية السعودية والحجاز: امتدت عملات المنطقة من ريالات الحجاز العثمانية إلى الهللة السعودية الحديثة. موطن أقدس البقاع الإسلامية.', en: 'From Ottoman Hejaz riyals to modern Saudi halalas, this region's coinage reflects its role as the heartland of Islam and the Arabian Peninsula.' },
+  gulf:      { ar: 'دول الخليج العربي: بدأت إصدار عملاتها المستقلة في الستينيات والسبعينيات مع الاستقلال. تتميز بصور الحكام وثروة النفط وبعض أندر العملات العربية.', en: 'Gulf states began independent coinage in the 1960s–70s. Their coins feature ruling sheikhs, oil wealth symbols, and include some of the rarest Arab issues.' },
+  maghreb:   { ar: 'المغرب العربي: امتدت عملاته من الدراهم المرينية إلى الفرنك الاستعماري الفرنسي والعملات الوطنية الحديثة. تجمع بين الموروث الإسلامي والتأثير الأوروبي.', en: 'North African coinage spans Marinid dirhams, French colonial francs, and modern national issues—a blend of Islamic tradition and European influence.' },
+};
+
 const METAL_OPTIONS = [
   'Gold','Silver','Copper','Bronze','Cupro-Nickel',
   'Bimetallic','Aluminium','Billon','Brass','Nickel','Steel',
@@ -43,6 +55,13 @@ const ERA_OPTIONS = [
   { value: '1971-2000', label_ar: '١٩٧١–٢٠٠٠', label_en: '1971–2000' },
   { value: '2001-2026', label_ar: '٢٠٠١–٢٠٢٦', label_en: '2001–2026' },
 ];
+
+
+function getCoinOfDay(coins: Coin[]): Coin {
+  const today = new Date();
+  const seed  = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  return coins[seed % coins.length];
+}
 
 function fuseSearch(coins: Coin[], query: string): Coin[] {
   if (!query.trim()) return coins;
@@ -74,6 +93,9 @@ export default function CataloguePage({ locale }: { locale: string }) {
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [dynasty, setDynasty]         = useState('');
   const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [sortBy, setSortBy]             = useState('default');
+  const [yearFrom, setYearFrom]         = useState('');
+  const [yearTo,   setYearTo]           = useState('');
   const autocompleteRef = useRef<HTMLDivElement>(null);
   // filtersOpen panel reserved for future use
   const searchRef = useRef<HTMLInputElement>(null);
@@ -127,16 +149,27 @@ export default function CataloguePage({ locale }: { locale: string }) {
         pill.match.some(m => c.dyn?.includes(m) || c.co?.includes(m) || c.co_ar?.includes(m))
       );
     }
+    // Year range inputs
+    if (yearFrom) result = result.filter(c => parseInt(c.yce || '0') >= parseInt(yearFrom));
+    if (yearTo)   result = result.filter(c => parseInt(c.yce || '0') <= parseInt(yearTo));
+
+    // Sort
+    if (sortBy === 'oldest')   result = [...result].sort((a, b) => parseInt(a.yce||'9999') - parseInt(b.yce||'9999'));
+    if (sortBy === 'newest')   result = [...result].sort((a, b) => parseInt(b.yce||'0')    - parseInt(a.yce||'0'));
+    if (sortBy === 'rarest')   result = [...result].sort((a, b) => parseInt(a.mint||'999999999') - parseInt(b.mint||'999999999'));
+    if (sortBy === 'common')   result = [...result].sort((a, b) => parseInt(b.mint||'0')   - parseInt(a.mint||'0'));
+    if (sortBy === 'az')       result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+
     return result;
-  }, [filters, dynasty]);
+  }, [filters, dynasty, yearFrom, yearTo, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query;
+  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom || yearTo || sortBy !== 'default';
 
   const clearFilters = () => {
-    setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 1500, yearTo: 2026 }); setDynasty('');
+    setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 1500, yearTo: 2026 }); setDynasty(''); setYearFrom(''); setYearTo(''); setSortBy('default');
     setPage(1);
   };
 
@@ -249,6 +282,44 @@ export default function CataloguePage({ locale }: { locale: string }) {
         <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, #8B6D2E, transparent)' }} />
       </section>
 
+
+      {/* ── COIN OF THE DAY ── */}
+      {(() => {
+        const cotd = getCoinOfDay(COINS);
+        return (
+          <div className="bg-gradient-to-r from-ink via-[#1e1206] to-ink border-b border-gold-700/30">
+            <div className="max-w-[1440px] mx-auto px-4 py-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2 shrink-0">
+                  <CalendarDays size={14} className="text-gold-500" />
+                  <span className="text-[10px] text-gold-500/70 uppercase tracking-widest font-medium">
+                    {isAr ? 'عملة اليوم' : 'Coin of the Day'}
+                  </span>
+                </div>
+                {cotd.o && (
+                  <img src={cotd.o} alt="" className="w-8 h-8 rounded-full object-cover border border-gold-700/40" />
+                )}
+                <button
+                  onClick={() => setSelectedCoin(cotd)}
+                  className="font-amiri text-gold-300 hover:text-gold-100 text-[14px] transition-colors text-right"
+                >
+                  {isAr ? (cotd.nar || cotd.name) : cotd.name}
+                </button>
+                <span className="text-[11px] text-gold-600/50 hidden sm:block">
+                  {cotd.yce ? `${cotd.yce} م` : ''} · {isAr ? cotd.co_ar : cotd.co}
+                </span>
+                <button
+                  onClick={() => setSelectedCoin(cotd)}
+                  className="mr-auto text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 rounded-full px-3 py-1 transition-colors shrink-0"
+                >
+                  {isAr ? 'عرض التفاصيل ←' : 'View details →'}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ── COUNTRY TABS ── */}
       <div className="bg-parch-dark/60 border-b border-gold-700/20 overflow-x-auto">
         <div className="max-w-[1440px] mx-auto px-4">
@@ -308,6 +379,18 @@ export default function CataloguePage({ locale }: { locale: string }) {
         </div>
       </div>
 
+
+      {/* ── DYNASTY HISTORY PANEL ── */}
+      {dynasty && DYNASTY_HISTORY[dynasty] && (
+        <div className="bg-gold-950/30 border-b border-gold-700/20">
+          <div className="max-w-[1440px] mx-auto px-4 py-3">
+            <p className="text-[12px] text-gold-300/80 leading-relaxed font-amiri" dir={isAr ? 'rtl' : 'ltr'}>
+              📜 {isAr ? DYNASTY_HISTORY[dynasty].ar : DYNASTY_HISTORY[dynasty].en}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* ── CONTROLS BAR ── */}
       <div className="bg-parch sticky top-[103px] z-30 border-b border-gold-700/15 shadow-sm">
         <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-3 flex-wrap">
@@ -345,6 +428,39 @@ export default function CataloguePage({ locale }: { locale: string }) {
                : '📊 ' + t('filters.withMintage')}
             </button>
           ))}
+
+          {/* Year range */}
+          <div className="flex items-center gap-1">
+            <input
+              type="number" placeholder={isAr ? 'من' : 'From'}
+              value={yearFrom}
+              onChange={e => { setYearFrom(e.target.value); setPage(1); }}
+              className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500"
+              min="1500" max="2026"
+            />
+            <span className="text-ink/30 text-[11px]">—</span>
+            <input
+              type="number" placeholder={isAr ? 'إلى' : 'To'}
+              value={yearTo}
+              onChange={e => { setYearTo(e.target.value); setPage(1); }}
+              className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500"
+              min="1500" max="2026"
+            />
+          </div>
+
+          {/* Sort */}
+          <select
+            value={sortBy}
+            onChange={e => { setSortBy(e.target.value); setPage(1); }}
+            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer"
+          >
+            <option value="default">{isAr ? 'ترتيب افتراضي' : 'Default'}</option>
+            <option value="oldest">{isAr  ? 'الأقدم أولاً'  : 'Oldest first'}</option>
+            <option value="newest">{isAr  ? 'الأحدث أولاً'  : 'Newest first'}</option>
+            <option value="rarest">{isAr  ? 'الأندر أولاً'  : 'Rarest first'}</option>
+            <option value="common">{isAr  ? 'الأكثر شيوعاً' : 'Most common'}</option>
+            <option value="az">{isAr     ? 'أبجدي'          : 'A → Z'}</option>
+          </select>
 
           {/* Results count */}
           <span className="text-[11px] text-ink/40 mr-auto">
