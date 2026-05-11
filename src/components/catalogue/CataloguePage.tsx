@@ -1,4 +1,4 @@
-// v2.1
+// v3.0
 'use client';
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
@@ -32,14 +32,14 @@ const DYNASTY_PILLS = [
 
 
 const DYNASTY_HISTORY: Record<string, { ar: string; en: string }> = {
-  ottoman:   { ar: 'حكمت الدولة العثمانية مصر والعالم العربي من 1517 حتى 1798م. ضربت عملاتها في دور الضرب بالقسطنطينية ومصر وتتميز بالخط العربي والطغراء.', en: "The Ottoman Empire ruled Egypt and much of the Arab world from 1517-1798. Their coins bear Arabic calligraphy and the tughra monogram." },
-  muhali:    { ar: 'أسس محمد علي باشا أسرة حاكمة في مصر (1805-1914) حدّثت نظام العملة وأدخلت المليم والقرش الحديثين.', en: "Muhammad Ali Pasha founded a dynasty (1805-1914) that modernized coinage, introducing the modern millieme and piastre system." },
-  sultanate: { ar: 'السلطنة المصرية (1914-1922): أُعلنت في خضم الحرب العالمية الأولى تحت الحماية البريطانية. حكمها السلطان حسين كامل ثم فؤاد الأول.', en: "The Egyptian Sultanate (1914-1922) was declared during WWI under British protectorate. Sultans Hussein Kamel and Fuad I issued distinctive coins." },
-  kingdom:   { ar: 'المملكة المصرية (1922-1953): أُعلنت الاستقلال الرسمي وحكمها الملك فؤاد الأول ثم فاروق الأول. تتميز عملاتها بصورة الملك وشعار المملكة.', en: "The Kingdom of Egypt (1922-1953) saw formal independence. Kings Fuad I and Farouk I issued silver and cupro-nickel coins with royal portraits." },
-  republic:  { ar: 'الجمهورية المصرية (1953 حتى الآن): أصدرت عملات تذكارية كثيرة تعكس إنجازات مصر من السد العالي إلى المتحف المصري الكبير.', en: "The Egyptian Republic (1953-present) issued commemorative coins marking the Aswan Dam, Suez Canal, and the Grand Egyptian Museum." },
-  saudi:     { ar: 'المملكة العربية السعودية والحجاز: امتدت عملات المنطقة من ريالات الحجاز العثمانية إلى الهللة السعودية الحديثة.', en: "From Ottoman Hejaz riyals to modern Saudi halalas, this coinage reflects the heartland of Islam and the Arabian Peninsula." },
-  gulf:      { ar: 'دول الخليج العربي: بدأت إصدار عملاتها المستقلة في الستينيات والسبعينيات. تتميز بصور الحكام وثروة النفط وبعض أندر العملات العربية.', en: "Gulf states began independent coinage in the 1960s-70s, featuring ruling sheikhs and oil wealth symbols, including some of the rarest Arab issues." },
-  maghreb:   { ar: 'المغرب العربي: امتدت عملاته من الدراهم المرينية إلى الفرنك الاستعماري الفرنسي والعملات الوطنية الحديثة.', en: "North African coinage spans Marinid dirhams, French colonial francs, and modern national issues - a blend of Islamic and European influences." },
+  ottoman:   { ar: "حكمت الدولة العثمانية مصر والعالم العربي من 1517 حتى 1798م. ضربت عملاتها في دور الضرب بالقسطنطينية ومصر وتتميز بالخط العربي والطغراء.", en: "The Ottoman Empire ruled Egypt and the Arab world from 1517-1798. Coins bear Arabic calligraphy and the tughra monogram." },
+  muhali:    { ar: "أسس محمد علي باشا أسرة حاكمة في مصر (1805-1914) حدّثت نظام العملة وأدخلت المليم والقرش الحديثين.", en: "Muhammad Ali Pasha founded a dynasty (1805-1914) that modernized coinage, introducing the modern millieme and piastre." },
+  sultanate: { ar: "السلطنة المصرية (1914-1922): أُعلنت تحت الحماية البريطانية. حكمها السلطان حسين كامل ثم فؤاد الأول.", en: "The Egyptian Sultanate (1914-1922) was declared under British protectorate, with Sultans Hussein Kamel and Fuad I." },
+  kingdom:   { ar: "المملكة المصرية (1922-1953): أُعلن الاستقلال الرسمي وحكمها الملك فؤاد الأول ثم فاروق الأول.", en: "The Kingdom of Egypt (1922-1953) gained formal independence. Kings Fuad I and Farouk I issued iconic portrait coins." },
+  republic:  { ar: "الجمهورية المصرية (1953 حتى الآن): أصدرت عملات تذكارية تعكس إنجازات مصر من السد العالي إلى المتحف المصري الكبير.", en: "The Egyptian Republic (1953-present) issued commemorative coins marking major milestones." },
+  saudi:     { ar: "المملكة العربية السعودية والحجاز: امتدت عملات المنطقة من ريالات الحجاز العثمانية إلى الهللة السعودية الحديثة.", en: "From Ottoman Hejaz riyals to modern Saudi halalas, this coinage reflects the heartland of Islam." },
+  gulf:      { ar: "دول الخليج العربي: بدأت إصدار عملاتها المستقلة في الستينيات والسبعينيات. تتميز بصور الحكام وثروة النفط.", en: "Gulf states began independent coinage in the 1960s-70s, featuring ruling sheikhs and oil wealth symbols." },
+  maghreb:   { ar: "المغرب العربي: امتدت عملاته من الدراهم المرينية إلى الفرنك الاستعماري والعملات الوطنية الحديثة.", en: "North African coinage spans Marinid dirhams, French colonial francs, and modern national issues." },
 };
 
 const METAL_OPTIONS = [
@@ -94,9 +94,9 @@ export default function CataloguePage({ locale }: { locale: string }) {
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [dynasty, setDynasty]         = useState('');
   const [showAutocomplete, setShowAutocomplete] = useState(false);
-  const [sortBy, setSortBy]             = useState('default');
-  const [yearFrom, setYearFrom]         = useState('');
-  const [yearTo,   setYearTo]           = useState('');
+  const [sortBy, setSortBy] = useState('default');
+  const [yearFrom, setYearFrom] = useState('');
+  const [yearTo, setYearTo] = useState('');
   const autocompleteRef = useRef<HTMLDivElement>(null);
   // filtersOpen panel reserved for future use
   const searchRef = useRef<HTMLInputElement>(null);
@@ -150,24 +150,20 @@ export default function CataloguePage({ locale }: { locale: string }) {
         pill.match.some(m => c.dyn?.includes(m) || c.co?.includes(m) || c.co_ar?.includes(m))
       );
     }
-    // Year range inputs
     if (yearFrom) result = result.filter(c => parseInt(c.yce || '0') >= parseInt(yearFrom));
     if (yearTo)   result = result.filter(c => parseInt(c.yce || '0') <= parseInt(yearTo));
-
-    // Sort
-    if (sortBy === 'oldest')   result = [...result].sort((a, b) => parseInt(a.yce||'9999') - parseInt(b.yce||'9999'));
-    if (sortBy === 'newest')   result = [...result].sort((a, b) => parseInt(b.yce||'0')    - parseInt(a.yce||'0'));
-    if (sortBy === 'rarest')   result = [...result].sort((a, b) => parseInt(a.mint||'999999999') - parseInt(b.mint||'999999999'));
-    if (sortBy === 'common')   result = [...result].sort((a, b) => parseInt(b.mint||'0')   - parseInt(a.mint||'0'));
-    if (sortBy === 'az')       result = [...result].sort((a, b) => a.name.localeCompare(b.name));
-
+    if (sortBy === 'oldest') result = [...result].sort((a, b) => parseInt(a.yce||'9999') - parseInt(b.yce||'9999'));
+    if (sortBy === 'newest') result = [...result].sort((a, b) => parseInt(b.yce||'0') - parseInt(a.yce||'0'));
+    if (sortBy === 'rarest') result = [...result].sort((a, b) => parseInt(a.mint||'999999999') - parseInt(b.mint||'999999999'));
+    if (sortBy === 'common') result = [...result].sort((a, b) => parseInt(b.mint||'0') - parseInt(a.mint||'0'));
+    if (sortBy === 'az')     result = [...result].sort((a, b) => a.name.localeCompare(b.name));
     return result;
   }, [filters, dynasty, yearFrom, yearTo, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom || yearTo || sortBy !== 'default';
+  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom !== '' || yearTo !== '' || sortBy !== 'default';
 
   const clearFilters = () => {
     setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 1500, yearTo: 2026 }); setDynasty(''); setYearFrom(''); setYearTo(''); setSortBy('default');
@@ -283,8 +279,7 @@ export default function CataloguePage({ locale }: { locale: string }) {
         <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, #8B6D2E, transparent)' }} />
       </section>
 
-
-      {/* ── COIN OF THE DAY ── */}
+      {/* COIN OF THE DAY */}
       {(() => {
         const cotd = getCoinOfDay(COINS);
         return (
@@ -298,22 +293,16 @@ export default function CataloguePage({ locale }: { locale: string }) {
                   </span>
                 </div>
                 {cotd.o && (
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={cotd.o} alt="" className="w-8 h-8 rounded-full object-cover border border-gold-700/40" />
                 )}
-                <button
-                  onClick={() => setSelectedCoin(cotd)}
-                  className="font-amiri text-gold-300 hover:text-gold-100 text-[14px] transition-colors text-right"
-                >
+                <button onClick={() => setSelectedCoin(cotd)} className="font-amiri text-gold-300 hover:text-gold-100 text-[14px] transition-colors">
                   {isAr ? (cotd.nar || cotd.name) : cotd.name}
                 </button>
                 <span className="text-[11px] text-gold-600/50 hidden sm:block">
-                  {cotd.yce ? `${cotd.yce} م` : ''} · {isAr ? cotd.co_ar : cotd.co}
+                  {cotd.yce ? cotd.yce + ' م' : ''} · {isAr ? cotd.co_ar : cotd.co}
                 </span>
-                <button
-                  onClick={() => setSelectedCoin(cotd)}
-                  className="mr-auto text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 rounded-full px-3 py-1 transition-colors shrink-0"
-                >
+                <button onClick={() => setSelectedCoin(cotd)} className="mr-auto text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 rounded-full px-3 py-1 transition-colors shrink-0">
                   {isAr ? 'عرض التفاصيل ←' : 'View details →'}
                 </button>
               </div>
@@ -381,13 +370,12 @@ export default function CataloguePage({ locale }: { locale: string }) {
         </div>
       </div>
 
-
-      {/* ── DYNASTY HISTORY PANEL ── */}
+      {/* DYNASTY HISTORY PANEL */}
       {dynasty && DYNASTY_HISTORY[dynasty] && (
         <div className="bg-gold-950/30 border-b border-gold-700/20">
           <div className="max-w-[1440px] mx-auto px-4 py-3">
             <p className="text-[12px] text-gold-300/80 leading-relaxed font-amiri" dir={isAr ? 'rtl' : 'ltr'}>
-              📜 {isAr ? DYNASTY_HISTORY[dynasty].ar : DYNASTY_HISTORY[dynasty].en}
+              {isAr ? DYNASTY_HISTORY[dynasty].ar : DYNASTY_HISTORY[dynasty].en}
             </p>
           </div>
         </div>
@@ -433,37 +421,26 @@ export default function CataloguePage({ locale }: { locale: string }) {
 
           {/* Year range */}
           <div className="flex items-center gap-1">
-            <input
-              type="number" placeholder={isAr ? 'من' : 'From'}
-              value={yearFrom}
+            <input type="number" placeholder={isAr ? 'من' : 'From'} value={yearFrom}
               onChange={e => { setYearFrom(e.target.value); setPage(1); }}
               className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500"
-              min="1500" max="2026"
-            />
+              min="1500" max="2026" />
             <span className="text-ink/30 text-[11px]">—</span>
-            <input
-              type="number" placeholder={isAr ? 'إلى' : 'To'}
-              value={yearTo}
+            <input type="number" placeholder={isAr ? 'إلى' : 'To'} value={yearTo}
               onChange={e => { setYearTo(e.target.value); setPage(1); }}
               className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500"
-              min="1500" max="2026"
-            />
+              min="1500" max="2026" />
           </div>
-
           {/* Sort */}
-          <select
-            value={sortBy}
-            onChange={e => { setSortBy(e.target.value); setPage(1); }}
-            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer"
-          >
+          <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }}
+            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
             <option value="default">{isAr ? 'ترتيب افتراضي' : 'Default'}</option>
-            <option value="oldest">{isAr  ? 'الأقدم أولاً'  : 'Oldest first'}</option>
-            <option value="newest">{isAr  ? 'الأحدث أولاً'  : 'Newest first'}</option>
-            <option value="rarest">{isAr  ? 'الأندر أولاً'  : 'Rarest first'}</option>
-            <option value="common">{isAr  ? 'الأكثر شيوعاً' : 'Most common'}</option>
-            <option value="az">{isAr     ? 'أبجدي'          : 'A → Z'}</option>
+            <option value="oldest">{isAr ? 'الأقدم أولاً' : 'Oldest first'}</option>
+            <option value="newest">{isAr ? 'الأحدث أولاً' : 'Newest first'}</option>
+            <option value="rarest">{isAr ? 'الأندر أولاً' : 'Rarest first'}</option>
+            <option value="common">{isAr ? 'الأكثر شيوعاً' : 'Most common'}</option>
+            <option value="az">{isAr ? 'أبجدي' : 'A to Z'}</option>
           </select>
-
           {/* Results count */}
           <span className="text-[11px] text-ink/40 mr-auto">
             {filtered.length.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {t('search.results')}
