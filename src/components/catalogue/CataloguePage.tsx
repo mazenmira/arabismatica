@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { Camera, Grid3X3, List, X, ArrowUpDown, Printer, CalendarDays } from 'lucide-react';
+import { Camera, Grid3X3, List, X, CalendarDays } from 'lucide-react';
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
 import type { Coin, FilterState } from '@/types/coin';
@@ -297,6 +297,7 @@ export default function CataloguePage({ locale }: { locale: string }) {
                   </span>
                 </div>
                 {cotd.o && (
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={cotd.o} alt="" className="w-8 h-8 rounded-full object-cover border border-gold-700/40" />
                 )}
                 <button
