@@ -1,10 +1,10 @@
-// v3.0
+// v3.1
 'use client';
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { Camera, Grid3X3, List, X, CalendarDays } from 'lucide-react';
+import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown } from 'lucide-react';
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
 import type { Coin, FilterState } from '@/types/coin';
@@ -100,6 +100,85 @@ export default function CataloguePage({ locale }: { locale: string }) {
   const autocompleteRef = useRef<HTMLDivElement>(null);
   // filtersOpen panel reserved for future use
   const searchRef = useRef<HTMLInputElement>(null);
+  const [showBackTop, setShowBackTop] = useState(false);
+
+  // Back-to-top visibility
+  useEffect(() => {
+    const onScroll = () => setShowBackTop(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // PDF export — builds a print-ready HTML page from filtered results
+  const downloadPDF = () => {
+    const isArLocal = locale === 'ar';
+    const rows = filtered.slice(0, 500).map(c => {
+      const name  = isArLocal ? (c.nar || c.name) : c.name;
+      const year  = c.yce ? c.yce + (isArLocal ? ' م' : ' CE') : '';
+      const mint  = c.mint ? parseInt(c.mint).toLocaleString(isArLocal ? 'ar-EG' : 'en-US') : '—';
+      const flag  = ({ EG:'🇪🇬',SA:'🇸🇦',AE:'🇦🇪',QA:'🇶🇦',IQ:'🇮🇶',JO:'🇯🇴',
+                       LB:'🇱🇧',LY:'🇱🇾',MA:'🇲🇦',OM:'🇴🇲',PS:'🇵🇸',SD:'🇸🇩',
+                       SY:'🇸🇾',DZ:'🇩🇿',TN:'🇹🇳',YE:'🇾🇪',KW:'🇰🇼',MR:'🇲🇷' } as Record<string,string>)[c.cc] ?? '';
+      return `<tr>
+        <td>${flag} ${isArLocal ? c.co_ar : c.co}</td>
+        <td dir="rtl">${name}</td>
+        <td>${c.dyn}</td>
+        <td>${year}</td>
+        <td>${c.metal}</td>
+        <td>${mint}</td>
+        <td>${c.km || '—'}</td>
+      </tr>`;
+    }).join('');
+
+    const title   = isArLocal ? 'نتائج البحث — المقتني العربي' : 'Search Results — The Arab Collector';
+    const headers = isArLocal
+      ? ['الدولة','الاسم','الأسرة','السنة','المعدن','المضروب','KM#']
+      : ['Country','Name','Dynasty','Year','Metal','Mintage','KM#'];
+    const date = new Date().toLocaleDateString(isArLocal ? 'ar-EG' : 'en-AU');
+    const total = filtered.length;
+
+    const html = `<!DOCTYPE html>
+<html dir="${isArLocal ? 'rtl' : 'ltr'}" lang="${locale}">
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Amiri', serif; font-size: 11px; color: #1a0e05; background: #fff; padding: 24px; }
+  h1 { font-size: 20px; color: #8B6D2E; margin-bottom: 4px; }
+  .meta { font-size: 10px; color: #888; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #1a0e05; color: #F0E8D4; padding: 6px 8px; text-align: ${isArLocal ? 'right' : 'left'}; font-size: 10px; }
+  td { padding: 5px 8px; border-bottom: 1px solid #e8dfc8; font-size: 11px; }
+  tr:nth-child(even) { background: #faf6ee; }
+  .footer { margin-top: 16px; font-size: 9px; color: #aaa; text-align: center; }
+  @media print { body { padding: 12px; } }
+</style>
+</head>
+<body>
+<h1>${title}</h1>
+<div class="meta">${date} · ${total} ${isArLocal ? 'عملة' : 'coins'}${total > 500 ? (isArLocal ? ' (أول 500 نتيجة)' : ' (first 500 results)') : ''}</div>
+<table>
+  <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<div class="footer">arabismatica.arabcollector.com · The Arab Collector © ${new Date().getFullYear()}</div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const win  = window.open(url, '_blank');
+    if (win) {
+      win.onload = () => {
+        win.print();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+      };
+    }
+  };
 
   // Close autocomplete on outside click
   useEffect(() => {
@@ -441,10 +520,22 @@ export default function CataloguePage({ locale }: { locale: string }) {
             <option value="common">{isAr ? 'الأكثر شيوعاً' : 'Most common'}</option>
             <option value="az">{isAr ? 'أبجدي' : 'A to Z'}</option>
           </select>
-          {/* Results count */}
-          <span className="text-[11px] text-ink/40 mr-auto">
-            {filtered.length.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {t('search.results')}
-          </span>
+          {/* Results count + PDF download */}
+          <div className="flex items-center gap-2 mr-auto">
+            <span className="text-[11px] text-ink/40">
+              {filtered.length.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {t('search.results')}
+            </span>
+            {filtered.length > 0 && (
+              <button
+                onClick={downloadPDF}
+                title={isAr ? 'تنزيل النتائج كـ PDF' : 'Download results as PDF'}
+                className="flex items-center gap-1 text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 hover:border-gold-500/60 rounded-full px-2.5 py-1 transition-colors"
+              >
+                <FileDown size={11} />
+                <span className="hidden sm:block">{isAr ? 'تنزيل PDF' : 'PDF'}</span>
+              </button>
+            )}
+          </div>
 
           {/* Clear filters */}
           {hasActiveFilters && (
@@ -556,6 +647,24 @@ export default function CataloguePage({ locale }: { locale: string }) {
       <AnimatePresence>
         {selectedCoin && (
           <CoinModal coin={selectedCoin} locale={locale} onClose={() => setSelectedCoin(null)} />
+        )}
+      </AnimatePresence>
+
+      {/* ── BACK TO TOP ── */}
+      <AnimatePresence>
+        {showBackTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            onClick={scrollToTop}
+            className="fixed bottom-6 left-6 z-50 w-11 h-11 rounded-full bg-gold-600 hover:bg-gold-500 text-ink shadow-lg flex items-center justify-center transition-colors"
+            title={locale === 'ar' ? 'العودة للأعلى' : 'Back to top'}
+            aria-label="Back to top"
+          >
+            <ArrowUp size={18} />
+          </motion.button>
         )}
       </AnimatePresence>
     </>
