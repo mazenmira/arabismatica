@@ -21,6 +21,8 @@ interface CoinCardProps {
   locale: string;
   view: 'grid' | 'list';
   onClick: () => void;
+  inCollection?: boolean;
+  onToggleCollection?: (e: React.MouseEvent) => void;
 }
 
 // ─── Year range helper ────────────────────────────────────────────────────────
@@ -78,12 +80,24 @@ function CoinImage({
     return (
       <div className="flex flex-col items-center justify-center h-full gap-0.5">
         <div
-          className="w-[70px] h-[70px] rounded-full flex items-center justify-center font-amiri font-bold text-xl text-ink border-2 border-parch/50"
+          className="w-[70px] h-[70px] rounded-full flex items-center justify-center relative overflow-hidden border-2 border-parch/30"
           style={{ background: getDiscGradient(metal) }}
         >
-          {getMetalSymbol(metal)}
+          {/* Coin silhouette SVG */}
+          <svg viewBox="0 0 70 70" className="absolute inset-0 w-full h-full opacity-20" fill="currentColor">
+            <circle cx="35" cy="35" r="33" stroke="currentColor" strokeWidth="2" fill="none" />
+            <circle cx="35" cy="35" r="26" stroke="currentColor" strokeWidth="1.5" fill="none" />
+            <circle cx="35" cy="35" r="12" fill="currentColor" opacity="0.4" />
+            <path d="M35 16 L37 28 L35 30 L33 28 Z" fill="currentColor" opacity="0.3" />
+            <path d="M35 54 L37 42 L35 40 L33 42 Z" fill="currentColor" opacity="0.3" />
+            <path d="M16 35 L28 33 L30 35 L28 37 Z" fill="currentColor" opacity="0.3" />
+            <path d="M54 35 L42 33 L40 35 L42 37 Z" fill="currentColor" opacity="0.3" />
+          </svg>
+          <span className="text-[9px] text-ink/50 z-10 font-amiri">
+            {side === 'obverse' ? 'و' : 'ظ'}
+          </span>
         </div>
-        <span className="text-[9px] text-ink/40">{sideLabel}</span>
+        <span className="text-[8px] text-ink/30">{sideLabel}</span>
       </div>
     );
   }
@@ -108,7 +122,7 @@ function CoinImage({
 
 // ─── CoinCard ─────────────────────────────────────────────────────────────────
 
-export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps) {
+export default function CoinCard({ coin, locale, view, onClick, inCollection = false, onToggleCollection }: CoinCardProps) {
   const c = coin as CoinWithVarieties;
   const isAr = locale === 'ar';
   const metalBadgeClass = METAL_BADGE_CLASSES[coin.metal] ?? METAL_BADGE_CLASSES.Other;
@@ -152,6 +166,17 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
             <div className="text-[10px] text-gold-500/60">
               📊 {formatMintage(String(totalMintage), locale)}
             </div>
+          )}
+          {onToggleCollection && (
+            <button
+              onClick={onToggleCollection}
+              className={`text-[10px] mt-0.5 transition-all rounded-full px-1.5 py-0.5 border
+                ${inCollection
+                  ? 'bg-gold-500 border-gold-500 text-ink font-bold'
+                  : 'border-gold-700/30 text-ink/30 hover:border-gold-500/60 hover:text-gold-500'}`}
+            >
+              {inCollection ? '✓' : '+'}
+            </button>
           )}
         </div>
       </button>
@@ -207,15 +232,30 @@ export default function CoinCard({ coin, locale, view, onClick }: CoinCardProps)
         ) : (
           <span />
         )}
-        <span className={`text-[8px] px-1.5 py-0.5 rounded-full border ${
-          coin.type === 'Commemorative'
-            ? 'border-amber-300/50 text-amber-600'
-            : 'border-gold-700/20 text-ink/30'
-        }`}>
-          {coin.type === 'Commemorative'
-            ? (isAr ? 'تذكارية' : 'Comm.')
-            : (isAr ? 'تداول' : 'Circ.')}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className={`text-[8px] px-1.5 py-0.5 rounded-full border ${
+            coin.type === 'Commemorative'
+              ? 'border-amber-300/50 text-amber-600'
+              : 'border-gold-700/20 text-ink/30'
+          }`}>
+            {coin.type === 'Commemorative'
+              ? (isAr ? 'تذكارية' : 'Comm.')
+              : (isAr ? 'تداول' : 'Circ.')}
+          </span>
+          {/* Collection toggle */}
+          {onToggleCollection && (
+            <button
+              onClick={onToggleCollection}
+              title={isAr ? (inCollection ? 'إزالة من المجموعة' : 'أضف إلى مجموعتي') : (inCollection ? 'Remove' : 'Collect')}
+              className={`text-[11px] transition-all rounded-full w-5 h-5 flex items-center justify-center border
+                ${inCollection
+                  ? 'bg-gold-500 border-gold-500 text-ink scale-110'
+                  : 'border-gold-700/30 text-ink/30 hover:border-gold-500/60 hover:text-gold-500'}`}
+            >
+              {inCollection ? '✓' : '+'}
+            </button>
+          )}
+        </div>
       </div>
     </button>
   );
