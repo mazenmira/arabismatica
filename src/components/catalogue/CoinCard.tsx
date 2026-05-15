@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { Coin, MintageEntry } from '@/types/coin';
 import {
   getDiscGradient,
+  getMetalSymbol,
   METAL_BADGE_CLASSES,
   COUNTRY_FLAGS,
   formatMintage,
