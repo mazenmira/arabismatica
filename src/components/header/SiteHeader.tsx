@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl';
 import { Menu, X, Globe, ChevronDown, Wrench, BookOpen } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, LinkedinIcon, YoutubeIcon, InstagramIcon, RssIcon } from './SocialIcons';
 import ToolsSidebar from '@/components/sidebar/ToolsSidebar';
-import { supabase } from '@/lib/supabase';
 import IdentifyModal from '@/components/modals/IdentifyModal';
 
 const WP = 'https://arabismatica.arabcollector.com';
