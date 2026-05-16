@@ -47,7 +47,7 @@ export function useCollection(userId: string | null) {
   };
 
   const toggle = async (coinId: string) => {
-    has(coinId) ? await remove(coinId) : await add(coinId);
+    if (has(coinId)) { await remove(coinId); } else { await add(coinId); }
   };
 
   const getEntry = (coinId: string) => collection.find(c => c.coin_id === coinId) ?? null;

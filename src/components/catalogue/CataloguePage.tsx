@@ -4,7 +4,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown, Moon, Sun, BookmarkCheck } from 'lucide-react';
+import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown, Moon, Sun } from 'lucide-react';
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
 import AdminPanel from './AdminPanel';

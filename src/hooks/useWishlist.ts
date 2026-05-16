@@ -45,7 +45,7 @@ export function useWishlist(userId: string | null) {
   };
 
   const toggle = async (coinId: string) => {
-    has(coinId) ? await remove(coinId) : await add(coinId);
+    if (has(coinId)) { await remove(coinId); } else { await add(coinId); }
   };
 
   return { wishlist, loading, has, add, remove, toggle, reload: load };
