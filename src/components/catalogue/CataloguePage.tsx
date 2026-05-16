@@ -107,6 +107,15 @@ export default function CataloguePage({ locale }: { locale: string }) {
   // filtersOpen panel reserved for future use
   const searchRef = useRef<HTMLInputElement>(null);
   const [showBackTop, setShowBackTop]   = useState(false);
+
+  // Local collection (localStorage fallback when not logged in)
+  const [collection, setCollection] = useState<Set<string>>(() => {
+    if (typeof window === 'undefined') return new Set<string>();
+    try {
+      const saved = localStorage.getItem('ac_collection');
+      return saved ? new Set<string>(JSON.parse(saved) as string[]) : new Set<string>();
+    } catch { return new Set<string>(); }
+  });
   const [darkMode, setDarkMode]         = useState(false);
   const [adminOpen, setAdminOpen]       = useState(false);
   const [authOpen, setAuthOpen]         = useState(false);
