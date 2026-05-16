@@ -4,7 +4,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown } from 'lucide-react';
+import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown, Moon, Sun, BookmarkCheck } from 'lucide-react';
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
 import AdminPanel from './AdminPanel';
@@ -655,6 +655,10 @@ export default function CataloguePage({ locale }: { locale: string }) {
                     locale={locale}
                     view={view}
                     onClick={() => setSelectedCoin(coin)}
+                    inCollection={user ? inCollection(coin.id) : collection.has(coin.id)}
+                    inWishlist={user ? inWishlist(coin.id) : false}
+                    onToggleCollection={(e) => { e.stopPropagation(); handleToggleCollection(coin.id); }}
+                    onToggleWishlist={(e) => { e.stopPropagation(); handleToggleWishlist(coin.id); }}
                   />
                 </motion.div>
               ))}
