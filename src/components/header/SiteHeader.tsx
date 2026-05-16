@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Menu, X, Globe, ChevronDown, Wrench, BookOpen } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, LinkedinIcon, YoutubeIcon, InstagramIcon, RssIcon } from './SocialIcons';
 import ToolsSidebar from '@/components/sidebar/ToolsSidebar';
+import { supabase } from '@/lib/supabase';
 import IdentifyModal from '@/components/modals/IdentifyModal';
 
 const WP = 'https://arabismatica.arabcollector.com';
@@ -47,7 +48,14 @@ function getArabicDate(): string {
   });
 }
 
-export default function SiteHeader({ locale }: { locale: string }) {
+interface SiteHeaderProps {
+  locale: string;
+  onAuthOpen?: () => void;
+  onDashOpen?: () => void;
+  user?: { id: string; email: string } | null;
+}
+
+export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: SiteHeaderProps) {
   const t = useTranslations();
   const isAr = locale === 'ar';
 
@@ -141,8 +149,8 @@ export default function SiteHeader({ locale }: { locale: string }) {
             {/* Logo */}
             <Link href={`/${locale}`} className="shrink-0">
               <Image
-                src="https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2025/04/New-Logo-Arab-Collector-white.png"
-                alt="The Arab Collector"
+                src="https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2026/05/Arabismatica-logo-Small.png"
+                alt="Arabismatica"
                 width={200} height={70}
                 className="h-[46px] w-auto object-contain"
                 priority
@@ -212,6 +220,24 @@ export default function SiteHeader({ locale }: { locale: string }) {
 
             {/* Right actions — no cart, no dark mode */}
             <div className="flex items-center gap-2 mr-auto xl:mr-0">
+              {/* Auth button */}
+              {user ? (
+                <button
+                  onClick={onDashOpen}
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 hover:bg-gold-500/25 transition-colors"
+                >
+                  <span>👤</span>
+                  <span className="max-w-[80px] truncate">{user.email.split('@')[0]}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onAuthOpen}
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-400 hover:border-gold-500/60 hover:text-gold-300 transition-colors"
+                >
+                  {locale === 'ar' ? 'دخول / تسجيل' : 'Sign in'}
+                </button>
+              )}
+
               {/* AI Identify */}
               <button
                 onClick={() => setIdentifyOpen(true)}
@@ -279,7 +305,18 @@ export default function SiteHeader({ locale }: { locale: string }) {
               </div>
             ))}
 
-            <div className="px-4 py-4 flex gap-3 border-t border-gold-800/30">
+            <div className="px-4 py-4 flex gap-3 border-t border-gold-800/30 flex-wrap">
+              {user ? (
+                <button onClick={() => { onDashOpen?.(); setMobileOpen(false); }}
+                  className="flex-1 py-2 text-[12px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 text-center">
+                  👤 {user.email.split('@')[0]}
+                </button>
+              ) : (
+                <button onClick={() => { onAuthOpen?.(); setMobileOpen(false); }}
+                  className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-400 text-center">
+                  {locale === 'ar' ? 'دخول / تسجيل' : 'Sign in'}
+                </button>
+              )}
               <button
                 onClick={() => { setIdentifyOpen(true); setMobileOpen(false); }}
                 className="flex-1 py-2 text-[12px] rounded-full border border-gold-700 text-gold-300 text-center"

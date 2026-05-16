@@ -87,7 +87,19 @@ function fuseSearch(coins: Coin[], query: string): Coin[] {
   );
 }
 
-export default function CataloguePage({ locale }: { locale: string }) {
+interface CataloguePageProps {
+  locale: string;
+  user?: { id: string; email: string } | null;
+  authOpen?: boolean;
+  dashOpen?: boolean;
+  setAuthOpen?: (v: boolean) => void;
+  setDashOpen?: (v: boolean) => void;
+}
+
+export default function CataloguePage({
+  locale, user: userProp, authOpen: authOpenProp = false,
+  dashOpen: dashOpenProp = false, setAuthOpen: setAuthOpenProp, setDashOpen: setDashOpenProp,
+}: CataloguePageProps) {
   const t = useTranslations();
   const isAr = locale === 'ar';
 
@@ -118,21 +130,30 @@ export default function CataloguePage({ locale }: { locale: string }) {
   });
   const [darkMode, setDarkMode]         = useState(false);
   const [adminOpen, setAdminOpen]       = useState(false);
-  const [authOpen, setAuthOpen]         = useState(false);
-  const [dashOpen, setDashOpen]         = useState(false);
-  const [user, setUser]                 = useState<{ id: string; email: string } | null>(null);
+  // Auth state — use props from page.tsx if provided, else manage locally
+  const [authOpenLocal, setAuthOpenLocal] = useState(false);
+  const [dashOpenLocal, setDashOpenLocal] = useState(false);
+  const [userLocal, setUserLocal]         = useState<{ id: string; email: string } | null>(null);
+
+  const authOpen   = authOpenProp || authOpenLocal;
+  const dashOpen   = dashOpenProp || dashOpenLocal;
+  const user       = userProp !== undefined ? userProp : userLocal;
+  const setAuthOpen = setAuthOpenProp ?? setAuthOpenLocal;
+  const setDashOpen = setDashOpenProp ?? setDashOpenLocal;
   const { has: inCollection, toggle: toggleCollectionDB } = useCollection(user?.id ?? null);
   const { has: inWishlist,   toggle: toggleWishlistDB }   = useWishlist(user?.id ?? null);
 
-  // Auth session listener
+  // Auth session listener (only when not controlled by parent)
   useEffect(() => {
+    if (userProp !== undefined) return; // controlled by page.tsx
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) setUser({ id: session.user.id, email: session.user.email ?? '' });
+      if (session?.user) setUserLocal({ id: session.user.id, email: session.user.email ?? '' });
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ? { id: session.user.id, email: session.user.email ?? '' } : null);
+      setUserLocal(session?.user ? { id: session.user.id, email: session.user.email ?? '' } : null);
     });
     return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Back-to-top visibility
@@ -438,33 +459,7 @@ export default function CataloguePage({ locale }: { locale: string }) {
         );
       })()}
 
-      {/* ── COUNTRY TABS ── */}
-      <div className="bg-parch-dark/60 border-b border-gold-700/20 overflow-x-auto">
-        <div className="max-w-[1440px] mx-auto px-4">
-          <div className="flex items-center gap-1 py-2 min-w-max">
-            <button
-              onClick={() => updateFilter('country', 'all')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] transition-colors font-medium shrink-0
-                ${filters.country === 'all' ? 'bg-gold-500 text-ink' : 'text-ink/60 hover:text-ink hover:bg-gold-500/15 border border-gold-700/20'}`}>
-              🌍 {isAr ? 'الكل' : 'All'} ({COINS.length})
-            </button>
-            {COUNTRIES.map(({ cc, co, co_ar }) => {
-              const count = countryCounts[co] || 0;
-              if (!count) return null;
-              return (
-                <button
-                  key={cc}
-                  onClick={() => updateFilter('country', co)}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] transition-colors shrink-0
-                    ${filters.country === co ? 'bg-gold-500 text-ink font-semibold' : 'text-ink/50 hover:text-ink/80 hover:bg-gold-500/10 border border-gold-700/15'}`}>
-                  {COUNTRY_FLAGS[cc]} {isAr ? co_ar : co}
-                  <span className="opacity-60">({count})</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+
 
       {/* ── DYNASTY PILLS ── */}
       <div className="bg-parch-dark/40 border-b border-gold-700/15 overflow-x-auto">
@@ -558,6 +553,26 @@ export default function CataloguePage({ locale }: { locale: string }) {
               className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500"
               min="1500" max="2026" />
           </div>
+          {/* Country filter dropdown */}
+          <div className="flex items-center gap-1.5">
+            <select
+              value={filters.country}
+              onChange={e => { updateFilter('country', e.target.value); setPage(1); }}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer"
+            >
+              <option value="all">🌍 {isAr ? 'كل الدول' : 'All Countries'} ({COINS.length})</option>
+              {COUNTRIES.map(({ cc, co, co_ar }) => {
+                const count = countryCounts[co] || 0;
+                if (!count) return null;
+                return (
+                  <option key={cc} value={co}>
+                    {COUNTRY_FLAGS[cc]} {isAr ? co_ar : co} ({count})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
           {/* Sort */}
           <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }}
             className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
@@ -593,19 +608,6 @@ export default function CataloguePage({ locale }: { locale: string }) {
             </button>
           )}
 
-          {/* User auth button */}
-          {user ? (
-            <button onClick={() => setDashOpen(true)}
-              className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-500 hover:bg-gold-500/25 transition-colors">
-              <span>👤</span>
-              <span className="hidden sm:block max-w-[80px] truncate">{user.email.split('@')[0]}</span>
-            </button>
-          ) : (
-            <button onClick={() => setAuthOpen(true)}
-              className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border border-gold-700/30 text-gold-600 hover:border-gold-500/60 transition-colors">
-              {isAr ? 'دخول / تسجيل' : 'Sign in'}
-            </button>
-          )}
           {/* Dark mode toggle */}
           <button onClick={() => setDarkMode(d => !d)}
             className="flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/30 text-gold-600 hover:text-gold-400 transition-colors"

@@ -1,16 +1,42 @@
-import { unstable_setRequestLocale } from 'next-intl/server';
+// v2.0
+'use client';
+
+import { useState, useEffect } from 'react';
 import SiteHeader from '@/components/header/SiteHeader';
 import CataloguePage from '@/components/catalogue/CataloguePage';
-
-// ISR — revalidate every hour
-export const revalidate = 3600;
+import { supabase } from '@/lib/supabase';
 
 export default function Home({ params: { locale } }: { params: { locale: string } }) {
-  unstable_setRequestLocale(locale);
+  const [user, setUser]         = useState<{ id: string; email: string } | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [dashOpen, setDashOpen] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) setUser({ id: session.user.id, email: session.user.email ?? '' });
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ? { id: session.user.id, email: session.user.email ?? '' } : null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <main className="min-h-screen" style={{ background: 'var(--parch)' }}>
-      <SiteHeader locale={locale} />
-      <CataloguePage locale={locale} />
+      <SiteHeader
+        locale={locale}
+        user={user}
+        onAuthOpen={() => setAuthOpen(true)}
+        onDashOpen={() => setDashOpen(true)}
+      />
+      <CataloguePage
+        locale={locale}
+        user={user}
+        authOpen={authOpen}
+        dashOpen={dashOpen}
+        setAuthOpen={setAuthOpen}
+        setDashOpen={setDashOpen}
+      />
     </main>
   );
 }
