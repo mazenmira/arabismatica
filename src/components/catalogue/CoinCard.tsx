@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { Coin, MintageEntry } from '@/types/coin';
 import {
   getDiscGradient,
+  getMetalSymbol,
   METAL_BADGE_CLASSES,
   COUNTRY_FLAGS,
   formatMintage,
@@ -22,6 +23,8 @@ interface CoinCardProps {
   onClick: () => void;
   inCollection?: boolean;
   onToggleCollection?: (e: React.MouseEvent) => void;
+  inWishlist?: boolean;
+  onToggleWishlist?: (e: React.MouseEvent) => void;
 }
 
 // ─── Year range helper ────────────────────────────────────────────────────────
@@ -121,7 +124,7 @@ function CoinImage({
 
 // ─── CoinCard ─────────────────────────────────────────────────────────────────
 
-export default function CoinCard({ coin, locale, view, onClick, inCollection = false, onToggleCollection }: CoinCardProps) {
+export default function CoinCard({ coin, locale, view, onClick, inCollection = false, onToggleCollection, inWishlist = false, onToggleWishlist }: CoinCardProps) {
   const c = coin as CoinWithVarieties;
   const isAr = locale === 'ar';
   const metalBadgeClass = METAL_BADGE_CLASSES[coin.metal] ?? METAL_BADGE_CLASSES.Other;
@@ -243,15 +246,20 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
           </span>
           {/* Collection toggle */}
           {onToggleCollection && (
-            <button
-              onClick={onToggleCollection}
+            <button onClick={onToggleCollection}
               title={isAr ? (inCollection ? 'إزالة من المجموعة' : 'أضف إلى مجموعتي') : (inCollection ? 'Remove' : 'Collect')}
               className={`text-[11px] transition-all rounded-full w-5 h-5 flex items-center justify-center border
-                ${inCollection
-                  ? 'bg-gold-500 border-gold-500 text-ink scale-110'
-                  : 'border-gold-700/30 text-ink/30 hover:border-gold-500/60 hover:text-gold-500'}`}
-            >
+                ${inCollection ? 'bg-gold-500 border-gold-500 text-ink scale-110' : 'border-gold-700/30 text-ink/30 hover:border-gold-500/60 hover:text-gold-500'}`}>
               {inCollection ? '✓' : '+'}
+            </button>
+          )}
+          {/* Wishlist toggle */}
+          {onToggleWishlist && (
+            <button onClick={onToggleWishlist}
+              title={isAr ? (inWishlist ? 'إزالة من الأمنيات' : 'أضف للأمنيات') : (inWishlist ? 'Remove wish' : 'Wish')}
+              className={`text-[11px] transition-all rounded-full w-5 h-5 flex items-center justify-center border
+                ${inWishlist ? 'bg-red-400 border-red-400 text-white scale-110' : 'border-gold-700/30 text-ink/30 hover:border-red-300 hover:text-red-400'}`}>
+              {inWishlist ? '♥' : '♡'}
             </button>
           )}
         </div>

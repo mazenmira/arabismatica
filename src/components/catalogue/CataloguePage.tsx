@@ -1,13 +1,18 @@
-// v3.2
+// v3.1
 'use client';
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown, Moon, Sun, BookmarkCheck } from 'lucide-react';
+import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown } from 'lucide-react';
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
 import AdminPanel from './AdminPanel';
+import AuthModal from '@/components/auth/AuthModal';
+import Dashboard from '@/components/dashboard/Dashboard';
+import { supabase } from '@/lib/supabase';
+import { useCollection } from '@/hooks/useCollection';
+import { useWishlist } from '@/hooks/useWishlist';
 import type { Coin, FilterState } from '@/types/coin';
 import { COUNTRIES, COUNTRY_FLAGS } from '@/lib/coins';
 
@@ -104,24 +109,22 @@ export default function CataloguePage({ locale }: { locale: string }) {
   const [showBackTop, setShowBackTop]   = useState(false);
   const [darkMode, setDarkMode]         = useState(false);
   const [adminOpen, setAdminOpen]       = useState(false);
+  const [authOpen, setAuthOpen]         = useState(false);
+  const [dashOpen, setDashOpen]         = useState(false);
+  const [user, setUser]                 = useState<{ id: string; email: string } | null>(null);
+  const { has: inCollection, toggle: toggleCollectionDB } = useCollection(user?.id ?? null);
+  const { has: inWishlist,   toggle: toggleWishlistDB }   = useWishlist(user?.id ?? null);
 
-  // Collection tracker — persisted in localStorage
-  const [collection, setCollection] = useState<Set<string>>(() => {
-    if (typeof window === 'undefined') return new Set();
-    try {
-      const saved = localStorage.getItem('ac_collection');
-      return saved ? new Set(JSON.parse(saved)) : new Set();
-    } catch { return new Set(); }
-  });
-
-  const toggleCollection = (id: string) => {
-    setCollection(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) { next.delete(id); } else { next.add(id); }
-      try { localStorage.setItem('ac_collection', JSON.stringify(Array.from(next))); } catch {}
-      return next;
+  // Auth session listener
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) setUser({ id: session.user.id, email: session.user.email ?? '' });
     });
-  };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ? { id: session.user.id, email: session.user.email ?? '' } : null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Back-to-top visibility
   useEffect(() => {
@@ -132,35 +135,19 @@ export default function CataloguePage({ locale }: { locale: string }) {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const downloadCollectionPDF = () => {
-    const isArLocal = locale === 'ar';
-    const myCoins = (COINS_DATA as unknown as Coin[]).filter(c => collection.has(c.id));
-    if (!myCoins.length) return;
-    const rows = myCoins.map(c => {
-      const name = isArLocal ? (c.nar || c.name) : c.name;
-      const year = c.yce ? c.yce + (isArLocal ? ' م' : ' CE') : '';
-      const flag = ({ EG:'🇪🇬',SA:'🇸🇦',AE:'🇦🇪',QA:'🇶🇦',IQ:'🇮🇶',JO:'🇯🇴',
-                      LB:'🇱🇧',LY:'🇱🇾',MA:'🇲🇦',OM:'🇴🇲',PS:'🇵🇸',SD:'🇸🇩',
-                      SY:'🇸🇾',DZ:'🇩🇿',TN:'🇹🇳',YE:'🇾🇪',KW:'🇰🇼',MR:'🇲🇷'} as Record<string,string>)[c.cc] ?? '';
-      return `<tr><td>${flag} ${isArLocal ? c.co_ar : c.co}</td><td dir="rtl">${name}</td><td>${c.dyn}</td><td>${year}</td><td>${c.metal}</td><td>${c.km || '—'}</td></tr>`;
-    }).join('');
-    const title = isArLocal ? 'مجموعتي — المقتني العربي' : 'My Collection — The Arab Collector';
-    const hdrs  = isArLocal ? ['الدولة','الاسم','الأسرة','السنة','المعدن','KM#'] : ['Country','Name','Dynasty','Year','Metal','KM#'];
-    const html  = `<!DOCTYPE html><html dir="${isArLocal?'rtl':'ltr'}" lang="${locale}"><head><meta charset="UTF-8"><title>${title}</title>
-<style>@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Amiri',serif;font-size:11px;color:#1a0e05;padding:24px}
-h1{font-size:20px;color:#8B6D2E;margin-bottom:12px}table{width:100%;border-collapse:collapse}
-th{background:#1a0e05;color:#F0E8D4;padding:6px 8px;text-align:${isArLocal?'right':'left'};font-size:10px}
-td{padding:5px 8px;border-bottom:1px solid #e8dfc8}tr:nth-child(even){background:#faf6ee}
-.foot{margin-top:16px;font-size:9px;color:#aaa;text-align:center}</style></head><body>
-<h1>${title}</h1>
-<table><thead><tr>${hdrs.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
-<div class="foot">arabismatica.arabcollector.com · ${new Date().toLocaleDateString(isArLocal?'ar-EG':'en-AU')} · ${myCoins.length} ${isArLocal?'عملة':'coins'}</div>
-</body></html>`;
-    const blob = new Blob([html], {type:'text/html;charset=utf-8'});
-    const url  = URL.createObjectURL(blob);
-    const win  = window.open(url,'_blank');
-    if (win) { win.onload = () => { win.print(); setTimeout(()=>URL.revokeObjectURL(url),3000); }; }
+  const handleToggleCollection = async (id: string) => {
+    if (user) { await toggleCollectionDB(id); return; }
+    setCollection(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
+      try { localStorage.setItem('ac_collection', JSON.stringify(Array.from(next))); } catch {}
+      return next;
+    });
+  };
+
+  const handleToggleWishlist = async (id: string) => {
+    if (!user) { setAuthOpen(true); return; }
+    await toggleWishlistDB(id);
   };
 
   // PDF export — builds a print-ready HTML page from filtered results
@@ -597,36 +584,31 @@ td{padding:5px 8px;border-bottom:1px solid #e8dfc8}tr:nth-child(even){background
             </button>
           )}
 
-          {/* Admin panel button */}
-          <button
-            onClick={() => setAdminOpen(true)}
-            className="flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/30 text-gold-600 hover:text-gold-400 transition-colors"
-            title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}
-          >
-            <span className="text-[11px]">⚙</span>
-          </button>
-
-          {/* Dark mode toggle */}
-          <button
-            onClick={() => setDarkMode(d => !d)}
-            className="flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/30 text-gold-600 hover:text-gold-400 transition-colors"
-            title={darkMode ? (isAr ? 'الوضع الفاتح' : 'Light mode') : (isAr ? 'الوضع الداكن' : 'Dark mode')}
-          >
-            {darkMode ? <Sun size={13} /> : <Moon size={13} />}
-          </button>
-
-          {/* Collection counter */}
-          {collection.size > 0 && (
-            <button
-              onClick={downloadCollectionPDF}
-              className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-full border border-gold-500/50 text-gold-500 hover:bg-gold-900/30 transition-colors"
-              title={isAr ? 'تنزيل مجموعتي' : 'Download my collection'}
-            >
-              <BookmarkCheck size={12} />
-              <span>{collection.size}</span>
+          {/* User auth button */}
+          {user ? (
+            <button onClick={() => setDashOpen(true)}
+              className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-500 hover:bg-gold-500/25 transition-colors">
+              <span>👤</span>
+              <span className="hidden sm:block max-w-[80px] truncate">{user.email.split('@')[0]}</span>
+            </button>
+          ) : (
+            <button onClick={() => setAuthOpen(true)}
+              className="flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full border border-gold-700/30 text-gold-600 hover:border-gold-500/60 transition-colors">
+              {isAr ? 'دخول / تسجيل' : 'Sign in'}
             </button>
           )}
-
+          {/* Dark mode toggle */}
+          <button onClick={() => setDarkMode(d => !d)}
+            className="flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/30 text-gold-600 hover:text-gold-400 transition-colors"
+            title={darkMode ? (isAr ? 'الوضع الفاتح' : 'Light mode') : (isAr ? 'الوضع الداكن' : 'Dark mode')}>
+            {darkMode ? <Sun size={13} /> : <Moon size={13} />}
+          </button>
+          {/* Admin panel button */}
+          <button onClick={() => setAdminOpen(true)}
+            className="flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/30 text-gold-600 hover:text-gold-400 transition-colors"
+            title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}>
+            <span className="text-[11px]">⚙</span>
+          </button>
           {/* View toggle */}
           <div className="flex items-center border border-gold-700/25 rounded-lg overflow-hidden">
             <button onClick={() => setView('grid')}
@@ -673,8 +655,6 @@ td{padding:5px 8px;border-bottom:1px solid #e8dfc8}tr:nth-child(even){background
                     locale={locale}
                     view={view}
                     onClick={() => setSelectedCoin(coin)}
-                    inCollection={collection.has(coin.id)}
-                    onToggleCollection={(e) => { e.stopPropagation(); toggleCollection(coin.id); }}
                   />
                 </motion.div>
               ))}
@@ -734,13 +714,16 @@ td{padding:5px 8px;border-bottom:1px solid #e8dfc8}tr:nth-child(even){background
         )}
       </AnimatePresence>
 
-      {/* ── ADMIN PANEL ── */}
+      {authOpen && (
+        <AuthModal locale={locale} onClose={() => setAuthOpen(false)} onSuccess={() => setAuthOpen(false)} />
+      )}
+      {dashOpen && user && (
+        <Dashboard locale={locale} userId={user.id} userEmail={user.email}
+          onClose={() => setDashOpen(false)}
+          onSignOut={async () => { await supabase.auth.signOut(); setDashOpen(false); }} />
+      )}
       {adminOpen && (
-        <AdminPanel
-          onClose={() => setAdminOpen(false)}
-          locale={locale}
-          onCoinAdded={() => {}}
-        />
+        <AdminPanel onClose={() => setAdminOpen(false)} locale={locale} onCoinAdded={() => {}} />
       )}
 
       {/* ── BACK TO TOP ── */}
