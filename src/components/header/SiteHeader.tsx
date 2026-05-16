@@ -19,6 +19,7 @@ const BREAKING_NEWS = [
 
 const TOP_NAV_ITEMS = [
   { label: 'المقتني العربي', children: [
+<<<<<<< Updated upstream
     { label: 'عن المقتني العربي', href: `${WP}/about-us/` },
     { label: 'فريق العمل', href: `${WP}/team-member/` },
     { label: 'شركاؤنا', href: `${WP}/our-partners/` },
@@ -56,16 +57,35 @@ const TOP_NAV_ITEMS = [
     { label: 'إرشادات النشر في المجلة', href: `${WP}/submission-guidelines/` },
     { label: 'النشر على الموقع', href: `${WP}/submit-post/` },
     { label: 'لوحة تحكم المؤلف', href: `${WP}/author-dashboard/` },
+=======
+    { label: 'عن المقتني العربي',   href: `https://arabcollector.com/about-us/` },
+    { label: 'فريق العمل',          href: `https://arabcollector.com/team-member/` },
+    { label: 'شركاؤنا',             href: `https://arabcollector.com/our-partners/` },
+  ]},
+  { label: 'مركز الأدوات والمعرفة', highlight: true, children: [
+    { label: 'أدوات التقييم',          href: `https://arabcollector.com/grading-tools/`,      highlight: true },
+    { label: 'بوابة المعرفة',          href: `https://arabcollector.com/knowledge-portal/`,   highlight: true },
+    { label: 'مختبر المقتني الصغير',   href: `https://arabcollector.com/young-collector-lab/` },
+>>>>>>> Stashed changes
   ]},
 ];
 
 const SOCIALS = [
+<<<<<<< Updated upstream
   { icon: FacebookIcon, href: `${WP}/facebook`, label: 'فيسبوك' },
   { icon: TwitterIcon, href: 'https://x.com/ArabCollector', label: 'X' },
   { icon: LinkedinIcon, href: 'https://au.linkedin.com/company/the-arab-collector', label: 'لينكدإن' },
   { icon: YoutubeIcon, href: 'https://www.youtube.com/@thearabcollector5252', label: 'يوتيوب' },
   { icon: InstagramIcon, href: 'https://www.instagram.com/thearabcollector/', label: 'انستقرام' },
   { icon: RssIcon, href: `${WP}/feed/`, label: 'RSS' },
+=======
+  { icon: FacebookIcon,  href: `https://www.facebook.com/arabcollector,                                      label: 'فيسبوك' },
+  { icon: TwitterIcon,   href: 'https://x.com/ArabCollector',                         label: 'X' },
+  { icon: LinkedinIcon,  href: 'https://au.linkedin.com/company/the-arab-collector',  label: 'لينكدإن' },
+  { icon: YoutubeIcon,   href: 'https://www.youtube.com/@thearabcollector5252',        label: 'يوتيوب' },
+  { icon: InstagramIcon, href: 'https://www.instagram.com/thearabcollector/',         label: 'انستقرام' },
+  { icon: RssIcon,       href: `https://arabcollector.com/feed/`,                                         label: 'RSS' },
+>>>>>>> Stashed changes
 ];
 
 function getArabicDate(): string {
@@ -170,8 +190,8 @@ export default function SiteHeader({ locale }: { locale: string }) {
             {/* Logo */}
             <Link href={`/${locale}`} className="shrink-0">
               <Image
-                src="https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2025/04/New-Logo-Arab-Collector-white.png"
-                alt="The Arab Collector"
+                src="https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2026/05/Arabismatica-logo-Small.png"
+                alt="Arabismatica"
                 width={200} height={70}
                 className="h-[46px] w-auto object-contain"
                 priority
@@ -218,6 +238,7 @@ export default function SiteHeader({ locale }: { locale: string }) {
                 </div>
               ))}
 
+<<<<<<< Updated upstream
               {/* Prominent links */}
               <a href={`${WP}/knowledge-portal/`} target="_blank" rel="noopener"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold text-ink bg-gold-500 hover:bg-gold-400 transition-colors ml-1 shrink-0">
@@ -226,6 +247,24 @@ export default function SiteHeader({ locale }: { locale: string }) {
               </a>
               <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500 text-gold-300 hover:bg-gold-900/40 transition-colors shrink-0">
+=======
+              {/* بوابة المعرفة — filled gold pill */}
+              <a
+                href={`https://arabcollector.com/knowledge-portal/`}
+                target="_blank" rel="noopener"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold text-ink bg-gold-500 hover:bg-gold-400 transition-colors mr-2 shrink-0"
+              >
+                <BookOpen size={12} />
+                بوابة المعرفة
+              </a>
+
+              {/* أدوات التقييم — outlined pill */}
+              <a
+                href={`https://arabcollector.com/grading-tools/`}
+                target="_blank" rel="noopener"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500 text-gold-300 hover:bg-gold-900/40 transition-colors shrink-0"
+              >
+>>>>>>> Stashed changes
                 أدوات التقييم
               </a>
             </nav>
@@ -277,11 +316,11 @@ export default function SiteHeader({ locale }: { locale: string }) {
           <div className="xl:hidden bg-ink border-t border-gold-800/50 max-h-[80vh] overflow-y-auto animate-fade-in">
             {/* Priority links first */}
             <div className="px-4 py-3 border-b border-gold-800/30 flex gap-2 flex-wrap">
-              <a href={`${WP}/knowledge-portal/`} target="_blank" rel="noopener"
+              <a href={`https://arabcollector.com/knowledge-portal/`} target="_blank" rel="noopener"
                 className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-semibold text-ink bg-gold-500">
                 <BookOpen size={12} /> بوابة المعرفة
               </a>
-              <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
+              <a href={`https://arabcollector.com/grading-tools/`} target="_blank" rel="noopener"
                 className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] border border-gold-500 text-gold-300">
                 أدوات التقييم
               </a>
