@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { ArrowRight, ExternalLink, ZoomIn, Copy, Check } from 'lucide-react';
 import type { Coin, MintageEntry } from '@/types/coin';
 import {
-  getDiscGradient, COUNTRY_FLAGS, formatMintage,
+  COUNTRY_FLAGS, formatMintage,
   isValidImageUrl, getCoinName, getCoinYear,
 } from '@/lib/coins';
 
