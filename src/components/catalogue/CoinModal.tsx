@@ -428,15 +428,22 @@ export default function CoinModal({
               ))}
             </div>
 
-            {/* Numista link */}
-            {coin.nid && (
-              <a href={`https://en.numista.com/catalogue/pieces${coin.nid}.html`}
-                target="_blank" rel="noopener noreferrer"
+            {/* Numista link + coin page link */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {coin.nid && (
+                <a href={`https://en.numista.com/catalogue/pieces${coin.nid}.html`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-[12px] text-gold-600 border border-gold-700/30 rounded-full px-4 py-2 hover:border-gold-500 hover:text-gold-500 transition-colors">
+                  <ExternalLink size={12} />
+                  {t('viewOnNumista')}
+                </a>
+              )}
+              <a href={`/${locale}/catalogue/${coin.id}`}
                 className="inline-flex items-center gap-2 text-[12px] text-gold-600 border border-gold-700/30 rounded-full px-4 py-2 hover:border-gold-500 hover:text-gold-500 transition-colors">
                 <ExternalLink size={12} />
-                {t('viewOnNumista')}
+                {locale === 'ar' ? '🔗 صفحة العملة' : '🔗 Coin page'}
               </a>
-            )}
+            </div>
           </div>
         </motion.div>
       </motion.div>
