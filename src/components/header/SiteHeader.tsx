@@ -337,4 +337,4 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
       <IdentifyModal open={identifyOpen} onClose={() => setIdentifyOpen(false)} locale={locale} />
     </>
   );
-}
+} 
