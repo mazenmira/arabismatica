@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { X, ExternalLink, ZoomIn } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Coin, MintageEntry } from '@/types/coin';
+import { supabase } from '@/lib/supabase';
 import {
   getDiscGradient,
   getMetalSymbol,
@@ -181,6 +182,236 @@ function MintageTable({ data, locale }: { data: MintageEntry[]; locale: string }
               locale,
             )}
           </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+// ─── Price Guide ──────────────────────────────────────────────────────────────
+
+interface PriceRow {
+  sheldon: number;
+  grade_label: string;
+  grade_ar: string;
+  price_low: number | null;
+  price_high: number | null;
+  currency: string;
+  certified: boolean;
+  source: string;
+  source_url: string | null;
+  updated_at: string;
+}
+
+// Static monthly exchange rates — update once a month
+const FX: Record<string, number> = {
+  USD: 1, AED: 3.67, SAR: 3.75, EGP: 50.5,
+  KWD: 0.31, OMR: 0.385, QAR: 3.64, GBP: 0.79,
+  EUR: 0.92, AUD: 1.55,
+};
+
+const DISPLAY_CURRENCIES = ['USD', 'AED', 'SAR', 'EGP'];
+
+function convertPrice(amount: number, fromCurrency: string, toCurrency: string): number {
+  const inUSD = amount / (FX[fromCurrency] ?? 1);
+  return Math.round(inUSD * (FX[toCurrency] ?? 1));
+}
+
+function PriceGuide({ coinId, locale }: { coinId: string; locale: string }) {
+  const isAr = locale === 'ar';
+  const [prices, setPrices] = useState<PriceRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [certified, setCertified] = useState(false);
+  const [displayCurrency, setDisplayCurrency] = useState('USD');
+  const [submitPrice, setSubmitPrice] = useState(false);
+  const [submission, setSubmission] = useState({ sheldon: 45, price: '', currency: 'USD', source_url: '' });
+  const [submitted, setSubmitted] = useState(false);
+
+  const SHELDON_GRADES_DISPLAY = [
+    { sheldon: 4,  label: 'G-4',   ar: 'جيد ٤' },
+    { sheldon: 8,  label: 'VG-8',  ar: 'جيد جداً ٨' },
+    { sheldon: 12, label: 'F-12',  ar: 'ممتاز ١٢' },
+    { sheldon: 20, label: 'VF-20', ar: 'ممتاز جداً ٢٠' },
+    { sheldon: 30, label: 'VF-30', ar: 'ممتاز جداً ٣٠' },
+    { sheldon: 40, label: 'EF-40', ar: 'بالغ الجودة ٤٠' },
+    { sheldon: 45, label: 'EF-45', ar: 'بالغ الجودة ٤٥' },
+    { sheldon: 50, label: 'AU-50', ar: 'شبه غير متداول ٥٠' },
+    { sheldon: 58, label: 'AU-58', ar: 'شبه غير متداول ٥٨' },
+    { sheldon: 62, label: 'MS-62', ar: 'حالة المطبعة ٦٢' },
+    { sheldon: 65, label: 'MS-65', ar: 'حالة المطبعة ٦٥' },
+    { sheldon: 70, label: 'MS-70', ar: 'حالة المطبعة ٧٠' },
+  ];
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      const { data } = await supabase
+        .from('coin_grades').select('*')
+        .eq('coin_id', coinId)
+        .eq('certified', certified)
+        .order('sheldon');
+      setPrices(data ?? []);
+      setLoading(false);
+    };
+    load();
+  }, [coinId, certified]);
+
+  const submitObservation = async () => {
+    if (!submission.price) return;
+    await supabase.from('price_submissions').insert({
+      coin_id: coinId,
+      sheldon: submission.sheldon,
+      price: parseFloat(submission.price),
+      currency: submission.currency,
+      source_url: submission.source_url || null,
+      certified: false,
+    });
+    setSubmitted(true);
+    setTimeout(() => { setSubmitted(false); setSubmitPrice(false); }, 2000);
+  };
+
+  const latestSource = prices[0];
+
+  return (
+    <div className="mb-4">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] text-ink/40 uppercase tracking-widest font-medium">
+            {isAr ? 'دليل الأسعار — Sheldon' : 'Price Guide — Sheldon Scale'}
+          </span>
+          <div className="flex-1 h-px bg-gold-700/20 w-8" />
+        </div>
+        {/* Certified toggle */}
+        <div className="flex items-center gap-1 text-[10px]">
+          <button onClick={() => setCertified(false)}
+            className={`px-2 py-0.5 rounded-full transition-colors ${!certified ? 'bg-gold-500 text-ink font-semibold' : 'text-ink/40 hover:text-ink/60'}`}>
+            {isAr ? 'خام' : 'Raw'}
+          </button>
+          <button onClick={() => setCertified(true)}
+            className={`px-2 py-0.5 rounded-full transition-colors ${certified ? 'bg-gold-500 text-ink font-semibold' : 'text-ink/40 hover:text-ink/60'}`}>
+            PCGS/NGC
+          </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="h-16 flex items-center justify-center text-ink/30 text-[12px]">
+          {isAr ? 'جاري التحميل...' : 'Loading...'}
+        </div>
+      ) : prices.length === 0 ? (
+        <div className="bg-parch-dark/30 rounded-xl border border-gold-700/15 px-4 py-4 text-center">
+          <p className="text-[12px] text-ink/40 font-amiri mb-2">
+            {isAr ? 'لا توجد بيانات أسعار لهذه العملة بعد' : 'No price data for this coin yet'}
+          </p>
+          <button onClick={() => setSubmitPrice(true)}
+            className="text-[11px] text-gold-600 border border-gold-700/30 rounded-full px-3 py-1 hover:border-gold-500 transition-colors">
+            {isAr ? '+ سجّل سعر ملاحَظ' : '+ Submit observed price'}
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Currency selector */}
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-[9px] text-ink/30">{isAr ? 'العملة:' : 'Currency:'}</span>
+            {DISPLAY_CURRENCIES.map(c => (
+              <button key={c} onClick={() => setDisplayCurrency(c)}
+                className={`text-[9px] px-1.5 py-0.5 rounded transition-colors ${displayCurrency === c ? 'bg-gold-500 text-ink font-bold' : 'text-ink/40 hover:text-ink/70 border border-gold-700/20'}`}>
+                {c}
+              </button>
+            ))}
+          </div>
+
+          {/* Price table */}
+          <div className="rounded-xl overflow-hidden border border-gold-700/25">
+            <table className="w-full text-[11px]">
+              <thead>
+                <tr className="bg-parch-dark/80 border-b border-gold-700/20">
+                  <th className="px-2 py-2 text-[9px] text-ink/40 font-medium text-start">{isAr ? 'الدرجة' : 'Grade'}</th>
+                  <th className="px-2 py-2 text-[9px] text-ink/40 font-medium text-end">{isAr ? `النطاق (${displayCurrency})` : `Range (${displayCurrency})`}</th>
+                  <th className="px-2 py-2 text-[9px] text-ink/40 font-medium text-center hidden sm:table-cell">{isAr ? 'المصدر' : 'Source'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {prices.map((p, i) => {
+                  const low  = p.price_low  ? convertPrice(p.price_low,  p.currency, displayCurrency) : null;
+                  const high = p.price_high ? convertPrice(p.price_high, p.currency, displayCurrency) : null;
+                  const grade = SHELDON_GRADES_DISPLAY.find(g => g.label === p.grade_label);
+                  return (
+                    <tr key={i} className={`border-b border-gold-700/10 last:border-0 ${i % 2 === 0 ? 'bg-parch-cream/30' : ''}`}>
+                      <td className="px-2 py-2">
+                        <span className="font-bold text-gold-600">{p.grade_label}</span>
+                        {grade && <span className="text-[9px] text-ink/40 mr-1">— {isAr ? grade.ar : ''}</span>}
+                      </td>
+                      <td className="px-2 py-2 text-end font-mono text-ink/80">
+                        {low != null ? (
+                          <span>
+                            {low.toLocaleString(isAr ? 'ar-EG' : 'en-US')}
+                            {high != null && ` – ${high.toLocaleString(isAr ? 'ar-EG' : 'en-US')}`}
+                          </span>
+                        ) : (
+                          <span className="text-ink/25">—</span>
+                        )}
+                      </td>
+                      <td className="px-2 py-2 text-center hidden sm:table-cell">
+                        {p.source_url ? (
+                          <a href={p.source_url} target="_blank" rel="noopener noreferrer"
+                            className="text-[9px] text-gold-600 hover:underline">{p.source}</a>
+                        ) : (
+                          <span className="text-[9px] text-ink/30">{p.source}</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between mt-1.5">
+            {latestSource && (
+              <span className="text-[9px] text-ink/25">
+                {isAr ? 'آخر تحديث:' : 'Updated:'} {new Date(latestSource.updated_at).toLocaleDateString(isAr ? 'ar-EG' : 'en-AU')}
+              </span>
+            )}
+            <button onClick={() => setSubmitPrice(s => !s)}
+              className="text-[10px] text-gold-600 hover:text-gold-400 transition-colors">
+              {isAr ? '+ اقتراح سعر' : '+ Suggest price'}
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Submit price form */}
+      {submitPrice && (
+        <div className="mt-3 bg-parch-dark/30 rounded-xl border border-gold-700/20 p-3 space-y-2">
+          <p className="text-[11px] text-ink/60 font-amiri">
+            {isAr ? 'شارك سعراً ملاحظاً — سيُراجع قبل النشر' : 'Share an observed price — reviewed before publishing'}
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            <select className="text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink outline-none"
+              value={submission.sheldon}
+              onChange={e => setSubmission(s => ({ ...s, sheldon: parseInt(e.target.value) }))}>
+              {SHELDON_GRADES_DISPLAY.map(g => <option key={g.label} value={g.sheldon}>{g.label}</option>)}
+            </select>
+            <input className="text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink outline-none" dir="ltr"
+              type="number" placeholder={isAr ? 'السعر' : 'Price'}
+              value={submission.price} onChange={e => setSubmission(s => ({ ...s, price: e.target.value }))} />
+            <select className="text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink outline-none"
+              value={submission.currency}
+              onChange={e => setSubmission(s => ({ ...s, currency: e.target.value }))}>
+              {['USD','AED','SAR','EGP','AUD','GBP'].map(c => <option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <input className="w-full text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink outline-none" dir="ltr"
+            placeholder={isAr ? 'رابط المصدر (اختياري)' : 'Source URL (optional)'}
+            value={submission.source_url} onChange={e => setSubmission(s => ({ ...s, source_url: e.target.value }))} />
+          <button onClick={submitObservation}
+            className={`w-full py-2 rounded-xl text-[12px] font-semibold transition-colors ${submitted ? 'bg-emerald-600 text-white' : 'bg-gold-600 hover:bg-gold-500 text-ink'}`}>
+            {submitted ? (isAr ? '✓ تم الإرسال للمراجعة' : '✓ Submitted for review') : (isAr ? 'إرسال' : 'Submit')}
+          </button>
         </div>
       )}
     </div>

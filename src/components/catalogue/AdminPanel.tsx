@@ -2,7 +2,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Plus, Save, Trash2, Lock, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Plus, Save, Trash2, Lock, Eye, EyeOff, ChevronDown, ChevronUp, DollarSign, Search } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import COINS_RAW from '@/data/coins.json';
+import type { Coin as CoinType } from '@/types/coin';
 import type { Coin } from '@/types/coin';
 
 // ── Simple password gate — change this to env var in production ───────────────
@@ -28,6 +31,31 @@ const COUNTRIES = [
   {cc:'TN',co:'Tunisia',co_ar:'تونس'},{cc:'YE',co:'Yemen',co_ar:'اليمن'},
   {cc:'QA',co:'Qatar',co_ar:'قطر'},{cc:'KW',co:'Kuwait',co_ar:'الكويت'},
   {cc:'PS',co:'Palestine',co_ar:'فلسطين'},{cc:'MR',co:'Mauritania',co_ar:'موريتانيا'},
+];
+
+// ── Sheldon grades ───────────────────────────────────────────────────────────
+const SHELDON_GRADES = [
+  { sheldon: 4,  label: 'G-4',   ar: 'جيد ٤' },
+  { sheldon: 8,  label: 'VG-8',  ar: 'جيد جداً ٨' },
+  { sheldon: 12, label: 'F-12',  ar: 'ممتاز ١٢' },
+  { sheldon: 20, label: 'VF-20', ar: 'ممتاز جداً ٢٠' },
+  { sheldon: 30, label: 'VF-30', ar: 'ممتاز جداً ٣٠' },
+  { sheldon: 40, label: 'EF-40', ar: 'بالغ الجودة ٤٠' },
+  { sheldon: 45, label: 'EF-45', ar: 'بالغ الجودة ٤٥' },
+  { sheldon: 50, label: 'AU-50', ar: 'شبه غير متداول ٥٠' },
+  { sheldon: 58, label: 'AU-58', ar: 'شبه غير متداول ٥٨' },
+  { sheldon: 62, label: 'MS-62', ar: 'حالة المطبعة ٦٢' },
+  { sheldon: 65, label: 'MS-65', ar: 'حالة المطبعة ٦٥' },
+  { sheldon: 70, label: 'MS-70', ar: 'حالة المطبعة ٧٠' },
+  { sheldon: 65, label: 'PR-65', ar: 'نسخة مرآة ٦٥' },
+];
+
+const CURRENCIES = ['USD','AED','SAR','EGP','KWD','OMR','QAR','GBP','EUR','AUD'];
+const ALL_COINS_DATA = COINS_RAW as unknown as CoinType[];
+
+const SOURCES = [
+  'Admin', 'Heritage Auctions', 'eBay Sold', 'Stack's Bowers',
+  'Mohamedia Auctions', 'Emirates Auction', 'Al-Andalus Auctions', 'Dealer', 'Other',
 ];
 
 // ── Field component ───────────────────────────────────────────────────────────
@@ -60,6 +88,19 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   const [saved, setSaved]         = useState(false);
   const [jsonExpanded, setJsonExpanded] = useState(false);
   const [pendingCoins, setPendingCoins] = useState<Partial<Coin>[]>([]);
+  const [adminTab, setAdminTab]         = useState<'coins' | 'prices' | 'submissions'>('coins');
+
+  // Price management state
+  const [priceSearch, setPriceSearch]   = useState('');
+  const [selectedCoinId, setSelectedCoinId] = useState('');
+  const [priceForm, setPriceForm]       = useState({
+    sheldon: 45, grade_label: 'EF-45', grade_ar: 'بالغ الجودة ٤٥',
+    price_low: '', price_high: '', currency: 'USD',
+    certified: false, source: 'Admin', source_url: '', source_date: '',
+  });
+  const [priceSaved, setPriceSaved]     = useState(false);
+  const [existingPrices, setExistingPrices] = useState<Record<string, { price_low: number; price_high: number; source: string }>>({});
+  const [submissions, setSubmissions]   = useState<{id:string;coin_id:string;sheldon:number;price:number;currency:string;status:string;submitted_at:string}[]>([]);
 
   // Load pending coins from localStorage
   useEffect(() => {
@@ -68,6 +109,75 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
       if (stored) setPendingCoins(JSON.parse(stored));
     } catch {}
   }, []);
+
+  const loadPrices = async (coinId: string) => {
+    if (!coinId) return;
+    const { data } = await supabase
+      .from('coin_grades').select('*').eq('coin_id', coinId);
+    if (data) {
+      const map: Record<string, { price_low: number; price_high: number; source: string }> = {};
+      data.forEach((r: { grade_label: string; price_low: number; price_high: number; source: string }) => {
+        map[r.grade_label] = { price_low: r.price_low, price_high: r.price_high, source: r.source };
+      });
+      setExistingPrices(map);
+    }
+  };
+
+  const loadSubmissions = async () => {
+    const { data } = await supabase
+      .from('price_submissions').select('*')
+      .eq('status', 'pending').order('submitted_at', { ascending: false });
+    if (data) setSubmissions(data);
+  };
+
+  const savePrice = async () => {
+    if (!selectedCoinId || !priceForm.price_low) return;
+    const grade = SHELDON_GRADES.find(g => g.sheldon === priceForm.sheldon && g.label === priceForm.grade_label);
+    const { error } = await supabase.from('coin_grades').upsert({
+      coin_id: selectedCoinId,
+      sheldon: priceForm.sheldon,
+      grade_label: priceForm.grade_label,
+      grade_ar: grade?.ar ?? priceForm.grade_ar,
+      price_low: parseFloat(String(priceForm.price_low)),
+      price_high: priceForm.price_high ? parseFloat(String(priceForm.price_high)) : null,
+      currency: priceForm.currency,
+      certified: priceForm.certified,
+      source: priceForm.source,
+      source_url: priceForm.source_url || null,
+      source_date: priceForm.source_date || null,
+    }, { onConflict: 'coin_id,sheldon,certified' });
+    if (!error) {
+      setPriceSaved(true);
+      await loadPrices(selectedCoinId);
+      setTimeout(() => setPriceSaved(false), 2000);
+    }
+  };
+
+  const approveSubmission = async (id: string, coinId: string, sheldon: number, price: number, currency: string) => {
+    const grade = SHELDON_GRADES.find(g => g.sheldon === sheldon);
+    await supabase.from('coin_grades').upsert({
+      coin_id: coinId, sheldon, certified: false,
+      grade_label: grade?.label ?? String(sheldon),
+      grade_ar: grade?.ar ?? String(sheldon),
+      price_low: price, price_high: null, currency, source: 'Community',
+    }, { onConflict: 'coin_id,sheldon,certified' });
+    await supabase.from('price_submissions').update({ status: 'approved' }).eq('id', id);
+    setSubmissions(prev => prev.filter(s => s.id !== id));
+  };
+
+  const rejectSubmission = async (id: string) => {
+    await supabase.from('price_submissions').update({ status: 'rejected' }).eq('id', id);
+    setSubmissions(prev => prev.filter(s => s.id !== id));
+  };
+
+  const coinSearchResults = priceSearch.length >= 2
+    ? ALL_COINS_DATA.filter(c =>
+        c.name.toLowerCase().includes(priceSearch.toLowerCase()) ||
+        (c.nar || '').includes(priceSearch)
+      ).slice(0, 8)
+    : [];
+
+  const selectedCoin = ALL_COINS_DATA.find(c => c.id === selectedCoinId);
 
   const login = () => {
     if (pw === ADMIN_PASSWORD) { setAuthed(true); setPwError(false); }
@@ -158,11 +268,12 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
       <div className="bg-parch-cream rounded-2xl shadow-2xl w-full max-w-[720px] max-h-[90vh] overflow-y-auto border border-gold-700/40">
 
         {/* Header */}
-        <div className="sticky top-0 bg-parch-cream flex items-center justify-between px-6 py-4 border-b border-gold-700/20 z-10">
-          <div className="flex items-center gap-2">
-            <Plus size={16} className="text-gold-500" />
-            <h2 className="font-amiri text-xl text-ink">{isAr ? 'إضافة عملة جديدة' : 'Add New Coin'}</h2>
-          </div>
+        <div className="sticky top-0 bg-parch-cream flex flex-col border-b border-gold-700/20 z-10">
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center gap-2">
+              <Plus size={16} className="text-gold-500" />
+              <h2 className="font-amiri text-xl text-ink">{isAr ? 'لوحة الإدارة' : 'Admin Panel'}</h2>
+            </div>
           <div className="flex items-center gap-2">
             {pendingCoins.length > 0 && (
               <button onClick={exportJSON}
@@ -174,9 +285,23 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
               <X size={14} />
             </button>
           </div>
+          {/* Tab bar */}
+          <div className="flex border-t border-gold-700/15">
+            {([
+              { key: 'coins',       icon: <Plus size={13} />,        label: isAr ? 'إضافة عملة'  : 'Add Coin' },
+              { key: 'prices',      icon: <DollarSign size={13} />,  label: isAr ? 'الأسعار'     : 'Prices' },
+              { key: 'submissions', icon: <Search size={13} />,      label: isAr ? 'المقترحات'   : 'Submissions' },
+            ] as const).map(tab => (
+              <button key={tab.key} onClick={() => { setAdminTab(tab.key); if (tab.key === 'submissions') loadSubmissions(); }}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[12px] font-medium transition-colors border-b-2
+                  ${adminTab === tab.key ? 'border-gold-500 text-gold-600' : 'border-transparent text-ink/40 hover:text-ink/70'}`}>
+                {tab.icon}{tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="px-6 py-5 space-y-5">
+        {adminTab === 'coins' && <div className="px-6 py-5 space-y-5">
           {/* Section: Identity */}
           <div>
             <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
@@ -337,7 +462,175 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
               ? 'العملات المحفوظة مؤقتة. استخدم "تصدير JSON" لتحميل الملف وإضافته إلى coins.json'
               : 'Saved coins are temporary. Use "Export JSON" to download and merge into coins.json'}
           </p>
-        </div>
+        </div>}
+
+        {/* ── PRICES TAB ── */}
+        {adminTab === 'prices' && (
+          <div className="px-6 py-5 space-y-4">
+            {/* Coin search */}
+            <div>
+              <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'ابحث عن عملة' : 'Search coin'}</label>
+              <div className="relative">
+                <input className={inp} value={priceSearch} onChange={e => setPriceSearch(e.target.value)}
+                  placeholder={isAr ? 'اسم العملة بالإنجليزية أو العربية...' : 'Coin name...'} />
+                {coinSearchResults.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-parch-cream border border-gold-700/30 rounded-xl shadow-xl z-20 max-h-48 overflow-y-auto mt-1">
+                    {coinSearchResults.map(c => (
+                      <button key={c.id} onClick={() => { setSelectedCoinId(c.id); setPriceSearch(c.name); loadPrices(c.id); }}
+                        className="w-full text-right px-4 py-2.5 text-[12px] text-ink/80 hover:bg-gold-500/10 border-b border-gold-700/10 last:border-0 transition-colors">
+                        <div className="font-amiri">{isAr ? (c.nar || c.name) : c.name}</div>
+                        <div className="text-[10px] text-ink/40">{c.cc} · {c.yce} · {c.metal}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {selectedCoin && (
+              <>
+                {/* Selected coin preview */}
+                <div className="flex items-center gap-3 bg-gold-500/10 border border-gold-500/30 rounded-xl px-4 py-3">
+                  {selectedCoin.o && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={selectedCoin.o} alt="" className="w-10 h-10 rounded-full object-cover border border-gold-700/30" />
+                  )}
+                  <div>
+                    <div className="font-amiri text-[14px] text-ink">{isAr ? (selectedCoin.nar || selectedCoin.name) : selectedCoin.name}</div>
+                    <div className="text-[10px] text-ink/40">{selectedCoin.cc} · {selectedCoin.yce} · {selectedCoin.metal} · {selectedCoin.km}</div>
+                  </div>
+                </div>
+
+                {/* Existing prices grid */}
+                {Object.keys(existingPrices).length > 0 && (
+                  <div>
+                    <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-2 block">{isAr ? 'الأسعار الحالية' : 'Current Prices'}</label>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {Object.entries(existingPrices).map(([grade, p]) => (
+                        <div key={grade} className="bg-parch-dark/40 rounded-lg px-2 py-1.5 border border-gold-700/15 text-center">
+                          <div className="text-[10px] font-bold text-gold-600">{grade}</div>
+                          <div className="text-[11px] text-ink">{p.price_low}{p.price_high ? `–${p.price_high}` : ''}</div>
+                          <div className="text-[9px] text-ink/30">{p.source}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Price form */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'الدرجة' : 'Grade'}</label>
+                    <select className={sel} value={priceForm.grade_label}
+                      onChange={e => {
+                        const g = SHELDON_GRADES.find(x => x.label === e.target.value);
+                        if (g) setPriceForm(f => ({ ...f, grade_label: g.label, sheldon: g.sheldon, grade_ar: g.ar }));
+                      }}>
+                      {SHELDON_GRADES.map(g => (
+                        <option key={g.label + g.sheldon} value={g.label}>{g.label} — {g.ar}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'العملة' : 'Currency'}</label>
+                    <select className={sel} value={priceForm.currency}
+                      onChange={e => setPriceForm(f => ({ ...f, currency: e.target.value }))}>
+                      {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'أقل سعر' : 'Price Low'}</label>
+                    <input className={inp} type="number" value={priceForm.price_low}
+                      onChange={e => setPriceForm(f => ({ ...f, price_low: e.target.value }))}
+                      placeholder="e.g. 60" dir="ltr" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'أعلى سعر' : 'Price High'}</label>
+                    <input className={inp} type="number" value={priceForm.price_high}
+                      onChange={e => setPriceForm(f => ({ ...f, price_high: e.target.value }))}
+                      placeholder="e.g. 90" dir="ltr" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'المصدر' : 'Source'}</label>
+                    <select className={sel} value={priceForm.source}
+                      onChange={e => setPriceForm(f => ({ ...f, source: e.target.value }))}>
+                      {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'تاريخ المصدر' : 'Source Date'}</label>
+                    <input className={inp} type="date" value={priceForm.source_date}
+                      onChange={e => setPriceForm(f => ({ ...f, source_date: e.target.value }))} dir="ltr" />
+                  </div>
+                </div>
+
+                <input className={inp} value={priceForm.source_url}
+                  onChange={e => setPriceForm(f => ({ ...f, source_url: e.target.value }))}
+                  placeholder={isAr ? 'رابط المصدر (اختياري)' : 'Source URL (optional)'} dir="ltr" />
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={priceForm.certified}
+                    onChange={e => setPriceForm(f => ({ ...f, certified: e.target.checked }))}
+                    className="w-4 h-4 rounded" />
+                  <span className="text-[12px] text-ink/70">
+                    {isAr ? 'عملة مصنفة (PCGS / NGC)' : 'Certified coin (PCGS / NGC)'}
+                  </span>
+                </label>
+
+                <button onClick={savePrice}
+                  className={`w-full py-3 rounded-xl font-semibold text-[14px] transition-all flex items-center justify-center gap-2
+                    ${priceSaved ? 'bg-emerald-600 text-white' : 'bg-gold-600 hover:bg-gold-500 text-ink cursor-pointer'}`}>
+                  <Save size={15} />
+                  {priceSaved ? (isAr ? '✓ تم حفظ السعر' : '✓ Price saved') : (isAr ? 'حفظ السعر' : 'Save Price')}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── SUBMISSIONS TAB ── */}
+        {adminTab === 'submissions' && (
+          <div className="px-6 py-5">
+            <p className="text-[12px] text-ink/50 mb-4">
+              {isAr ? `${submissions.length} اقتراح سعر بانتظار المراجعة` : `${submissions.length} price submission(s) pending review`}
+            </p>
+            {submissions.length === 0 ? (
+              <div className="text-center py-8 text-ink/30 font-amiri">{isAr ? 'لا توجد اقتراحات جديدة' : 'No pending submissions'}</div>
+            ) : (
+              <div className="space-y-3">
+                {submissions.map(s => {
+                  const coin = ALL_COINS_DATA.find(c => c.id === s.coin_id);
+                  const grade = SHELDON_GRADES.find(g => g.sheldon === s.sheldon);
+                  return (
+                    <div key={s.id} className="bg-parch-dark/30 rounded-xl border border-gold-700/15 p-3">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div>
+                          <div className="text-[13px] font-amiri text-ink">{coin ? (isAr ? (coin.nar || coin.name) : coin.name) : s.coin_id}</div>
+                          <div className="text-[11px] text-ink/50">
+                            {grade?.label} · {s.price} {s.currency}
+                          </div>
+                          <div className="text-[10px] text-ink/30 mt-0.5">
+                            {new Date(s.submitted_at).toLocaleDateString(isAr ? 'ar-EG' : 'en-AU')}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => approveSubmission(s.id, s.coin_id, s.sheldon, s.price, s.currency)}
+                          className="flex-1 py-1.5 text-[11px] rounded-lg bg-emerald-600 text-white font-medium">
+                          {isAr ? '✓ قبول' : '✓ Approve'}
+                        </button>
+                        <button onClick={() => rejectSubmission(s.id)}
+                          className="flex-1 py-1.5 text-[11px] rounded-lg bg-red-500 text-white font-medium">
+                          {isAr ? '✗ رفض' : '✗ Reject'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Pending coins list */}
         {pendingCoins.length > 0 && (
