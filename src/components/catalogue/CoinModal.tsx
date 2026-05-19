@@ -659,6 +659,9 @@ export default function CoinModal({
               ))}
             </div>
 
+            {/* Price Guide */}
+            <PriceGuide coinId={coin.id} locale={locale} />
+
             {/* Numista link + coin page link */}
             <div className="flex items-center gap-2 flex-wrap">
               {coin.nid && (
