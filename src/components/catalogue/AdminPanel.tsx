@@ -274,6 +274,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
               <Plus size={16} className="text-gold-500" />
               <h2 className="font-amiri text-xl text-ink">{isAr ? 'لوحة الإدارة' : 'Admin Panel'}</h2>
             </div>
+          </div>
           <div className="flex items-center gap-2">
             {pendingCoins.length > 0 && (
               <button onClick={exportJSON}
