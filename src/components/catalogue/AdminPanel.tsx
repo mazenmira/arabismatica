@@ -54,7 +54,7 @@ const CURRENCIES = ['USD','AED','SAR','EGP','KWD','OMR','QAR','GBP','EUR','AUD']
 const ALL_COINS_DATA = COINS_RAW as unknown as CoinType[];
 
 const SOURCES = [
-  'Admin', 'Heritage Auctions', 'eBay Sold', 'Stack's Bowers',
+  'Admin', 'Heritage Auctions', 'eBay Sold', "Stack's Bowers",
   'Mohamedia Auctions', 'Emirates Auction', 'Al-Andalus Auctions', 'Dealer', 'Other',
 ];
 
