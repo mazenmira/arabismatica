@@ -14,11 +14,15 @@ const WP = 'https://arabismatica.arabcollector.com';
 // ── Kept: المقتني العربي + مركز الأدوات والمعرفة only ──
 const TOP_NAV_ITEMS = [
   { label: 'المقتني العربي', children: [
-    { label: 'عن المقتني العربي',   href: 'https://arabcollector.com/about-us/' },
+    { label: 'عن المقتني العربي',   href: 'https://arabcollector.com/about-us/' },  
   ]},
   { label: 'مركز الأدوات والمعرفة', highlight: true, children: [
-    { label: 'أدوات التقييم',          href: 'https://arabcollector.com/grading-tools/' ,      highlight: true },
-    { label: 'بوابة المعرفة',          href: 'https://arabcollector.com/knowledge-portal/' ,   highlight: true },
+    { label: 'أدوات التقييم',          href: `${WP}/grading-tools/`,      highlight: true },
+    { label: 'بوابة المعرفة',          href: `${WP}/knowledge-portal/`,   highlight: true },
+    { label: 'مختبر المقتني الصغير',   href: `${WP}/young-collector-lab/` },
+    { label: 'أكاديمية المقتني العربي', href: `${WP}/ac-academy/` },
+    { label: 'المكتبة الإلكترونية',    href: 'https://library.arabcollector.com/' },
+    { label: 'مكتبة المرئيات',         href: `${WP}/video/` },
   ]},
 ];
 
@@ -189,7 +193,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
 
               {/* بوابة المعرفة — filled gold pill */}
               <a
-                href={https://arabcollector.com/knowledge-portal/}
+                href={`${WP}/knowledge-portal/`}
                 target="_blank" rel="noopener"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold text-ink bg-gold-500 hover:bg-gold-400 transition-colors mr-2 shrink-0"
               >
@@ -199,7 +203,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
 
               {/* أدوات التقييم — outlined pill */}
               <a
-                href={https://arabcollector.com/grading-tools/}
+                href={`${WP}/grading-tools/`}
                 target="_blank" rel="noopener"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500 text-gold-300 hover:bg-gold-900/40 transition-colors shrink-0"
               >
