@@ -8,7 +8,7 @@ import COINS_RAW from '@/data/coins.json';
 import type { Coin as CoinType } from '@/types/coin';
 import type { Coin } from '@/types/coin';
 
-// ── Simple password gate — change this to env var in production ───────────────
+// -- Simple password gate - change this to env var in production --
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'arabcollector2025';
 
 const EMPTY_COIN: Partial<Coin> = {
@@ -33,7 +33,7 @@ const COUNTRIES = [
   {cc:'PS',co:'Palestine',co_ar:'فلسطين'},{cc:'MR',co:'Mauritania',co_ar:'موريتانيا'},
 ];
 
-// ── Sheldon grades ───────────────────────────────────────────────────────────
+// -- Sheldon grades --
 const SHELDON_GRADES = [
   { sheldon: 4,  label: 'G-4',   ar: 'جيد ٤' },
   { sheldon: 8,  label: 'VG-8',  ar: 'جيد جداً ٨' },
@@ -58,7 +58,7 @@ const SOURCES = [
   'Mohamedia Auctions', 'Emirates Auction', 'Al-Andalus Auctions', 'Dealer', 'Other',
 ];
 
-// ── Field component ───────────────────────────────────────────────────────────
+// -- Field component --
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
@@ -71,7 +71,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 const inp = "w-full text-[12px] px-3 py-2 rounded-lg border border-gold-700/30 bg-parch-cream text-ink outline-none focus:border-gold-500 transition-colors";
 const sel = inp + " cursor-pointer";
 
-// ── Main AdminPanel ───────────────────────────────────────────────────────────
+// -- Main AdminPanel --
 interface AdminPanelProps {
   onClose: () => void;
   locale: string;
@@ -222,7 +222,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     a.click(); URL.revokeObjectURL(url);
   };
 
-  // ── Password screen ─────────────────────────────────────────────────────
+  // -- Password screen --
   if (!authed) return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
       style={{ background: 'rgba(22,16,10,.9)', backdropFilter: 'blur(8px)' }}>
@@ -261,7 +261,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     </div>
   );
 
-  // ── Admin form ──────────────────────────────────────────────────────────
+  // -- Admin form --
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
       style={{ background: 'rgba(22,16,10,.85)', backdropFilter: 'blur(6px)' }}>
