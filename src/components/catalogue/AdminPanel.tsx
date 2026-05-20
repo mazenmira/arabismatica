@@ -1,15 +1,12 @@
-// v1.0
+// v2.0 - Supabase auth + role-based access + sub-admin management
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Plus, Save, Trash2, Lock, Eye, EyeOff, ChevronDown, ChevronUp, DollarSign, Search } from 'lucide-react';
+import { X, Plus, Save, Trash2, Lock, Eye, EyeOff, ChevronDown, ChevronUp, DollarSign, Search, Users, LogOut } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import COINS_RAW from '@/data/coins.json';
 import type { Coin as CoinType } from '@/types/coin';
 import type { Coin } from '@/types/coin';
-
-// -- Simple password gate - change this to env var in production --
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'arabcollector2025';
 
 const EMPTY_COIN: Partial<Coin> = {
   id: '', cc: 'EG', co: 'Egypt', co_ar: 'مصر', dyn: '',
@@ -33,7 +30,6 @@ const COUNTRIES = [
   {cc:'PS',co:'Palestine',co_ar:'فلسطين'},{cc:'MR',co:'Mauritania',co_ar:'موريتانيا'},
 ];
 
-// -- Sheldon grades --
 const SHELDON_GRADES = [
   { sheldon: 4,  label: 'G-4',   ar: 'جيد ٤' },
   { sheldon: 8,  label: 'VG-8',  ar: 'جيد جداً ٨' },
@@ -58,7 +54,16 @@ const SOURCES = [
   'Mohamedia Auctions', 'Emirates Auction', 'Al-Andalus Auctions', 'Dealer', 'Other',
 ];
 
-// -- Field component --
+type UserRole = 'super_admin' | 'coin_admin' | 'price_admin';
+
+interface RoleRecord {
+  id: string;
+  user_id: string;
+  role: UserRole;
+  email: string;
+  created_at: string;
+}
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
@@ -71,7 +76,6 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 const inp = "w-full text-[12px] px-3 py-2 rounded-lg border border-gold-700/30 bg-parch-cream text-ink outline-none focus:border-gold-500 transition-colors";
 const sel = inp + " cursor-pointer";
 
-// -- Main AdminPanel --
 interface AdminPanelProps {
   onClose: () => void;
   locale: string;
@@ -80,17 +84,27 @@ interface AdminPanelProps {
 
 export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelProps) {
   const isAr = locale === 'ar';
-  const [authed, setAuthed]       = useState(false);
-  const [pw, setPw]               = useState('');
+
+  // -- Auth state --
+  const [email, setEmail]         = useState('');
+  const [password, setPassword]   = useState('');
   const [showPw, setShowPw]       = useState(false);
-  const [pwError, setPwError]     = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [userRole, setUserRole]   = useState<UserRole | null>(null);
+  const [authed, setAuthed]       = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  // -- Tab state --
+  const [adminTab, setAdminTab] = useState<'coins' | 'prices' | 'submissions' | 'team'>('coins');
+
+  // -- Coin form --
   const [form, setForm]           = useState<Partial<Coin>>(EMPTY_COIN);
   const [saved, setSaved]         = useState(false);
   const [jsonExpanded, setJsonExpanded] = useState(false);
   const [pendingCoins, setPendingCoins] = useState<Partial<Coin>[]>([]);
-  const [adminTab, setAdminTab]         = useState<'coins' | 'prices' | 'submissions'>('coins');
 
-  // Price management state
+  // -- Price state --
   const [priceSearch, setPriceSearch]   = useState('');
   const [selectedCoinId, setSelectedCoinId] = useState('');
   const [priceForm, setPriceForm]       = useState({
@@ -100,9 +114,34 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   });
   const [priceSaved, setPriceSaved]     = useState(false);
   const [existingPrices, setExistingPrices] = useState<Record<string, { price_low: number; price_high: number; source: string }>>({});
-  const [submissions, setSubmissions]   = useState<{id:string;coin_id:string;sheldon:number;price:number;currency:string;status:string;submitted_at:string}[]>([]);
 
-  // Load pending coins from localStorage
+  // -- Submissions --
+  const [submissions, setSubmissions] = useState<{
+    id: string; coin_id: string; sheldon: number; price: number;
+    currency: string; status: string; submitted_at: string; source_url?: string;
+  }[]>([]);
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
+
+  // -- Team management --
+  const [teamMembers, setTeamMembers]   = useState<RoleRecord[]>([]);
+  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [newMemberRole, setNewMemberRole]   = useState<'coin_admin' | 'price_admin'>('price_admin');
+  const [teamError, setTeamError]       = useState('');
+  const [teamSaved, setTeamSaved]       = useState(false);
+
+  // -- Check existing session on mount --
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await loadUserRole(session.user.id);
+      }
+      setCheckingSession(false);
+    };
+    checkSession();
+  }, []);
+
+  // -- Load pending coins from localStorage --
   useEffect(() => {
     try {
       const stored = localStorage.getItem('ac_pending_coins');
@@ -110,10 +149,44 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     } catch {}
   }, []);
 
+  const loadUserRole = async (userId: string) => {
+    const { data } = await supabase
+      .from('user_roles').select('role').eq('user_id', userId).single();
+    if (data) {
+      setUserRole(data.role as UserRole);
+      setAuthed(true);
+      // coin_admins start on coins tab; price_admins start on prices tab
+      if (data.role === 'price_admin') setAdminTab('prices');
+    } else {
+      setAuthError(isAr ? 'ليس لديك صلاحيات. تواصل مع المسؤول الرئيسي.' : 'No admin role assigned. Contact the super admin.');
+    }
+  };
+
+  const login = async () => {
+    setAuthLoading(true);
+    setAuthError('');
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.user) {
+      setAuthError(isAr ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Incorrect email or password');
+      setAuthLoading(false);
+      return;
+    }
+    await loadUserRole(data.user.id);
+    setAuthLoading(false);
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setAuthed(false);
+    setUserRole(null);
+    setEmail('');
+    setPassword('');
+  };
+
+  // -- Price helpers --
   const loadPrices = async (coinId: string) => {
     if (!coinId) return;
-    const { data } = await supabase
-      .from('coin_grades').select('*').eq('coin_id', coinId);
+    const { data } = await supabase.from('coin_grades').select('*').eq('coin_id', coinId);
     if (data) {
       const map: Record<string, { price_low: number; price_high: number; source: string }> = {};
       data.forEach((r: { grade_label: string; price_low: number; price_high: number; source: string }) => {
@@ -124,10 +197,12 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   };
 
   const loadSubmissions = async () => {
-    const { data } = await supabase
+    setSubmissionsLoading(true);
+    const { data, error } = await supabase
       .from('price_submissions').select('*')
       .eq('status', 'pending').order('submitted_at', { ascending: false });
-    if (data) setSubmissions(data);
+    if (!error && data) setSubmissions(data);
+    setSubmissionsLoading(false);
   };
 
   const savePrice = async () => {
@@ -170,6 +245,54 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     setSubmissions(prev => prev.filter(s => s.id !== id));
   };
 
+  // -- Team management --
+  const loadTeam = async () => {
+    const { data } = await supabase.from('user_roles').select('*').order('created_at');
+    if (data) setTeamMembers(data as RoleRecord[]);
+  };
+
+  const addTeamMember = async () => {
+    setTeamError('');
+    if (!newMemberEmail.trim()) return;
+    // Look up the user by email via auth.users (requires service role in prod;
+    // here we look them up from user_roles or prompt them to log in first)
+    const { data: existing } = await supabase
+      .from('user_roles').select('id').eq('email', newMemberEmail.trim()).single();
+    if (existing) {
+      setTeamError(isAr ? 'هذا المستخدم موجود بالفعل' : 'This user already has a role');
+      return;
+    }
+    // Find the user_id by email using a direct query to auth.users
+    // NOTE: This requires the user to have already signed up via Supabase Auth.
+    const { data: authUser, error: authErr } = await supabase
+      .rpc('get_user_id_by_email', { lookup_email: newMemberEmail.trim() });
+    if (authErr || !authUser) {
+      setTeamError(isAr
+        ? 'لم يتم العثور على المستخدم. يجب أن يكون قد سجّل حساباً أولاً.'
+        : 'User not found. They must create an account first.');
+      return;
+    }
+    const { error } = await supabase.from('user_roles').insert({
+      user_id: authUser,
+      role: newMemberRole,
+      email: newMemberEmail.trim(),
+    });
+    if (error) {
+      setTeamError(isAr ? 'خطأ أثناء الإضافة' : 'Error adding member');
+    } else {
+      setNewMemberEmail('');
+      setTeamSaved(true);
+      setTimeout(() => setTeamSaved(false), 2000);
+      await loadTeam();
+    }
+  };
+
+  const removeTeamMember = async (id: string) => {
+    await supabase.from('user_roles').delete().eq('id', id);
+    setTeamMembers(prev => prev.filter(m => m.id !== id));
+  };
+
+  // -- Coin helpers --
   const coinSearchResults = priceSearch.length >= 2
     ? ALL_COINS_DATA.filter(c =>
         c.name.toLowerCase().includes(priceSearch.toLowerCase()) ||
@@ -179,12 +302,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
 
   const selectedCoin = ALL_COINS_DATA.find(c => c.id === selectedCoinId);
 
-  const login = () => {
-    if (pw === ADMIN_PASSWORD) { setAuthed(true); setPwError(false); }
-    else { setPwError(true); }
-  };
-
-  const set = (key: keyof Coin, val: string | number | null) =>
+  const setField = (key: keyof Coin, val: string | number | null) =>
     setForm(f => ({ ...f, [key]: val }));
 
   const setCountry = (cc: string) => {
@@ -222,7 +340,17 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     a.click(); URL.revokeObjectURL(url);
   };
 
-  // -- Password screen --
+  // -- Role label helper --
+  const roleLabel = (role: UserRole) => ({
+    super_admin: isAr ? 'مسؤول رئيسي' : 'Super Admin',
+    coin_admin:  isAr ? 'مدير عملات' : 'Coin Admin',
+    price_admin: isAr ? 'مدير أسعار' : 'Price Admin',
+  }[role]);
+
+  // -- Loading state --
+  if (checkingSession) return null;
+
+  // -- Login screen --
   if (!authed) return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
       style={{ background: 'rgba(22,16,10,.9)', backdropFilter: 'blur(8px)' }}>
@@ -234,66 +362,104 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
           </div>
           <button onClick={onClose} className="text-ink/40 hover:text-ink transition-colors"><X size={16} /></button>
         </div>
-        <div className="relative mb-3">
+
+        <div className="space-y-3">
           <input
-            type={showPw ? 'text' : 'password'}
-            placeholder={isAr ? 'كلمة المرور' : 'Password'}
-            value={pw}
-            onChange={e => { setPw(e.target.value); setPwError(false); }}
+            type="email"
+            placeholder={isAr ? 'البريد الإلكتروني' : 'Email'}
+            value={email}
+            onChange={e => { setEmail(e.target.value); setAuthError(''); }}
             onKeyDown={e => e.key === 'Enter' && login()}
-            className={`${inp} pr-10 ${pwError ? 'border-red-400' : ''}`}
+            className={inp}
             dir="ltr"
           />
-          <button onClick={() => setShowPw(s => !s)}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/30 hover:text-ink/60">
-            {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
-          </button>
+          <div className="relative">
+            <input
+              type={showPw ? 'text' : 'password'}
+              placeholder={isAr ? 'كلمة المرور' : 'Password'}
+              value={password}
+              onChange={e => { setPassword(e.target.value); setAuthError(''); }}
+              onKeyDown={e => e.key === 'Enter' && login()}
+              className={`${inp} pr-10 ${authError ? 'border-red-400' : ''}`}
+              dir="ltr"
+            />
+            <button onClick={() => setShowPw(s => !s)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/30 hover:text-ink/60">
+              {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
+            </button>
+          </div>
         </div>
-        {pwError && <p className="text-[11px] text-red-500 mb-3">{isAr ? 'كلمة المرور غير صحيحة' : 'Incorrect password'}</p>}
-        <button onClick={login}
-          className="w-full py-2.5 bg-gold-600 hover:bg-gold-500 text-ink rounded-xl font-semibold text-[13px] transition-colors">
-          {isAr ? 'دخول' : 'Login'}
+
+        {authError && (
+          <p className="text-[11px] text-red-500 mt-2">{authError}</p>
+        )}
+
+        <button onClick={login} disabled={authLoading}
+          className="w-full mt-4 py-2.5 bg-gold-600 hover:bg-gold-500 disabled:opacity-50 text-ink rounded-xl font-semibold text-[13px] transition-colors">
+          {authLoading ? (isAr ? 'جاري الدخول...' : 'Signing in...') : (isAr ? 'دخول' : 'Sign In')}
         </button>
         <p className="text-[10px] text-ink/30 text-center mt-4">
-          {isAr ? 'للمسؤولين فقط' : 'Authorized administrators only'}
+          {isAr ? 'للمسؤولين المعتمدين فقط' : 'Authorized administrators only'}
         </p>
       </div>
     </div>
   );
 
-  // -- Admin form --
+  // -- Which tabs this role can see --
+  const canSeeCoins       = userRole === 'super_admin' || userRole === 'coin_admin';
+  const canSeePrices      = userRole === 'super_admin' || userRole === 'price_admin';
+  const canSeeSubmissions = userRole === 'super_admin' || userRole === 'price_admin';
+  const canSeeTeam        = userRole === 'super_admin';
+
+  const tabs = [
+    canSeeCoins       && { key: 'coins'       as const, icon: <Plus size={13} />,        label: isAr ? 'إضافة عملة' : 'Add Coin' },
+    canSeePrices      && { key: 'prices'      as const, icon: <DollarSign size={13} />,  label: isAr ? 'الأسعار'    : 'Prices' },
+    canSeeSubmissions && { key: 'submissions' as const, icon: <Search size={13} />,      label: isAr ? 'المقترحات'  : 'Submissions' },
+    canSeeTeam        && { key: 'team'        as const, icon: <Users size={13} />,       label: isAr ? 'الفريق'     : 'Team' },
+  ].filter(Boolean) as { key: 'coins' | 'prices' | 'submissions' | 'team'; icon: React.ReactNode; label: string }[];
+
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
       style={{ background: 'rgba(22,16,10,.85)', backdropFilter: 'blur(6px)' }}>
       <div className="bg-parch-cream rounded-2xl shadow-2xl w-full max-w-[720px] max-h-[90vh] overflow-y-auto border border-gold-700/40">
 
         {/* Header */}
-        <div className="sticky top-0 bg-parch-cream flex flex-col border-b border-gold-700/20 z-10">
+        <div className="sticky top-0 bg-parch-cream border-b border-gold-700/20 z-10">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-2">
               <Plus size={16} className="text-gold-500" />
               <h2 className="font-amiri text-xl text-ink">{isAr ? 'لوحة الإدارة' : 'Admin Panel'}</h2>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-600 border border-gold-700/30">
+                {userRole ? roleLabel(userRole) : ''}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {pendingCoins.length > 0 && (
+                <button onClick={exportJSON}
+                  className="text-[11px] px-3 py-1.5 border border-gold-500/50 text-gold-600 hover:bg-gold-900/30 rounded-full transition-colors">
+                  {isAr ? `تصدير JSON (${pendingCoins.length})` : `Export JSON (${pendingCoins.length})`}
+                </button>
+              )}
+              <button onClick={logout} title={isAr ? 'تسجيل خروج' : 'Sign out'}
+                className="w-8 h-8 rounded-full border border-gold-700/30 text-ink/40 hover:text-red-400 flex items-center justify-center transition-colors">
+                <LogOut size={13} />
+              </button>
+              <button onClick={onClose}
+                className="w-8 h-8 rounded-full border border-gold-700/30 text-ink/40 hover:text-ink flex items-center justify-center transition-colors">
+                <X size={14} />
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {pendingCoins.length > 0 && (
-              <button onClick={exportJSON}
-                className="text-[11px] px-3 py-1.5 border border-gold-500/50 text-gold-600 hover:bg-gold-900/30 rounded-full transition-colors">
-                {isAr ? `تصدير JSON (${pendingCoins.length})` : `Export JSON (${pendingCoins.length})`}
-              </button>
-            )}
-            <button onClick={onClose} className="w-8 h-8 rounded-full border border-gold-700/30 text-ink/40 hover:text-ink flex items-center justify-center transition-colors">
-              <X size={14} />
-            </button>
-          </div>
+
           {/* Tab bar */}
           <div className="flex border-t border-gold-700/15">
-            {([
-              { key: 'coins',       icon: <Plus size={13} />,        label: isAr ? 'إضافة عملة'  : 'Add Coin' },
-              { key: 'prices',      icon: <DollarSign size={13} />,  label: isAr ? 'الأسعار'     : 'Prices' },
-              { key: 'submissions', icon: <Search size={13} />,      label: isAr ? 'المقترحات'   : 'Submissions' },
-            ] as const).map(tab => (
-              <button key={tab.key} onClick={() => { setAdminTab(tab.key); if (tab.key === 'submissions') loadSubmissions(); }}
+            {tabs.map(tab => (
+              <button key={tab.key}
+                onClick={() => {
+                  setAdminTab(tab.key);
+                  if (tab.key === 'submissions') loadSubmissions();
+                  if (tab.key === 'team') loadTeam();
+                }}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[12px] font-medium transition-colors border-b-2
                   ${adminTab === tab.key ? 'border-gold-500 text-gold-600' : 'border-transparent text-ink/40 hover:text-ink/70'}`}>
                 {tab.icon}{tab.label}
@@ -302,178 +468,144 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
           </div>
         </div>
 
-        {adminTab === 'coins' && <div className="px-6 py-5 space-y-5">
-          {/* Section: Identity */}
-          <div>
-            <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
-              {isAr ? 'هوية العملة' : 'Coin Identity'}
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label={isAr ? 'الدولة' : 'Country'}>
-                <select className={sel} value={form.cc} onChange={e => setCountry(e.target.value)}>
-                  {COUNTRIES.map(c => <option key={c.cc} value={c.cc}>{isAr ? c.co_ar : c.co}</option>)}
-                </select>
-              </Field>
-              <Field label={isAr ? 'الأسرة الحاكمة' : 'Dynasty'}>
-                <input className={inp} value={form.dyn || ''} onChange={e => set('dyn', e.target.value)}
-                  placeholder={isAr ? 'مثال: السلطنة المصرية' : 'e.g. Egyptian Sultanate'} />
-              </Field>
-              <Field label={isAr ? 'الاسم الإنجليزي' : 'English Name'}>
-                <input className={inp} value={form.name || ''} onChange={e => set('name', e.target.value)}
-                  placeholder="2 Milliemes - Fuad I" dir="ltr" />
-              </Field>
-              <Field label={isAr ? 'الاسم العربي' : 'Arabic Name'}>
-                <input className={inp} value={form.nar || ''} onChange={e => set('nar', e.target.value)}
-                  placeholder="٢ مليم - فؤاد الأول" dir="rtl" />
-              </Field>
-            </div>
-          </div>
-
-          {/* Section: Dates */}
-          <div>
-            <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
-              {isAr ? 'التاريخ' : 'Dates'}
-            </h3>
-            <div className="grid grid-cols-3 gap-3">
-              <Field label={isAr ? 'سنة ميلادية' : 'Gregorian Year'}>
-                <input className={inp} type="number" value={form.yce || ''} onChange={e => set('yce', e.target.value)}
-                  placeholder="1924" min="1000" max="2026" dir="ltr" />
-              </Field>
-              <Field label={isAr ? 'سنة هجرية' : 'Hijri Year'}>
-                <input className={inp} value={form.yah || ''} onChange={e => set('yah', e.target.value)}
-                  placeholder="1342" dir="ltr" />
-              </Field>
-              <Field label={isAr ? 'النوع' : 'Type'}>
-                <select className={sel} value={form.type} onChange={e => set('type', e.target.value)}>
-                  <option value="Circulation">{isAr ? 'تداول' : 'Circulation'}</option>
-                  <option value="Commemorative">{isAr ? 'تذكارية' : 'Commemorative'}</option>
-                </select>
-              </Field>
-            </div>
-          </div>
-
-          {/* Section: Physical specs */}
-          <div>
-            <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
-              {isAr ? 'المواصفات الفيزيائية' : 'Physical Specs'}
-            </h3>
-            <div className="grid grid-cols-3 gap-3">
-              <Field label={isAr ? 'المعدن' : 'Metal'}>
-                <select className={sel} value={form.metal} onChange={e => set('metal', e.target.value)}>
-                  {METALS.map(m => <option key={m} value={m}>{m}</option>)}
-                </select>
-              </Field>
-              <Field label={isAr ? 'الوزن (غ)' : 'Weight (g)'}>
-                <input className={inp} type="number" step="0.01" value={form.wt ?? ''} onChange={e => set('wt', parseFloat(e.target.value) || null)}
-                  placeholder="3.9" dir="ltr" />
-              </Field>
-              <Field label={isAr ? 'القطر (مم)' : 'Diameter (mm)'}>
-                <input className={inp} type="number" step="0.1" value={form.dia ?? ''} onChange={e => set('dia', parseFloat(e.target.value) || null)}
-                  placeholder="20.0" dir="ltr" />
-              </Field>
-            </div>
-          </div>
-
-          {/* Section: References */}
-          <div>
-            <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
-              {isAr ? 'المراجع' : 'References'}
-            </h3>
-            <div className="grid grid-cols-3 gap-3">
-              <Field label="KM#">
-                <input className={inp} value={form.km || ''} onChange={e => set('km', e.target.value)}
-                  placeholder="KM#330" dir="ltr" />
-              </Field>
-              <Field label="Numista N#">
-                <input className={inp} value={form.nref || ''} onChange={e => set('nref', e.target.value)}
-                  placeholder="N#21801" dir="ltr" />
-              </Field>
-              <Field label={isAr ? 'عدد المضروب' : 'Mintage'}>
-                <input className={inp} value={form.mint || ''} onChange={e => set('mint', e.target.value)}
-                  placeholder="3000000" dir="ltr" />
-              </Field>
-            </div>
-          </div>
-
-          {/* Section: Images */}
-          <div>
-            <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
-              {isAr ? 'الصور (روابط Numista)' : 'Images (Numista URLs)'}
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label={isAr ? 'الوجه' : 'Obverse'}>
-                <input className={inp} value={form.o || ''} onChange={e => set('o', e.target.value)}
-                  placeholder="https://en.numista.com/..." dir="ltr" />
-              </Field>
-              <Field label={isAr ? 'الظهر' : 'Reverse'}>
-                <input className={inp} value={form.r || ''} onChange={e => set('r', e.target.value)}
-                  placeholder="https://en.numista.com/..." dir="ltr" />
-              </Field>
-            </div>
-            {/* Image preview */}
-            {(form.o || form.r) && (
-              <div className="flex gap-4 mt-3">
-                {form.o && form.o.startsWith('http') && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={form.o} alt="obverse preview" className="w-16 h-16 rounded-full object-cover border-2 border-gold-500/50" />
-                )}
-                {form.r && form.r.startsWith('http') && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={form.r} alt="reverse preview" className="w-16 h-16 rounded-full object-cover border-2 border-gold-500/50" />
-                )}
+        {/* ── COINS TAB ── */}
+        {adminTab === 'coins' && canSeeCoins && (
+          <div className="px-6 py-5 space-y-5">
+            <div>
+              <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
+                {isAr ? 'هوية العملة' : 'Coin Identity'}
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label={isAr ? 'الدولة' : 'Country'}>
+                  <select className={sel} value={form.cc} onChange={e => setCountry(e.target.value)}>
+                    {COUNTRIES.map(c => <option key={c.cc} value={c.cc}>{isAr ? c.co_ar : c.co}</option>)}
+                  </select>
+                </Field>
+                <Field label={isAr ? 'الأسرة الحاكمة' : 'Dynasty'}>
+                  <input className={inp} value={form.dyn || ''} onChange={e => setField('dyn', e.target.value)} />
+                </Field>
+                <Field label={isAr ? 'الاسم (إنجليزي)' : 'Name (English)'}>
+                  <input className={inp} value={form.name || ''} onChange={e => setField('name', e.target.value)} placeholder="e.g. 10 Piastres" dir="ltr" />
+                </Field>
+                <Field label={isAr ? 'الاسم (عربي)' : 'Name (Arabic)'}>
+                  <input className={inp} value={form.nar || ''} onChange={e => setField('nar', e.target.value)} placeholder="مثال: ١٠ قروش" dir="rtl" />
+                </Field>
+                <Field label={isAr ? 'السنة الميلادية' : 'Year (CE)'}>
+                  <input className={inp} value={form.yce || ''} onChange={e => setField('yce', e.target.value)} placeholder="1930" dir="ltr" />
+                </Field>
+                <Field label={isAr ? 'السنة الهجرية' : 'Year (AH)'}>
+                  <input className={inp} value={form.yah || ''} onChange={e => setField('yah', e.target.value)} placeholder="1342" dir="ltr" />
+                </Field>
+                <Field label={isAr ? 'النوع' : 'Type'}>
+                  <select className={sel} value={form.type} onChange={e => setField('type', e.target.value)}>
+                    <option value="Circulation">{isAr ? 'تداول' : 'Circulation'}</option>
+                    <option value="Commemorative">{isAr ? 'تذكارية' : 'Commemorative'}</option>
+                  </select>
+                </Field>
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* JSON preview */}
-          <div>
-            <button
-              onClick={() => setJsonExpanded(e => !e)}
-              className="flex items-center gap-1.5 text-[11px] text-gold-600 hover:text-gold-400 transition-colors"
-            >
-              {jsonExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-              {isAr ? 'معاينة JSON' : 'Preview JSON'}
+            <div>
+              <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
+                {isAr ? 'المواصفات الفيزيائية' : 'Physical Specs'}
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
+                <Field label={isAr ? 'المعدن' : 'Metal'}>
+                  <select className={sel} value={form.metal} onChange={e => setField('metal', e.target.value)}>
+                    {METALS.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                </Field>
+                <Field label={isAr ? 'الوزن (غ)' : 'Weight (g)'}>
+                  <input className={inp} type="number" step="0.01" value={form.wt ?? ''} onChange={e => setField('wt', parseFloat(e.target.value) || null)} placeholder="3.9" dir="ltr" />
+                </Field>
+                <Field label={isAr ? 'القطر (مم)' : 'Diameter (mm)'}>
+                  <input className={inp} type="number" step="0.1" value={form.dia ?? ''} onChange={e => setField('dia', parseFloat(e.target.value) || null)} placeholder="20.0" dir="ltr" />
+                </Field>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
+                {isAr ? 'المراجع' : 'References'}
+              </h3>
+              <div className="grid grid-cols-3 gap-3">
+                <Field label="KM#">
+                  <input className={inp} value={form.km || ''} onChange={e => setField('km', e.target.value)} placeholder="KM#330" dir="ltr" />
+                </Field>
+                <Field label="Numista N#">
+                  <input className={inp} value={form.nref || ''} onChange={e => setField('nref', e.target.value)} placeholder="N#21801" dir="ltr" />
+                </Field>
+                <Field label={isAr ? 'عدد المضروب' : 'Mintage'}>
+                  <input className={inp} value={form.mint || ''} onChange={e => setField('mint', e.target.value)} placeholder="3000000" dir="ltr" />
+                </Field>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
+                {isAr ? 'الصور (روابط Numista)' : 'Images (Numista URLs)'}
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label={isAr ? 'الوجه' : 'Obverse'}>
+                  <input className={inp} value={form.o || ''} onChange={e => setField('o', e.target.value)} placeholder="https://en.numista.com/..." dir="ltr" />
+                </Field>
+                <Field label={isAr ? 'الظهر' : 'Reverse'}>
+                  <input className={inp} value={form.r || ''} onChange={e => setField('r', e.target.value)} placeholder="https://en.numista.com/..." dir="ltr" />
+                </Field>
+              </div>
+              {(form.o || form.r) && (
+                <div className="flex gap-4 mt-3">
+                  {form.o && form.o.startsWith('http') && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={form.o} alt="obverse preview" className="w-16 h-16 rounded-full object-cover border-2 border-gold-500/50" />
+                  )}
+                  {form.r && form.r.startsWith('http') && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={form.r} alt="reverse preview" className="w-16 h-16 rounded-full object-cover border-2 border-gold-500/50" />
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <button onClick={() => setJsonExpanded(e => !e)}
+                className="flex items-center gap-1.5 text-[11px] text-gold-600 hover:text-gold-400 transition-colors">
+                {jsonExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                {isAr ? 'معاينة JSON' : 'Preview JSON'}
+              </button>
+              {jsonExpanded && (
+                <pre className="mt-2 text-[10px] bg-ink/90 text-gold-300 p-3 rounded-xl overflow-x-auto max-h-40 font-mono" dir="ltr">
+                  {JSON.stringify(form, null, 2)}
+                </pre>
+              )}
+            </div>
+
+            <button onClick={saveCoin} disabled={!form.name || !form.cc}
+              className={`w-full py-3 rounded-xl font-semibold text-[14px] transition-all flex items-center justify-center gap-2
+                ${saved ? 'bg-emerald-600 text-white'
+                  : (!form.name || !form.cc) ? 'bg-gold-800/30 text-ink/30 cursor-not-allowed'
+                  : 'bg-gold-600 hover:bg-gold-500 text-ink cursor-pointer'}`}>
+              <Save size={15} />
+              {saved
+                ? (isAr ? '✓ تم الحفظ' : '✓ Saved')
+                : (isAr ? 'حفظ العملة' : 'Save Coin')}
             </button>
-            {jsonExpanded && (
-              <pre className="mt-2 text-[10px] bg-ink/90 text-gold-300 p-3 rounded-xl overflow-x-auto max-h-40 font-mono" dir="ltr">
-                {JSON.stringify(form, null, 2)}
-              </pre>
-            )}
+            <p className="text-[10px] text-ink/30 text-center">
+              {isAr
+                ? 'العملات المحفوظة مؤقتة. استخدم "تصدير JSON" لتحميل الملف وإضافته إلى coins.json'
+                : 'Saved coins are temporary. Use "Export JSON" to download and merge into coins.json'}
+            </p>
           </div>
-
-          {/* Save button */}
-          <button
-            onClick={saveCoin}
-            disabled={!form.name || !form.cc}
-            className={`w-full py-3 rounded-xl font-semibold text-[14px] transition-all flex items-center justify-center gap-2
-              ${saved
-                ? 'bg-emerald-600 text-white'
-                : (!form.name || !form.cc)
-                  ? 'bg-gold-800/30 text-ink/30 cursor-not-allowed'
-                  : 'bg-gold-600 hover:bg-gold-500 text-ink cursor-pointer'}`}
-          >
-            <Save size={15} />
-            {saved
-              ? (isAr ? '✓ تم الحفظ — جاهز لإضافة التالية' : '✓ Saved — ready for next')
-              : (isAr ? 'حفظ العملة' : 'Save Coin')}
-          </button>
-
-          <p className="text-[10px] text-ink/30 text-center">
-            {isAr
-              ? 'العملات المحفوظة مؤقتة. استخدم "تصدير JSON" لتحميل الملف وإضافته إلى coins.json'
-              : 'Saved coins are temporary. Use "Export JSON" to download and merge into coins.json'}
-          </p>
-        </div>}
+        )}
 
         {/* ── PRICES TAB ── */}
-        {adminTab === 'prices' && (
+        {adminTab === 'prices' && canSeePrices && (
           <div className="px-6 py-5 space-y-4">
-            {/* Coin search */}
             <div>
               <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'ابحث عن عملة' : 'Search coin'}</label>
               <div className="relative">
                 <input className={inp} value={priceSearch} onChange={e => setPriceSearch(e.target.value)}
-                  placeholder={isAr ? 'اسم العملة بالإنجليزية أو العربية...' : 'Coin name...'} />
+                  placeholder={isAr ? 'اسم العملة...' : 'Coin name...'} />
                 {coinSearchResults.length > 0 && (
                   <div className="absolute top-full left-0 right-0 bg-parch-cream border border-gold-700/30 rounded-xl shadow-xl z-20 max-h-48 overflow-y-auto mt-1">
                     {coinSearchResults.map(c => (
@@ -490,7 +622,6 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
 
             {selectedCoin && (
               <>
-                {/* Selected coin preview */}
                 <div className="flex items-center gap-3 bg-gold-500/10 border border-gold-500/30 rounded-xl px-4 py-3">
                   {selectedCoin.o && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -502,7 +633,6 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                   </div>
                 </div>
 
-                {/* Existing prices grid */}
                 {Object.keys(existingPrices).length > 0 && (
                   <div>
                     <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-2 block">{isAr ? 'الأسعار الحالية' : 'Current Prices'}</label>
@@ -518,7 +648,6 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                   </div>
                 )}
 
-                {/* Price form */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'الدرجة' : 'Grade'}</label>
@@ -534,27 +663,23 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                   </div>
                   <div>
                     <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'العملة' : 'Currency'}</label>
-                    <select className={sel} value={priceForm.currency}
-                      onChange={e => setPriceForm(f => ({ ...f, currency: e.target.value }))}>
+                    <select className={sel} value={priceForm.currency} onChange={e => setPriceForm(f => ({ ...f, currency: e.target.value }))}>
                       {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'أقل سعر' : 'Price Low'}</label>
                     <input className={inp} type="number" value={priceForm.price_low}
-                      onChange={e => setPriceForm(f => ({ ...f, price_low: e.target.value }))}
-                      placeholder="e.g. 60" dir="ltr" />
+                      onChange={e => setPriceForm(f => ({ ...f, price_low: e.target.value }))} placeholder="60" dir="ltr" />
                   </div>
                   <div>
                     <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'أعلى سعر' : 'Price High'}</label>
                     <input className={inp} type="number" value={priceForm.price_high}
-                      onChange={e => setPriceForm(f => ({ ...f, price_high: e.target.value }))}
-                      placeholder="e.g. 90" dir="ltr" />
+                      onChange={e => setPriceForm(f => ({ ...f, price_high: e.target.value }))} placeholder="90" dir="ltr" />
                   </div>
                   <div>
                     <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'المصدر' : 'Source'}</label>
-                    <select className={sel} value={priceForm.source}
-                      onChange={e => setPriceForm(f => ({ ...f, source: e.target.value }))}>
+                    <select className={sel} value={priceForm.source} onChange={e => setPriceForm(f => ({ ...f, source: e.target.value }))}>
                       {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
@@ -590,13 +715,17 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
         )}
 
         {/* ── SUBMISSIONS TAB ── */}
-        {adminTab === 'submissions' && (
+        {adminTab === 'submissions' && canSeeSubmissions && (
           <div className="px-6 py-5">
             <p className="text-[12px] text-ink/50 mb-4">
-              {isAr ? `${submissions.length} اقتراح سعر بانتظار المراجعة` : `${submissions.length} price submission(s) pending review`}
+              {submissionsLoading
+                ? (isAr ? 'جاري التحميل...' : 'Loading...')
+                : (isAr ? `${submissions.length} اقتراح بانتظار المراجعة` : `${submissions.length} submission(s) pending review`)}
             </p>
-            {submissions.length === 0 ? (
-              <div className="text-center py-8 text-ink/30 font-amiri">{isAr ? 'لا توجد اقتراحات جديدة' : 'No pending submissions'}</div>
+            {!submissionsLoading && submissions.length === 0 ? (
+              <div className="text-center py-8 text-ink/30 font-amiri">
+                {isAr ? 'لا توجد اقتراحات جديدة' : 'No pending submissions'}
+              </div>
             ) : (
               <div className="space-y-3">
                 {submissions.map(s => {
@@ -606,10 +735,18 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                     <div key={s.id} className="bg-parch-dark/30 rounded-xl border border-gold-700/15 p-3">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div>
-                          <div className="text-[13px] font-amiri text-ink">{coin ? (isAr ? (coin.nar || coin.name) : coin.name) : s.coin_id}</div>
-                          <div className="text-[11px] text-ink/50">
-                            {grade?.label} · {s.price} {s.currency}
+                          <div className="text-[13px] font-amiri text-ink">
+                            {coin ? (isAr ? (coin.nar || coin.name) : coin.name) : s.coin_id}
                           </div>
+                          <div className="text-[11px] text-ink/50">
+                            {grade?.label} · {s.price.toLocaleString()} {s.currency}
+                          </div>
+                          {s.source_url && (
+                            <a href={s.source_url} target="_blank" rel="noopener noreferrer"
+                              className="text-[10px] text-gold-600 hover:underline block mt-0.5">
+                              {isAr ? 'المصدر' : 'Source'} &rarr;
+                            </a>
+                          )}
                           <div className="text-[10px] text-ink/30 mt-0.5">
                             {new Date(s.submitted_at).toLocaleDateString(isAr ? 'ar-EG' : 'en-AU')}
                           </div>
@@ -617,11 +754,11 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                       </div>
                       <div className="flex gap-2">
                         <button onClick={() => approveSubmission(s.id, s.coin_id, s.sheldon, s.price, s.currency)}
-                          className="flex-1 py-1.5 text-[11px] rounded-lg bg-emerald-600 text-white font-medium">
+                          className="flex-1 py-1.5 text-[11px] rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-500 transition-colors">
                           {isAr ? '✓ قبول' : '✓ Approve'}
                         </button>
                         <button onClick={() => rejectSubmission(s.id)}
-                          className="flex-1 py-1.5 text-[11px] rounded-lg bg-red-500 text-white font-medium">
+                          className="flex-1 py-1.5 text-[11px] rounded-lg bg-red-500 text-white font-medium hover:bg-red-400 transition-colors">
                           {isAr ? '✗ رفض' : '✗ Reject'}
                         </button>
                       </div>
@@ -633,8 +770,84 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
           </div>
         )}
 
+        {/* ── TEAM TAB (super_admin only) ── */}
+        {adminTab === 'team' && canSeeTeam && (
+          <div className="px-6 py-5 space-y-5">
+            <div>
+              <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium">
+                {isAr ? 'إضافة مسؤول جديد' : 'Add Admin'}
+              </h3>
+              <div className="space-y-3">
+                <input className={inp} type="email" dir="ltr"
+                  placeholder={isAr ? 'البريد الإلكتروني للمستخدم' : "User's email address"}
+                  value={newMemberEmail}
+                  onChange={e => { setNewMemberEmail(e.target.value); setTeamError(''); }} />
+                <div>
+                  <label className="text-[10px] text-ink/50 uppercase tracking-wider mb-1 block">{isAr ? 'الصلاحية' : 'Role'}</label>
+                  <select className={sel} value={newMemberRole}
+                    onChange={e => setNewMemberRole(e.target.value as 'coin_admin' | 'price_admin')}>
+                    <option value="coin_admin">{isAr ? 'مدير عملات (إضافة عملات فقط)' : 'Coin Admin (add coins only)'}</option>
+                    <option value="price_admin">{isAr ? 'مدير أسعار (أسعار ومقترحات فقط)' : 'Price Admin (prices & submissions only)'}</option>
+                  </select>
+                </div>
+                {teamError && <p className="text-[11px] text-red-500">{teamError}</p>}
+                <button onClick={addTeamMember}
+                  className={`w-full py-2.5 rounded-xl font-semibold text-[13px] transition-colors flex items-center justify-center gap-2
+                    ${teamSaved ? 'bg-emerald-600 text-white' : 'bg-gold-600 hover:bg-gold-500 text-ink'}`}>
+                  <Plus size={14} />
+                  {teamSaved ? (isAr ? '✓ تمت الإضافة' : '✓ Added') : (isAr ? 'إضافة مسؤول' : 'Add Admin')}
+                </button>
+                <p className="text-[10px] text-ink/30">
+                  {isAr
+                    ? 'يجب أن يكون المستخدم قد أنشأ حساباً بالفعل عبر صفحة تسجيل الدخول.'
+                    : 'The user must have already created an account via the sign-in page.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Current team list */}
+            <div>
+              <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium border-t border-gold-700/20 pt-4">
+                {isAr ? 'المسؤولون الحاليون' : 'Current Admins'}
+              </h3>
+              <div className="space-y-2">
+                {teamMembers.length === 0 ? (
+                  <p className="text-[12px] text-ink/30 text-center py-4">{isAr ? 'لا يوجد مسؤولون' : 'No admins yet'}</p>
+                ) : (
+                  teamMembers.map(m => (
+                    <div key={m.id} className="flex items-center justify-between bg-parch-dark/30 rounded-xl px-3 py-2.5 border border-gold-700/15">
+                      <div>
+                        <div className="text-[12px] text-ink">{m.email || m.user_id}</div>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-medium
+                            ${m.role === 'super_admin'
+                              ? 'bg-gold-500/20 text-gold-600 border-gold-700/30'
+                              : m.role === 'coin_admin'
+                              ? 'bg-sky-900/30 text-sky-300 border-sky-700/30'
+                              : 'bg-emerald-900/30 text-emerald-300 border-emerald-700/30'}`}>
+                            {roleLabel(m.role)}
+                          </span>
+                          <span className="text-[9px] text-ink/25">
+                            {new Date(m.created_at).toLocaleDateString(isAr ? 'ar-EG' : 'en-AU')}
+                          </span>
+                        </div>
+                      </div>
+                      {m.role !== 'super_admin' && (
+                        <button onClick={() => removeTeamMember(m.id)}
+                          className="text-red-400/50 hover:text-red-400 transition-colors">
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Pending coins list */}
-        {pendingCoins.length > 0 && (
+        {pendingCoins.length > 0 && adminTab === 'coins' && (
           <div className="px-6 pb-6">
             <h3 className="text-[11px] text-gold-600 uppercase tracking-widest mb-3 font-medium border-t border-gold-700/20 pt-4">
               {isAr ? `قيد الانتظار (${pendingCoins.length})` : `Pending (${pendingCoins.length})`}
@@ -646,8 +859,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                     <div className="text-[12px] text-ink font-amiri">{c.name}</div>
                     <div className="text-[10px] text-ink/40">{c.cc} · {c.yce} · {c.metal}</div>
                   </div>
-                  <button onClick={() => removePending(i)}
-                    className="text-red-400/60 hover:text-red-400 transition-colors">
+                  <button onClick={() => removePending(i)} className="text-red-400/60 hover:text-red-400 transition-colors">
                     <Trash2 size={13} />
                   </button>
                 </div>

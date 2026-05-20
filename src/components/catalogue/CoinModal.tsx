@@ -227,6 +227,18 @@ function PriceGuide({ coinId, locale }: { coinId: string; locale: string }) {
   const [submitPrice, setSubmitPrice] = useState(false);
   const [submission, setSubmission] = useState({ sheldon: 45, price: '', currency: 'USD', source_url: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check if user is authenticated
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   const SHELDON_GRADES_DISPLAY = [
     { sheldon: 4,  label: 'G-4',   ar: 'جيد ٤' },
@@ -305,10 +317,16 @@ function PriceGuide({ coinId, locale }: { coinId: string; locale: string }) {
           <p className="text-[12px] text-ink/40 font-amiri mb-2">
             {isAr ? 'لا توجد بيانات أسعار لهذه العملة بعد' : 'No price data for this coin yet'}
           </p>
-          <button onClick={() => setSubmitPrice(true)}
-            className="text-[11px] text-gold-600 border border-gold-700/30 rounded-full px-3 py-1 hover:border-gold-500 transition-colors">
-            {isAr ? '+ سجّل سعر ملاحَظ' : '+ Submit observed price'}
-          </button>
+          {isLoggedIn ? (
+            <button onClick={() => setSubmitPrice(true)}
+              className="text-[11px] text-gold-600 border border-gold-700/30 rounded-full px-3 py-1 hover:border-gold-500 transition-colors">
+              {isAr ? '+ سجّل سعر ملاحَظ' : '+ Submit observed price'}
+            </button>
+          ) : (
+            <p className="text-[11px] text-ink/30">
+              {isAr ? 'سجّل دخولك لاقتراح سعر' : 'Sign in to suggest a price'}
+            </p>
+          )}
         </div>
       ) : (
         <>
@@ -376,10 +394,16 @@ function PriceGuide({ coinId, locale }: { coinId: string; locale: string }) {
                 {isAr ? 'آخر تحديث:' : 'Updated:'} {new Date(latestSource.updated_at).toLocaleDateString(isAr ? 'ar-EG' : 'en-AU')}
               </span>
             )}
-            <button onClick={() => setSubmitPrice(s => !s)}
-              className="text-[10px] text-gold-600 hover:text-gold-400 transition-colors">
-              {isAr ? '+ اقتراح سعر' : '+ Suggest price'}
-            </button>
+            {isLoggedIn ? (
+              <button onClick={() => setSubmitPrice(s => !s)}
+                className="text-[10px] text-gold-600 hover:text-gold-400 transition-colors">
+                {isAr ? '+ اقتراح سعر' : '+ Suggest price'}
+              </button>
+            ) : (
+              <span className="text-[10px] text-ink/30">
+                {isAr ? 'سجّل دخولك لاقتراح سعر' : 'Sign in to suggest a price'}
+              </span>
+            )}
           </div>
         </>
       )}
