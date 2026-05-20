@@ -166,8 +166,14 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     setAuthLoading(true);
     setAuthError('');
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error || !data.user) {
-      setAuthError(isAr ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Incorrect email or password');
+    if (error) {
+      // Surface the real Supabase error message to help diagnose
+      setAuthError(error.message || (isAr ? 'خطأ في تسجيل الدخول' : 'Sign in error'));
+      setAuthLoading(false);
+      return;
+    }
+    if (!data.user) {
+      setAuthError(isAr ? 'لم يتم العثور على المستخدم' : 'User not found');
       setAuthLoading(false);
       return;
     }
