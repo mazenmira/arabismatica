@@ -130,6 +130,7 @@ export default function CataloguePage({
   });
   const [darkMode, setDarkMode]         = useState(false);
   const [adminOpen, setAdminOpen]       = useState(false);
+  const [adminAuthed, setAdminAuthed]   = useState(false);
   // Auth state — use props from page.tsx if provided, else manage locally
   const [authOpenLocal, setAuthOpenLocal] = useState(false);
   const [dashOpenLocal, setDashOpenLocal] = useState(false);
@@ -615,7 +616,14 @@ export default function CataloguePage({
             {darkMode ? <Sun size={13} /> : <Moon size={13} />}
           </button>
           {/* Admin panel button */}
-          <button onClick={() => setAdminOpen(true)}
+          <button onClick={async () => {
+            // Sign out of collector session to avoid Supabase session conflict with admin
+            if (user) {
+              await supabase.auth.signOut();
+              setUserLocal(null);
+            }
+            setAdminOpen(true);
+          }}
             className="flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/30 text-gold-600 hover:text-gold-400 transition-colors"
             title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}>
             <span className="text-[11px]">⚙</span>
@@ -738,7 +746,15 @@ export default function CataloguePage({
           onSignOut={async () => { await supabase.auth.signOut(); setDashOpen(false); }} />
       )}
       {adminOpen && (
-        <AdminPanel onClose={() => setAdminOpen(false)} locale={locale} onCoinAdded={() => {}} />
+        <AdminPanel
+          onClose={async () => {
+            // Sign out admin session on close so it doesn't bleed into collector session
+            await supabase.auth.signOut();
+            setAdminOpen(false);
+          }}
+          locale={locale}
+          onCoinAdded={() => {}}
+        />
       )}
 
       {/* ── BACK TO TOP ── */}
