@@ -130,7 +130,6 @@ export default function CataloguePage({
   });
   const [darkMode, setDarkMode]         = useState(false);
   const [adminOpen, setAdminOpen]       = useState(false);
-  const [adminAuthed, setAdminAuthed]   = useState(false);
   // Auth state — use props from page.tsx if provided, else manage locally
   const [authOpenLocal, setAuthOpenLocal] = useState(false);
   const [dashOpenLocal, setDashOpenLocal] = useState(false);
