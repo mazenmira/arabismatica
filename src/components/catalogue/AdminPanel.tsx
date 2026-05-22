@@ -1,8 +1,8 @@
-// v2.0 - Supabase auth + role-based access + sub-admin management
+// v2.1 - Simple password gate + full admin features
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Plus, Save, Trash2, Lock, Eye, EyeOff, ChevronDown, ChevronUp, DollarSign, Search, Users, LogOut } from 'lucide-react';
+import { X, Plus, Save, Trash2, Lock, Eye, EyeOff, ChevronDown, ChevronUp, DollarSign, Search, Users } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import COINS_RAW from '@/data/coins.json';
 import type { Coin as CoinType } from '@/types/coin';
@@ -86,14 +86,11 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   const isAr = locale === 'ar';
 
   // -- Auth state --
-  const [email, setEmail]         = useState('');
   const [password, setPassword]   = useState('');
   const [showPw, setShowPw]       = useState(false);
   const [authError, setAuthError] = useState('');
-  const [authLoading, setAuthLoading] = useState(false);
-  const [userRole, setUserRole]   = useState<UserRole | null>(null);
+  const [userRole]                = useState<UserRole>('super_admin');
   const [authed, setAuthed]       = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
 
   // -- Tab state --
   const [adminTab, setAdminTab] = useState<'coins' | 'prices' | 'submissions' | 'team'>('coins');
@@ -129,17 +126,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   const [teamError, setTeamError]       = useState('');
   const [teamSaved, setTeamSaved]       = useState(false);
 
-  // -- Check existing session on mount --
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        await loadUserRole(session.user.id);
-      }
-      setCheckingSession(false);
-    };
-    checkSession();
-  }, []);
+  // -- No session check needed for password gate --
 
   // -- Load pending coins from localStorage --
   useEffect(() => {
@@ -149,43 +136,17 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     } catch {}
   }, []);
 
-  const loadUserRole = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_roles').select('role').eq('user_id', userId).single();
-    if (data) {
-      setUserRole(data.role as UserRole);
+  const login = () => {
+    if (password === 'arabcollector2025') {
       setAuthed(true);
-      // coin_admins start on coins tab; price_admins start on prices tab
-      if (data.role === 'price_admin') setAdminTab('prices');
+      setAuthError('');
     } else {
-      setAuthError(isAr ? 'ليس لديك صلاحيات. تواصل مع المسؤول الرئيسي.' : 'No admin role assigned. Contact the super admin.');
+      setAuthError(isAr ? 'كلمة المرور غير صحيحة' : 'Incorrect password');
     }
   };
 
-  const login = async () => {
-    setAuthLoading(true);
-    setAuthError('');
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      // Surface the real Supabase error message to help diagnose
-      setAuthError(error.message || (isAr ? 'خطأ في تسجيل الدخول' : 'Sign in error'));
-      setAuthLoading(false);
-      return;
-    }
-    if (!data.user) {
-      setAuthError(isAr ? 'لم يتم العثور على المستخدم' : 'User not found');
-      setAuthLoading(false);
-      return;
-    }
-    await loadUserRole(data.user.id);
-    setAuthLoading(false);
-  };
-
-  const logout = async () => {
-    await supabase.auth.signOut();
+  const logout = () => {
     setAuthed(false);
-    setUserRole(null);
-    setEmail('');
     setPassword('');
   };
 
@@ -353,9 +314,6 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     price_admin: isAr ? 'مدير أسعار' : 'Price Admin',
   }[role]);
 
-  // -- Loading state --
-  if (checkingSession) return null;
-
   // -- Login screen --
   if (!authed) return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
@@ -369,40 +327,29 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
           <button onClick={onClose} className="text-ink/40 hover:text-ink transition-colors"><X size={16} /></button>
         </div>
 
-        <div className="space-y-3">
+        <div className="relative">
           <input
-            type="email"
-            placeholder={isAr ? 'البريد الإلكتروني' : 'Email'}
-            value={email}
-            onChange={e => { setEmail(e.target.value); setAuthError(''); }}
+            type={showPw ? 'text' : 'password'}
+            placeholder={isAr ? 'كلمة المرور' : 'Password'}
+            value={password}
+            onChange={e => { setPassword(e.target.value); setAuthError(''); }}
             onKeyDown={e => e.key === 'Enter' && login()}
-            className={inp}
+            className={`${inp} pr-10 ${authError ? 'border-red-400' : ''}`}
             dir="ltr"
           />
-          <div className="relative">
-            <input
-              type={showPw ? 'text' : 'password'}
-              placeholder={isAr ? 'كلمة المرور' : 'Password'}
-              value={password}
-              onChange={e => { setPassword(e.target.value); setAuthError(''); }}
-              onKeyDown={e => e.key === 'Enter' && login()}
-              className={`${inp} pr-10 ${authError ? 'border-red-400' : ''}`}
-              dir="ltr"
-            />
-            <button onClick={() => setShowPw(s => !s)}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/30 hover:text-ink/60">
-              {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
-            </button>
-          </div>
+          <button onClick={() => setShowPw(s => !s)}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/30 hover:text-ink/60">
+            {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
+          </button>
         </div>
 
         {authError && (
           <p className="text-[11px] text-red-500 mt-2">{authError}</p>
         )}
 
-        <button onClick={login} disabled={authLoading}
-          className="w-full mt-4 py-2.5 bg-gold-600 hover:bg-gold-500 disabled:opacity-50 text-ink rounded-xl font-semibold text-[13px] transition-colors">
-          {authLoading ? (isAr ? 'جاري الدخول...' : 'Signing in...') : (isAr ? 'دخول' : 'Sign In')}
+        <button onClick={login}
+          className="w-full mt-4 py-2.5 bg-gold-600 hover:bg-gold-500 text-ink rounded-xl font-semibold text-[13px] transition-colors">
+          {isAr ? 'دخول' : 'Sign In'}
         </button>
         <p className="text-[10px] text-ink/30 text-center mt-4">
           {isAr ? 'للمسؤولين المعتمدين فقط' : 'Authorized administrators only'}
@@ -447,8 +394,8 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                 </button>
               )}
               <button onClick={logout} title={isAr ? 'تسجيل خروج' : 'Sign out'}
-                className="w-8 h-8 rounded-full border border-gold-700/30 text-ink/40 hover:text-red-400 flex items-center justify-center transition-colors">
-                <LogOut size={13} />
+                className="text-[11px] px-3 py-1.5 border border-gold-700/30 text-ink/40 hover:text-red-400 rounded-full transition-colors">
+                {isAr ? 'خروج' : 'Exit'}
               </button>
               <button onClick={onClose}
                 className="w-8 h-8 rounded-full border border-gold-700/30 text-ink/40 hover:text-ink flex items-center justify-center transition-colors">
