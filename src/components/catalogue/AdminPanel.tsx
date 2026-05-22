@@ -134,11 +134,18 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        await loadUserRole(session.user.id);
+        const { data } = await supabase
+          .from('user_roles').select('role').eq('user_id', session.user.id).single();
+        if (data) {
+          setUserRole(data.role as UserRole);
+          setAuthed(true);
+          if (data.role === 'price_admin') setAdminTab('prices');
+        }
       }
       setCheckingSession(false);
     };
     checkSession();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // -- Load pending coins from localStorage --
