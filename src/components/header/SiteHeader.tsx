@@ -206,16 +206,20 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                       className="absolute top-full right-0 mt-1 bg-ink border border-gold-800/50 rounded-lg shadow-2xl min-w-[220px] py-1 z-50 animate-fade-in"
                       onMouseLeave={() => setActiveMenu(null)}
                     >
-                      {item.children.map((child) => (
-                        <a key={child.label} href={child.href} target="_blank" rel="noopener noreferrer"
-                          className={`block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0
-                            ${(child as { highlight?: boolean }).highlight
-                              ? 'text-gold-300 hover:text-gold-100 hover:bg-gold-900/30 font-medium'
-                              : 'text-white/70 hover:text-white hover:bg-white/5'}`}>
-                          {(child as { highlight?: boolean }).highlight && <span className="mr-1 text-gold-500">★</span>}
-                          {child.label}
-                        </a>
-                      ))}
+                      {item.children.map((child) => {
+                        const isExternal = child.href.startsWith('http');
+                        return (
+                          <a key={child.label} href={child.href}
+                            {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                            className={`block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0
+                              ${(child as { highlight?: boolean }).highlight
+                                ? 'text-gold-300 hover:text-gold-100 hover:bg-gold-900/30 font-medium'
+                                : 'text-white/70 hover:text-white hover:bg-white/5'}`}>
+                            {(child as { highlight?: boolean }).highlight && <span className="mr-1 text-gold-500">★</span>}
+                            {child.label}
+                          </a>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -311,12 +315,16 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 </button>
                 {activeMenu === item.label && item.children && (
                   <div className="bg-ink/80">
-                    {item.children.map((child) => (
-                      <a key={child.label} href={child.href} target="_blank" rel="noopener noreferrer"
-                        className="block px-8 py-2.5 text-[12px] text-white/60 hover:text-white border-b border-gold-900/10 last:border-0">
-                        {child.label}
-                      </a>
-                    ))}
+                    {item.children.map((child) => {
+                      const isExternal = child.href.startsWith('http');
+                      return (
+                        <a key={child.label} href={child.href}
+                          {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                          className="block px-8 py-2.5 text-[12px] text-white/60 hover:text-white border-b border-gold-900/10 last:border-0">
+                          {child.label}
+                        </a>
+                      );
+                    })}
                   </div>
                 )}
               </div>
