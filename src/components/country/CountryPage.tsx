@@ -14,6 +14,88 @@ import {
   DISC_GRADIENTS,
 } from '@/lib/coins';
 
+// ── Historical era remapping ─────────────────────────────────────────────
+// The raw dyn field in coins.json is unreliable (catch-all labels, wrong centuries).
+// We remap based on known historical year ranges per country.
+interface EraRule { label_en: string; label_ar: string; from: number; to: number; }
+const ERA_RULES: Record<string, EraRule[]> = {
+  EG: [
+    { label_en: 'Ottoman Period',             label_ar: 'العهد العثماني',           from: 1500, to: 1804 },
+    { label_en: 'Muhammad Ali Dynasty',       label_ar: 'أسرة محمد علي',            from: 1805, to: 1882 },
+    { label_en: 'British Occupation',         label_ar: 'الاحتلال البريطاني',        from: 1883, to: 1914 },
+    { label_en: 'Sultanate / Kingdom',        label_ar: 'السلطنة / المملكة المصرية', from: 1915, to: 1952 },
+    { label_en: 'Republic',                   label_ar: 'الجمهورية',                 from: 1953, to: 2099 },
+  ],
+  SA: [
+    { label_en: 'Hejaz (Pre-Kingdom)',        label_ar: 'الحجاز قبل المملكة',        from: 1800, to: 1931 },
+    { label_en: 'King Abdulaziz',             label_ar: 'عهد الملك عبد العزيز',      from: 1932, to: 1953 },
+    { label_en: 'King Saud',                  label_ar: 'عهد الملك سعود',            from: 1954, to: 1964 },
+    { label_en: 'King Faisal',                label_ar: 'عهد الملك فيصل',            from: 1965, to: 1975 },
+    { label_en: 'King Khalid',                label_ar: 'عهد الملك خالد',            from: 1976, to: 1982 },
+    { label_en: 'King Fahd',                  label_ar: 'عهد الملك فهد',             from: 1983, to: 2005 },
+    { label_en: 'King Abdullah',              label_ar: 'عهد الملك عبدالله',          from: 2006, to: 2015 },
+    { label_en: 'King Salman',                label_ar: 'عهد الملك سلمان',           from: 2016, to: 2099 },
+  ],
+  MA: [
+    { label_en: 'Alaoui Sultanate',           label_ar: 'السلطنة العلوية',           from: 1600, to: 1911 },
+    { label_en: 'French Protectorate',        label_ar: 'الحماية الفرنسية',          from: 1912, to: 1956 },
+    { label_en: 'Mohammed V',                 label_ar: 'عهد محمد الخامس',           from: 1957, to: 1961 },
+    { label_en: 'Hassan II',                  label_ar: 'عهد الحسن الثاني',          from: 1962, to: 1999 },
+    { label_en: 'Mohammed VI',                label_ar: 'عهد محمد السادس',           from: 2000, to: 2099 },
+  ],
+  TN: [
+    { label_en: 'Husainid Beys',              label_ar: 'الأسرة الحسينية',           from: 1700, to: 1881 },
+    { label_en: 'French Protectorate',        label_ar: 'الحماية الفرنسية',          from: 1882, to: 1956 },
+    { label_en: 'Bourguiba Era',              label_ar: 'عهد بورقيبة',               from: 1957, to: 1987 },
+    { label_en: 'Ben Ali Era',                label_ar: 'عهد بن علي',                from: 1988, to: 2010 },
+    { label_en: 'Republic (Post-Revolution)', label_ar: 'الجمهورية (ما بعد الثورة)',  from: 2011, to: 2099 },
+  ],
+  IQ: [
+    { label_en: 'British Mandate',            label_ar: 'الانتداب البريطاني',         from: 1918, to: 1932 },
+    { label_en: 'Hashemite Kingdom',          label_ar: 'المملكة الهاشمية',           from: 1933, to: 1958 },
+    { label_en: 'Republic',                   label_ar: 'الجمهورية',                  from: 1959, to: 1967 },
+    { label_en: 'Baath Era',                  label_ar: 'الحقبة البعثية',             from: 1968, to: 2003 },
+    { label_en: 'Modern Iraq',                label_ar: 'العراق الحديث',              from: 2004, to: 2099 },
+  ],
+  SY: [
+    { label_en: 'French Mandate',             label_ar: 'الانتداب الفرنسي',           from: 1918, to: 1946 },
+    { label_en: 'Republic',                   label_ar: 'الجمهورية',                  from: 1947, to: 1957 },
+    { label_en: 'UAR Period',                 label_ar: 'حقبة الجمهورية العربية المتحدة', from: 1958, to: 1961 },
+    { label_en: 'Syrian Arab Republic',       label_ar: 'الجمهورية العربية السورية',   from: 1962, to: 2099 },
+  ],
+  LY: [
+    { label_en: 'Italian Colonial',           label_ar: 'الحقبة الاستعمارية الإيطالية', from: 1900, to: 1951 },
+    { label_en: 'Kingdom of Libya',           label_ar: 'المملكة الليبية',             from: 1952, to: 1969 },
+    { label_en: 'Gaddafi Era',                label_ar: 'حقبة القذافي',               from: 1970, to: 2010 },
+    { label_en: 'Modern Libya',               label_ar: 'ليبيا الحديثة',              from: 2011, to: 2099 },
+  ],
+  JO: [
+    { label_en: 'Emirate of Transjordan',     label_ar: 'إمارة شرق الأردن',           from: 1920, to: 1951 },
+    { label_en: 'King Talal',                 label_ar: 'عهد الملك طلال',             from: 1952, to: 1952 },
+    { label_en: 'King Hussein',               label_ar: 'عهد الملك حسين',             from: 1953, to: 1999 },
+    { label_en: 'King Abdullah II',           label_ar: 'عهد الملك عبدالله الثاني',   from: 2000, to: 2099 },
+  ],
+};
+
+function getEraLabel(coin: Coin, cc: string, locale: string): string {
+  const rules = ERA_RULES[cc];
+  if (!rules) return coin.dyn || '';
+  const year = parseInt(coin.yce || '0');
+  if (!year) return coin.dyn || '';
+  const rule = rules.find(r => year >= r.from && year <= r.to);
+  if (!rule) return coin.dyn || '';
+  return locale === 'ar' ? rule.label_ar : rule.label_en;
+}
+
+function getErasForCountry(coins: Coin[], cc: string, locale: string): string[] {
+  const rules = ERA_RULES[cc];
+  if (!rules) return Array.from(new Set(coins.map(c => c.dyn).filter(Boolean)));
+  // Return only eras that actually have coins, in historical order
+  return rules
+    .filter(r => coins.some(c => { const y = parseInt(c.yce || '0'); return y >= r.from && y <= r.to; }))
+    .map(r => locale === 'ar' ? r.label_ar : r.label_en);
+}
+
 interface Props {
   meta: CountryMeta;
   coins: Coin[];
@@ -119,7 +201,7 @@ export default function CountryPage({ meta, coins, locale }: Props) {
   const yearMin = years.length ? Math.min(...years) : 0;
   const yearMax = years.length ? Math.max(...years) : 0;
   const commemorative = coins.filter(c => c.type === 'Commemorative').length;
-  const dynasties = Array.from(new Set(coins.map(c => c.dyn).filter(Boolean)));
+  const dynasties = getErasForCountry(coins, meta.cc, locale);
   const metals    = Array.from(new Set(coins.map(c => c.metal).filter(Boolean)));
   const goldCoins = coins.filter(c => c.metal === 'Gold').length;
 
@@ -142,10 +224,10 @@ export default function CountryPage({ meta, coins, locale }: Props) {
         c.dyn?.toLowerCase().includes(q)
       );
     }
-    if (dyn)   result = result.filter(c => c.dyn === dyn);
+    if (dyn)   result = result.filter(c => getEraLabel(c, meta.cc, locale) === dyn);
     if (metal) result = result.filter(c => c.metal === metal);
     return result;
-  }, [coins, query, dyn, metal]);
+  }, [coins, query, dyn, metal, meta.cc, locale]);
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);

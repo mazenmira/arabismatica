@@ -479,6 +479,26 @@ export default function CataloguePage({
       {/* ── CONTROLS BAR ── */}
       <div className="bg-parch sticky top-[103px] z-30 border-b border-gold-700/15 shadow-sm">
         <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-3 flex-wrap">
+          {/* Country filter — FIRST */}
+          <div className="flex items-center gap-1.5">
+            <select
+              value={filters.country}
+              onChange={e => { updateFilter('country', e.target.value); setPage(1); }}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer font-medium"
+            >
+              <option value="all">🌍 {isAr ? 'كل الدول' : 'All Countries'} ({COINS.length})</option>
+              {COUNTRIES.map(({ cc, co, co_ar }) => {
+                const count = countryCounts[co] || 0;
+                if (!count) return null;
+                return (
+                  <option key={cc} value={co}>
+                    {COUNTRY_FLAGS[cc]} {isAr ? co_ar : co} ({count})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
           {/* Era */}
           <select
             value={filters.era}
@@ -525,25 +545,6 @@ export default function CataloguePage({
               onChange={e => { setYearTo(e.target.value); setPage(1); }}
               className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500"
               min="1500" max="2026" />
-          </div>
-          {/* Country filter dropdown */}
-          <div className="flex items-center gap-1.5">
-            <select
-              value={filters.country}
-              onChange={e => { updateFilter('country', e.target.value); setPage(1); }}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer"
-            >
-              <option value="all">🌍 {isAr ? 'كل الدول' : 'All Countries'} ({COINS.length})</option>
-              {COUNTRIES.map(({ cc, co, co_ar }) => {
-                const count = countryCounts[co] || 0;
-                if (!count) return null;
-                return (
-                  <option key={cc} value={co}>
-                    {COUNTRY_FLAGS[cc]} {isAr ? co_ar : co} ({count})
-                  </option>
-                );
-              })}
-            </select>
           </div>
 
           {/* Sort */}

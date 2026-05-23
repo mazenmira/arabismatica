@@ -35,14 +35,6 @@ const TOP_NAV_ITEMS_AR = [
     { label: '🇲🇷 موريتانيا',                href: '/ar/country/mauritania' },
     { label: '🇵🇸 فلسطين',                   href: '/ar/country/palestine' },
   ]},
-  { label: 'مركز الأدوات والمعرفة', highlight: true, children: [
-    { label: 'أدوات التقييم',          href: `${WP}/grading-tools/`,      highlight: true },
-    { label: 'بوابة المعرفة',          href: `${WP}/knowledge-portal/`,   highlight: true },
-    { label: 'مختبر المقتني الصغير',   href: `${WP}/young-collector-lab/` },
-    { label: 'أكاديمية المقتني العربي', href: `${WP}/ac-academy/` },
-    { label: 'المكتبة الإلكترونية',    href: 'https://library.arabcollector.com/' },
-    { label: 'مكتبة المرئيات',         href: `${WP}/video/` },
-  ]},
 ];
 
 const TOP_NAV_ITEMS_EN = [
@@ -68,14 +60,6 @@ const TOP_NAV_ITEMS_EN = [
     { label: '🇸🇩 Sudan',        href: '/en/country/sudan' },
     { label: '🇲🇷 Mauritania',   href: '/en/country/mauritania' },
     { label: '🇵🇸 Palestine',    href: '/en/country/palestine' },
-  ]},
-  { label: 'Knowledge & Tools Hub', highlight: true, children: [
-    { label: 'Grading Tools',          href: `${WP}/grading-tools/`,      highlight: true },
-    { label: 'Knowledge Portal',       href: `${WP}/knowledge-portal/`,   highlight: true },
-    { label: 'Young Collector Lab',    href: `${WP}/young-collector-lab/` },
-    { label: 'Arab Collector Academy', href: `${WP}/ac-academy/` },
-    { label: 'Digital Library',        href: 'https://library.arabcollector.com/' },
-    { label: 'Video Library',          href: `${WP}/video/` },
   ]},
 ];
 
@@ -191,9 +175,8 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
               {TOP_NAV_ITEMS.map((item) => (
                 <div key={item.label} className="relative group">
                   <button
-                    className={`flex items-center gap-1 px-3 py-2 text-[13px] font-medium rounded transition-colors whitespace-nowrap
-                      ${item.highlight ? 'text-gold-300 hover:text-gold-100' : 'text-white/80 hover:text-white hover:bg-white/5'}
-                      ${activeMenu === item.label ? 'bg-white/10' : ''}`}
+                    className={`flex items-center gap-1 px-3 py-2 text-[13px] font-medium rounded transition-colors whitespace-nowrap text-gold-400 hover:text-white hover:bg-white/5
+                      ${activeMenu === item.label ? 'bg-white/10 text-white' : ''}`}
                     onClick={() => setActiveMenu(activeMenu === item.label ? null : item.label)}
                     onMouseEnter={() => setActiveMenu(item.label)}
                   >
@@ -225,24 +208,41 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 </div>
               ))}
 
-              {/* Knowledge Portal pill */}
-              <a href={`${WP}/knowledge-portal/`} target="_blank" rel="noopener"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold text-ink bg-gold-500 hover:bg-gold-400 transition-colors mx-2 shrink-0">
-                <BookOpen size={12} />
-                {isAr ? 'بوابة المعرفة' : 'Knowledge Portal'}
-              </a>
-
-              {/* Grading Tools pill */}
-              <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500 text-gold-300 hover:bg-gold-900/40 transition-colors shrink-0">
-                {isAr ? 'أدوات التقييم' : 'Grading Tools'}
-              </a>
             </nav>
 
             {/* Right actions */}
             <div className="flex items-center gap-2 mr-auto xl:mr-0">
 
-              {/* Admin Panel button — always visible */}
+              {/* Knowledge Portal */}
+              <a href={`${WP}/knowledge-portal/`} target="_blank" rel="noopener"
+                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold text-ink bg-gold-500 hover:bg-gold-400 transition-colors shrink-0">
+                <BookOpen size={12} />
+                {isAr ? 'بوابة المعرفة' : 'Knowledge Portal'}
+              </a>
+
+              {/* Grading Tools */}
+              <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
+                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500 text-gold-300 hover:bg-gold-900/40 transition-colors shrink-0">
+                {isAr ? 'أدوات التقييم' : 'Grading Tools'}
+              </a>
+
+              {/* Tools — sits right after Grading Tools */}
+              <button onClick={() => setToolsOpen(true)}
+                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-gold-700 hover:bg-gold-600 text-gold-100 transition-colors"
+                title={t('tools.open')}>
+                <Wrench size={13} />
+                {isAr ? 'الأدوات' : 'Tools'}
+              </button>
+
+              {/* AI Identify */}
+              <button onClick={() => setIdentifyOpen(true)}
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700 text-gold-300 hover:bg-gold-900/40 transition-colors"
+                title={isAr ? 'تحديد العملة بالصورة' : 'Identify coin by image'}>
+                <span>🔍</span>
+                {isAr ? 'تحديد بالصورة' : 'Identify'}
+              </button>
+
+              {/* Admin Panel — towards end */}
               <button
                 onClick={onAdminOpen}
                 className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-500 hover:border-gold-500 hover:text-gold-300 transition-colors"
@@ -252,7 +252,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 <span className="hidden lg:block">{isAr ? 'الإدارة' : 'Admin'}</span>
               </button>
 
-              {/* Auth button */}
+              {/* Auth button — at the end */}
               {user ? (
                 <button onClick={onDashOpen}
                   className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 hover:bg-gold-500/25 transition-colors">
@@ -265,22 +265,6 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                   {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>
               )}
-
-              {/* AI Identify */}
-              <button onClick={() => setIdentifyOpen(true)}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700 text-gold-300 hover:bg-gold-900/40 transition-colors"
-                title={isAr ? 'تحديد العملة بالصورة' : 'Identify coin by image'}>
-                <span>🔍</span>
-                {isAr ? 'تحديد بالصورة' : 'Identify'}
-              </button>
-
-              {/* Tools */}
-              <button onClick={() => setToolsOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-gold-700 hover:bg-gold-600 text-gold-100 transition-colors"
-                title={t('tools.open')}>
-                <Wrench size={13} />
-                <span className="hidden sm:block">{isAr ? 'الأدوات' : 'Tools'}</span>
-              </button>
 
               {/* Mobile toggle */}
               <button onClick={() => setMobileOpen(!mobileOpen)}
@@ -303,12 +287,16 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] border border-gold-500 text-gold-300">
                 {isAr ? 'أدوات التقييم' : 'Grading Tools'}
               </a>
+              <button onClick={() => { setToolsOpen(true); setMobileOpen(false); }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-semibold bg-gold-700 text-gold-100">
+                <Wrench size={12} /> {isAr ? 'الأدوات' : 'Tools'}
+              </button>
             </div>
 
             {TOP_NAV_ITEMS.map((item) => (
               <div key={item.label}>
                 <button
-                  className="w-full flex items-center justify-between px-5 py-3 text-[13px] text-white/80 border-b border-gold-900/20"
+                  className="w-full flex items-center justify-between px-5 py-3 text-[13px] text-gold-400 hover:text-white border-b border-gold-900/20"
                   onClick={() => setActiveMenu(activeMenu === item.label ? null : item.label)}>
                   <span>{item.label}</span>
                   <ChevronDown size={14} className={`transition-transform ${activeMenu === item.label ? 'rotate-180' : ''}`} />
@@ -317,12 +305,18 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                   <div className="bg-ink/80">
                     {item.children.map((child) => {
                       const isExternal = child.href.startsWith('http');
-                      return (
+                      return isExternal ? (
                         <a key={child.label} href={child.href}
-                          {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                          className="block px-8 py-2.5 text-[12px] text-white/60 hover:text-white border-b border-gold-900/10 last:border-0">
+                          target="_blank" rel="noopener noreferrer"
+                          className="block px-8 py-2.5 text-[12px] text-gold-400 hover:text-white border-b border-gold-900/10 last:border-0">
                           {child.label}
                         </a>
+                      ) : (
+                        <Link key={child.label} href={child.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="block px-8 py-2.5 text-[12px] text-gold-400 hover:text-white border-b border-gold-900/10 last:border-0">
+                          {child.label}
+                        </Link>
                       );
                     })}
                   </div>
@@ -331,12 +325,14 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
             ))}
 
             <div className="px-4 py-4 flex gap-3 border-t border-gold-800/30 flex-wrap">
-              {/* Admin Panel mobile */}
+              <button onClick={() => { setIdentifyOpen(true); setMobileOpen(false); }}
+                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700 text-gold-300 text-center">
+                {isAr ? 'تحديد بالصورة' : 'Identify'}
+              </button>
               <button onClick={() => { onAdminOpen?.(); setMobileOpen(false); }}
                 className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500 text-center flex items-center justify-center gap-1">
                 <Settings size={12} /> {isAr ? 'الإدارة' : 'Admin'}
               </button>
-
               {user ? (
                 <button onClick={() => { onDashOpen?.(); setMobileOpen(false); }}
                   className="flex-1 py-2 text-[12px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 text-center">
@@ -348,14 +344,6 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                   {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>
               )}
-              <button onClick={() => { setIdentifyOpen(true); setMobileOpen(false); }}
-                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700 text-gold-300 text-center">
-                {isAr ? 'تحديد بالصورة' : 'Identify'}
-              </button>
-              <button onClick={() => { setToolsOpen(true); setMobileOpen(false); }}
-                className="flex-1 py-2 text-[12px] rounded-full bg-gold-700 text-gold-100 font-semibold text-center">
-                {isAr ? 'الأدوات' : 'Tools'}
-              </button>
             </div>
           </div>
         )}
