@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { Coin, MintageEntry } from '@/types/coin';
 import {
   getDiscGradient,
@@ -145,8 +146,9 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
   // ── List view ──────────────────────────────────────────────────────────────
   if (view === 'list') {
     return (
-      <button
-        onClick={onClick}
+      <Link
+        href={`/${locale}/catalogue/${coin.id}`}
+        onClick={(e) => { e.preventDefault(); onClick(); }}
         className="w-full flex items-center gap-3 bg-parch-cream rounded-xl border border-gold-700/15 hover:border-gold-500/50 hover:shadow-md transition-all group text-right px-3 py-2.5 cursor-pointer"
       >
         <div className="shrink-0">
@@ -180,14 +182,15 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
             </button>
           )}
         </div>
-      </button>
+      </Link>
     );
   }
 
   // ── Grid view ──────────────────────────────────────────────────────────────
   return (
-    <button
-      onClick={onClick}
+    <Link
+      href={`/${locale}/catalogue/${coin.id}`}
+      onClick={(e) => { e.preventDefault(); onClick(); }}
       className="group w-full bg-parch-cream rounded-xl border border-gold-700/15 hover:border-gold-500 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex flex-col text-right animate-fade-in"
       style={{ boxShadow: '0 1px 8px rgba(80,50,10,.06)' }}
     >
@@ -263,6 +266,6 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
           )}
         </div>
       </div>
-    </button>
+    </Link>
   );
 }

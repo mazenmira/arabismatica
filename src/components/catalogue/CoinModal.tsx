@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { X, ExternalLink, ZoomIn } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -593,7 +594,17 @@ export default function CoinModal({
         >
           {/* Header bar */}
           <div className="sticky top-0 bg-parch-cream flex items-center justify-between px-5 py-3.5 border-b border-gold-700/20 z-10">
-            <span className="text-[10px] text-ink/30 font-mono">{coin.id} · {coin.km} · {coin.nref}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] text-ink/30 font-mono">{coin.id} · {coin.km} · {coin.nref}</span>
+              <Link
+                href={`/${locale}/catalogue/${coin.id}`}
+                className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full border border-gold-700/30 text-gold-600 hover:bg-gold-500/10 hover:border-gold-500 transition-colors"
+                title={isAr ? 'فتح الصفحة الكاملة' : 'Open full page'}
+              >
+                <ExternalLink size={10} />
+                {isAr ? 'صفحة كاملة' : 'Full page'}
+              </Link>
+            </div>
             <button onClick={onClose}
               className="w-8 h-8 rounded-full border border-gold-700/30 text-gold-600 hover:text-gold-400 hover:border-gold-500 flex items-center justify-center transition-colors">
               <X size={14} />

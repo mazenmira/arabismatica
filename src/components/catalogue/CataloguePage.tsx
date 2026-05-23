@@ -4,6 +4,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown, Moon, Sun } from 'lucide-react';
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
@@ -416,15 +417,15 @@ export default function CataloguePage({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={cotd.o} alt="" className="w-8 h-8 rounded-full object-cover border border-gold-700/40" />
                 )}
-                <button onClick={() => setSelectedCoin(cotd)} className="font-amiri text-gold-300 hover:text-gold-100 text-[14px] transition-colors">
+                <Link href={`/${locale}/catalogue/${cotd.id}`} onClick={(e) => { e.preventDefault(); setSelectedCoin(cotd); }} className="font-amiri text-gold-300 hover:text-gold-100 text-[14px] transition-colors">
                   {isAr ? (cotd.nar || cotd.name) : cotd.name}
-                </button>
+                </Link>
                 <span className="text-[11px] text-gold-600/50 hidden sm:block">
                   {cotd.yce ? cotd.yce + ' م' : ''} · {isAr ? cotd.co_ar : cotd.co}
                 </span>
-                <button onClick={() => setSelectedCoin(cotd)} className="mr-auto text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 rounded-full px-3 py-1 transition-colors shrink-0">
+                <Link href={`/${locale}/catalogue/${cotd.id}`} onClick={(e) => { e.preventDefault(); setSelectedCoin(cotd); }} className="mr-auto text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 rounded-full px-3 py-1 transition-colors shrink-0">
                   {isAr ? 'عرض التفاصيل ←' : 'View details →'}
-                </button>
+                </Link>
               </div>
             </div>
           </div>

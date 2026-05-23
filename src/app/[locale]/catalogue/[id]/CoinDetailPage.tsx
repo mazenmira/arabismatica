@@ -9,6 +9,16 @@ import {
   COUNTRY_FLAGS, formatMintage,
   isValidImageUrl, getCoinName, getCoinYear,
 } from '@/lib/coins';
+import COINS_RAW from '@/data/coins.json';
+
+const ALL_COINS = COINS_RAW as unknown as Coin[];
+
+// Related coins: same country+metal, exclude self, up to 6
+function getRelated(coin: Coin, locale: string): Coin[] {
+  return ALL_COINS
+    .filter(c => c.id !== coin.id && c.cc === coin.cc && c.metal === coin.metal)
+    .slice(0, 6);
+}
 
 interface Props { coin: Coin; locale: string; }
 
@@ -267,6 +277,47 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                   </div>
                 </div>
               )}
+
+              {/* ── Related Coins ── */}
+              {(() => {
+                const related = getRelated(coin, locale);
+                if (related.length === 0) return null;
+                return (
+                  <div className="mb-6">
+                    <h2 className="text-[13px] font-semibold text-amber-900 mb-3 flex items-center gap-2">
+                      {isAr ? 'عملات ذات صلة' : 'Related Coins'}
+                      <span className="text-[10px] font-normal text-amber-600/50">({related.length})</span>
+                    </h2>
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                      {related.map(rc => {
+                        const rcName = getCoinName(rc, locale);
+                        const rcYear = rc.yce || rc.yah || '';
+                        return (
+                          <a
+                            key={rc.id}
+                            href={`/${locale}/catalogue/${rc.id}`}
+                            className="flex flex-col items-center gap-1.5 p-2 rounded-xl border border-amber-100 hover:border-amber-300 hover:bg-amber-50 transition-all group"
+                          >
+                            {isValidImageUrl(rc.o) ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={rc.o}
+                                alt={rcName}
+                                className="w-12 h-12 rounded-full object-cover group-hover:scale-105 transition-transform"
+                                style={{ border: '2px solid #F0E8D4', outline: '1px solid #8B6D2E' }}
+                              />
+                            ) : (
+                              <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-lg border-2 border-amber-200">🪙</div>
+                            )}
+                            <span className="text-[9px] text-amber-800 text-center leading-tight line-clamp-2 font-amiri">{rcName}</span>
+                            {rcYear && <span className="text-[8px] text-amber-500">{rcYear}</span>}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* ── View in catalogue CTA ── */}
               <div className="flex items-center justify-between flex-wrap gap-3 pt-4 border-t border-amber-100">
