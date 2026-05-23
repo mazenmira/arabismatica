@@ -25,6 +25,28 @@ const COINS = COINS_DATA as unknown as Coin[];
 
 const PER_PAGE = 60;
 
+// Year-range based dynasty matching — fixes "Muhammad Ali" showing 1992 coins
+// Each pill defines which year windows count as that era, per country code (or '*' for all)
+const DYNASTY_YEAR_RANGES: Record<string, { cc: string | '*'; from: number; to: number }[]> = {
+  ottoman:   [{ cc: '*',  from: 1299, to: 1918 }],
+  muhali:    [{ cc: 'EG', from: 1805, to: 1882 }],
+  sultanate: [{ cc: 'EG', from: 1883, to: 1921 }],
+  kingdom:   [{ cc: 'EG', from: 1922, to: 1952 }, { cc: 'IQ', from: 1921, to: 1958 }, { cc: 'LY', from: 1952, to: 1969 }, { cc: 'JO', from: 1946, to: 1999 }],
+  republic:  [{ cc: 'EG', from: 1953, to: 2099 }, { cc: 'IQ', from: 1958, to: 2099 }, { cc: 'SY', from: 1946, to: 2099 }, { cc: 'LB', from: 1946, to: 2099 }, { cc: 'YE', from: 1962, to: 2099 }, { cc: 'DZ', from: 1962, to: 2099 }, { cc: 'SD', from: 1956, to: 2099 }, { cc: 'MR', from: 1960, to: 2099 }],
+  saudi:     [{ cc: 'SA', from: 1800, to: 2099 }],
+  gulf:      [{ cc: 'AE', from: 1960, to: 2099 }, { cc: 'QA', from: 1960, to: 2099 }, { cc: 'KW', from: 1960, to: 2099 }, { cc: 'OM', from: 1960, to: 2099 }, { cc: 'QD', from: 1960, to: 2099 }, { cc: 'BH', from: 1960, to: 2099 }],
+  maghreb:   [{ cc: 'MA', from: 1600, to: 2099 }, { cc: 'DZ', from: 1500, to: 2099 }, { cc: 'TN', from: 1700, to: 2099 }, { cc: 'LY', from: 1800, to: 2099 }],
+};
+
+function coinMatchesDynastyPill(coin: { cc: string; yce?: string }, pillKey: string): boolean {
+  const ranges = DYNASTY_YEAR_RANGES[pillKey];
+  if (!ranges) return false;
+  const year = parseInt(coin.yce || '0');
+  return ranges.some(r =>
+    (r.cc === '*' || r.cc === coin.cc) && year >= r.from && year <= r.to
+  );
+}
+
 const DYNASTY_PILLS = [
   { key: 'ottoman',   label_ar: 'العثمانيون',           label_en: 'Ottoman',         match: ['الدولة العثمانية', 'Ottoman'] },
   { key: 'muhali',    label_ar: 'أسرة محمد علي',        label_en: 'Muhammad Ali',    match: ['محمد علي', 'Muhammad Ali', 'أسرة'] },
@@ -94,13 +116,16 @@ interface CataloguePageProps {
   user?: { id: string; email: string } | null;
   authOpen?: boolean;
   dashOpen?: boolean;
+  adminOpen?: boolean;
   setAuthOpen?: (v: boolean) => void;
   setDashOpen?: (v: boolean) => void;
+  setAdminOpen?: (v: boolean) => void;
 }
 
 export default function CataloguePage({
   locale, user: userProp, authOpen: authOpenProp = false,
-  dashOpen: dashOpenProp = false, setAuthOpen: setAuthOpenProp, setDashOpen: setDashOpenProp,
+  dashOpen: dashOpenProp = false, adminOpen: adminOpenProp = false,
+  setAuthOpen: setAuthOpenProp, setDashOpen: setDashOpenProp, setAdminOpen: setAdminOpenProp,
 }: CataloguePageProps) {
   const t = useTranslations();
   const isAr = locale === 'ar';
@@ -131,7 +156,9 @@ export default function CataloguePage({
     } catch { return new Set<string>(); }
   });
   const [darkMode, setDarkMode]         = useState(false);
-  const [adminOpen, setAdminOpen]       = useState(false);
+  const [adminOpenLocal, setAdminOpenLocal] = useState(false);
+  const adminOpen    = adminOpenProp    || adminOpenLocal;
+  const setAdminOpen = setAdminOpenProp ?? setAdminOpenLocal;
   // Auth state — use props from page.tsx if provided, else manage locally
   const [authOpenLocal, setAuthOpenLocal] = useState(false);
   const [dashOpenLocal, setDashOpenLocal] = useState(false);
@@ -295,10 +322,7 @@ export default function CataloguePage({
     if (filters.type === 'Commemorative') result = result.filter(c => c.type === 'Commemorative');
     if (filters.type === 'has-mint') result = result.filter(c => Boolean(c.mint));
     if (dynasty) {
-      const pill = DYNASTY_PILLS.find(p => p.key === dynasty);
-      if (pill) result = result.filter(c =>
-        pill.match.some(m => c.dyn?.includes(m) || c.co?.includes(m) || c.co_ar?.includes(m))
-      );
+      result = result.filter(c => coinMatchesDynastyPill(c, dynasty));
     }
     if (yearFrom) result = result.filter(c => parseInt(c.yce || '0') >= parseInt(yearFrom));
     if (yearTo)   result = result.filter(c => parseInt(c.yce || '0') <= parseInt(yearTo));

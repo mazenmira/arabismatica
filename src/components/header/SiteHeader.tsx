@@ -222,13 +222,13 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
 
               {/* Grading Tools */}
               <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
-                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500 text-gold-300 hover:bg-gold-900/40 transition-colors shrink-0">
+                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500/70 text-gold-400 hover:text-white hover:border-gold-400 transition-colors shrink-0">
                 {isAr ? 'أدوات التقييم' : 'Grading Tools'}
               </a>
 
               {/* Tools — sits right after Grading Tools */}
               <button onClick={() => setToolsOpen(true)}
-                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-gold-700 hover:bg-gold-600 text-gold-100 transition-colors"
+                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500/70 text-gold-400 hover:text-white hover:border-gold-400 transition-colors"
                 title={t('tools.open')}>
                 <Wrench size={13} />
                 {isAr ? 'الأدوات' : 'Tools'}
@@ -236,7 +236,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
 
               {/* AI Identify */}
               <button onClick={() => setIdentifyOpen(true)}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700 text-gold-300 hover:bg-gold-900/40 transition-colors"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-500/70 text-gold-400 hover:text-white hover:border-gold-400 transition-colors"
                 title={isAr ? 'تحديد العملة بالصورة' : 'Identify coin by image'}>
                 <span>🔍</span>
                 {isAr ? 'تحديد بالصورة' : 'Identify'}
@@ -245,7 +245,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
               {/* Admin Panel — towards end */}
               <button
                 onClick={onAdminOpen}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-500 hover:border-gold-500 hover:text-gold-300 transition-colors"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-500/70 hover:border-gold-600 hover:text-gold-400 transition-colors"
                 title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}
               >
                 <Settings size={12} />
@@ -261,7 +261,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 </button>
               ) : (
                 <button onClick={onAuthOpen}
-                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-400 hover:border-gold-500/60 hover:text-gold-300 transition-colors">
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-500/70 hover:border-gold-600 hover:text-gold-400 transition-colors">
                   {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>
               )}
@@ -284,11 +284,11 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 <BookOpen size={12} /> {isAr ? 'بوابة المعرفة' : 'Knowledge Portal'}
               </a>
               <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] border border-gold-500 text-gold-300">
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] border border-gold-500/70 text-gold-400">
                 {isAr ? 'أدوات التقييم' : 'Grading Tools'}
               </a>
               <button onClick={() => { setToolsOpen(true); setMobileOpen(false); }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-semibold bg-gold-700 text-gold-100">
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] border border-gold-500/70 text-gold-400">
                 <Wrench size={12} /> {isAr ? 'الأدوات' : 'Tools'}
               </button>
             </div>
@@ -326,11 +326,11 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
 
             <div className="px-4 py-4 flex gap-3 border-t border-gold-800/30 flex-wrap">
               <button onClick={() => { setIdentifyOpen(true); setMobileOpen(false); }}
-                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700 text-gold-300 text-center">
+                className="flex-1 py-2 text-[12px] rounded-full border border-gold-500/70 text-gold-400 text-center">
                 {isAr ? 'تحديد بالصورة' : 'Identify'}
               </button>
               <button onClick={() => { onAdminOpen?.(); setMobileOpen(false); }}
-                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500 text-center flex items-center justify-center gap-1">
+                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500/70 text-center flex items-center justify-center gap-1">
                 <Settings size={12} /> {isAr ? 'الإدارة' : 'Admin'}
               </button>
               {user ? (
@@ -340,7 +340,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 </button>
               ) : (
                 <button onClick={() => { onAuthOpen?.(); setMobileOpen(false); }}
-                  className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-400 text-center">
+                  className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500/70 text-center">
                   {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>
               )}

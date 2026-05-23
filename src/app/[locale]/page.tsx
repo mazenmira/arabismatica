@@ -8,8 +8,9 @@ import { supabase } from '@/lib/supabase';
 
 export default function Home({ params: { locale } }: { params: { locale: string } }) {
   const [user, setUser]         = useState<{ id: string; email: string } | null>(null);
-  const [authOpen, setAuthOpen] = useState(false);
-  const [dashOpen, setDashOpen] = useState(false);
+  const [authOpen, setAuthOpen]   = useState(false);
+  const [dashOpen, setDashOpen]   = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -28,14 +29,17 @@ export default function Home({ params: { locale } }: { params: { locale: string 
         user={user}
         onAuthOpen={() => setAuthOpen(true)}
         onDashOpen={() => setDashOpen(true)}
+        onAdminOpen={() => setAdminOpen(true)}
       />
       <CataloguePage
         locale={locale}
         user={user}
         authOpen={authOpen}
         dashOpen={dashOpen}
+        adminOpen={adminOpen}
         setAuthOpen={setAuthOpen}
         setDashOpen={setDashOpen}
+        setAdminOpen={setAdminOpen}
       />
     </main>
   );
