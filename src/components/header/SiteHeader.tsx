@@ -3,8 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
-import { Menu, X, Globe, ChevronDown, Wrench, BookOpen, Settings } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, Wrench, Settings } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, LinkedinIcon, YoutubeIcon, InstagramIcon, RssIcon } from './SocialIcons';
 import ToolsSidebar from '@/components/sidebar/ToolsSidebar';
 import IdentifyModal from '@/components/modals/IdentifyModal';
@@ -101,7 +100,6 @@ interface SiteHeaderProps {
 }
 
 export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen, user }: SiteHeaderProps) {
-  const t = useTranslations();
   const isAr = locale === 'ar';
   const TOP_NAV_ITEMS = isAr ? TOP_NAV_ITEMS_AR : TOP_NAV_ITEMS_EN;
 
