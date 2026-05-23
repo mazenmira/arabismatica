@@ -35,6 +35,8 @@ const TOP_NAV_ITEMS_AR = [
     { label: '🇵🇸 فلسطين',                   href: '/ar/country/palestine' },
   ]},
   { label: 'الأدوات', isTools: true, children: [
+    { label: '📅 محول الهجري ↔ الميلادي', href: '#hijri-converter' },
+    { label: '🛠️ باقي الأدوات الداخلية', href: '#tools-sidebar' },
     { label: '📚 بوابة المعرفة',  href: `${WP}/knowledge-portal/` },
     { label: '🎓 أدوات التقييم', href: `${WP}/grading-tools/` },
     { label: '🔬 مختبر المقتني الصغير', href: `${WP}/young-collector-lab/` },
@@ -68,6 +70,8 @@ const TOP_NAV_ITEMS_EN = [
     { label: '🇵🇸 Palestine',    href: '/en/country/palestine' },
   ]},
   { label: 'Tools', isTools: true, children: [
+    { label: '📅 Hijri ↔ Gregorian Converter', href: '#hijri-converter' },
+    { label: '🛠️ More Built-in Tools', href: '#tools-sidebar' },
     { label: '📚 Knowledge Portal',       href: `${WP}/knowledge-portal/` },
     { label: '🎓 Grading Tools',          href: `${WP}/grading-tools/` },
     { label: '🔬 Young Collector Lab',    href: `${WP}/young-collector-lab/` },
@@ -106,6 +110,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [activeMenu,   setActiveMenu]   = useState<string | null>(null);
   const [toolsOpen,    setToolsOpen]    = useState(false);
+  const [toolDefault,  setToolDefault]  = useState<string | undefined>(undefined);
   const [identifyOpen, setIdentifyOpen] = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -206,9 +211,17 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                       onMouseLeave={() => setActiveMenu(null)}
                     >
                       {item.children.map((child) => {
+                        if (child.href === '#hijri-converter') {
+                          return (
+                            <button key={child.label} onClick={() => { setToolDefault('hijriConverter'); setToolsOpen(true); setActiveMenu(null); }}
+                              className="w-full text-start block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0 text-gold-300 hover:text-white hover:bg-white/5 font-medium">
+                              {child.label}
+                            </button>
+                          );
+                        }
                         if (child.href === '#tools-sidebar') {
                           return (
-                            <button key={child.label} onClick={() => { setToolsOpen(true); setActiveMenu(null); }}
+                            <button key={child.label} onClick={() => { setToolDefault(undefined); setToolsOpen(true); setActiveMenu(null); }}
                               className="w-full text-start block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0 text-white/70 hover:text-white hover:bg-white/5">
                               {child.label}
                             </button>
@@ -290,6 +303,24 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 {activeMenu === item.label && item.children && (
                   <div className="bg-ink/80">
                     {item.children.map((child) => {
+                      if (child.href === '#hijri-converter') {
+                        return (
+                          <button key={child.label}
+                            onClick={() => { setToolDefault('hijriConverter'); setToolsOpen(true); setMobileOpen(false); setActiveMenu(null); }}
+                            className="w-full text-start block px-8 py-2.5 text-[12px] text-gold-300 font-medium hover:text-white border-b border-gold-900/10 last:border-0">
+                            {child.label}
+                          </button>
+                        );
+                      }
+                      if (child.href === '#tools-sidebar') {
+                        return (
+                          <button key={child.label}
+                            onClick={() => { setToolDefault(undefined); setToolsOpen(true); setMobileOpen(false); setActiveMenu(null); }}
+                            className="w-full text-start block px-8 py-2.5 text-[12px] text-gold-400 hover:text-white border-b border-gold-900/10 last:border-0">
+                            {child.label}
+                          </button>
+                        );
+                      }
                       const isExternal = child.href.startsWith('http');
                       return isExternal ? (
                         <a key={child.label} href={child.href}
@@ -335,7 +366,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
         )}
       </header>
 
-      <ToolsSidebar open={toolsOpen} onClose={() => setToolsOpen(false)} locale={locale} />
+      <ToolsSidebar open={toolsOpen} onClose={() => { setToolsOpen(false); setToolDefault(undefined); }} locale={locale} defaultTool={toolDefault} />
       <IdentifyModal open={identifyOpen} onClose={() => setIdentifyOpen(false)} locale={locale} />
     </>
   );

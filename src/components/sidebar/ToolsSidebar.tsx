@@ -143,11 +143,22 @@ function HijriConverter({ locale }: { locale: string }) {
   );
 }
 
-export default function ToolsSidebar({ open, onClose, locale }: { open: boolean; onClose: () => void; locale: string }) {
+export default function ToolsSidebar({ open, onClose, locale, defaultTool }: { open: boolean; onClose: () => void; locale: string; defaultTool?: string }) {
   const t = useTranslations('tools');
   const isAr = locale === 'ar';
   const [activeTab, setActiveTab] = useState<TabId>('encyclopedias');
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
+
+  // Auto-open to a specific tool when triggered externally (e.g. Hijri converter)
+  useEffect(() => {
+    if (open && defaultTool) {
+      setExpandedTool(defaultTool);
+      // Find which tab the tool belongs to and switch to it
+      const tab = (Object.entries(TOOLS) as [TabId, typeof TOOLS[TabId]][])
+        .find(([, tools]) => tools.some(t => t.key === defaultTool))?.[0];
+      if (tab) setActiveTab(tab);
+    }
+  }, [open, defaultTool]);
 
   useEffect(() => {
     if (open) document.body.style.overflow = 'hidden';
