@@ -4,17 +4,16 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { Menu, X, Globe, ChevronDown, Wrench, BookOpen } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, Wrench, BookOpen, Settings } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, LinkedinIcon, YoutubeIcon, InstagramIcon, RssIcon } from './SocialIcons';
 import ToolsSidebar from '@/components/sidebar/ToolsSidebar';
 import IdentifyModal from '@/components/modals/IdentifyModal';
 
-const WP = 'https://arabismatica.arabcollector.com';
+const WP = 'https://arabcollector.com';
 
-// ── Kept: المقتني العربي + مركز الأدوات والمعرفة only ──
-const TOP_NAV_ITEMS = [
+const TOP_NAV_ITEMS_AR = [
   { label: 'المقتني العربي', children: [
-    { label: 'عن المقتني العربي',   href: 'https://arabcollector.com/about-us/' },  
+    { label: 'عن المقتني العربي', href: `${WP}/about-us/` },
   ]},
   { label: 'مركز الأدوات والمعرفة', highlight: true, children: [
     { label: 'أدوات التقييم',          href: `${WP}/grading-tools/`,      highlight: true },
@@ -26,17 +25,31 @@ const TOP_NAV_ITEMS = [
   ]},
 ];
 
-const SOCIALS = [
-  { icon: FacebookIcon,  href: `${WP}/facebook`,                                      label: 'فيسبوك' },
-  { icon: TwitterIcon,   href: 'https://x.com/ArabCollector',                         label: 'X' },
-  { icon: LinkedinIcon,  href: 'https://au.linkedin.com/company/the-arab-collector',  label: 'لينكدإن' },
-  { icon: YoutubeIcon,   href: 'https://www.youtube.com/@thearabcollector5252',        label: 'يوتيوب' },
-  { icon: InstagramIcon, href: 'https://www.instagram.com/thearabcollector/',         label: 'انستقرام' },
-  { icon: RssIcon,       href: `${WP}/feed/`,                                         label: 'RSS' },
+const TOP_NAV_ITEMS_EN = [
+  { label: 'The Arab Collector', children: [
+    { label: 'About The Arab Collector', href: `${WP}/about-us/` },
+  ]},
+  { label: 'Knowledge & Tools Hub', highlight: true, children: [
+    { label: 'Grading Tools',          href: `${WP}/grading-tools/`,      highlight: true },
+    { label: 'Knowledge Portal',       href: `${WP}/knowledge-portal/`,   highlight: true },
+    { label: 'Young Collector Lab',    href: `${WP}/young-collector-lab/` },
+    { label: 'Arab Collector Academy', href: `${WP}/ac-academy/` },
+    { label: 'Digital Library',        href: 'https://library.arabcollector.com/' },
+    { label: 'Video Library',          href: `${WP}/video/` },
+  ]},
 ];
 
-function getArabicDate(): string {
-  return new Date().toLocaleDateString('ar-EG', {
+const SOCIALS = [
+  { icon: FacebookIcon,  href: `${WP}/facebook`,                                     label: 'Facebook' },
+  { icon: TwitterIcon,   href: 'https://x.com/ArabCollector',                        label: 'X' },
+  { icon: LinkedinIcon,  href: 'https://au.linkedin.com/company/the-arab-collector', label: 'LinkedIn' },
+  { icon: YoutubeIcon,   href: 'https://www.youtube.com/@thearabcollector5252',       label: 'YouTube' },
+  { icon: InstagramIcon, href: 'https://www.instagram.com/thearabcollector/',        label: 'Instagram' },
+  { icon: RssIcon,       href: `${WP}/feed/`,                                        label: 'RSS' },
+];
+
+function getDate(locale: string): string {
+  return new Date().toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-AU', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 }
@@ -45,12 +58,14 @@ interface SiteHeaderProps {
   locale: string;
   onAuthOpen?: () => void;
   onDashOpen?: () => void;
+  onAdminOpen?: () => void;
   user?: { id: string; email: string } | null;
 }
 
-export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: SiteHeaderProps) {
+export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen, user }: SiteHeaderProps) {
   const t = useTranslations();
   const isAr = locale === 'ar';
+  const TOP_NAV_ITEMS = isAr ? TOP_NAV_ITEMS_AR : TOP_NAV_ITEMS_EN;
 
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [activeMenu,   setActiveMenu]   = useState<string | null>(null);
@@ -67,9 +82,8 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node))
         setActiveMenu(null);
-      }
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -77,37 +91,21 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
 
   return (
     <>
-      {/* ── TOP BAR (no ticker) ─────────────────────────────────────────── */}
+      {/* ── TOP BAR ─────────────────────────────────────────────────────── */}
       <div className="bg-ink text-xs border-b border-gold-700/30">
         <div className="max-w-[1440px] mx-auto px-4 h-9 flex items-center gap-3">
 
-          {/* Language switcher — fixed width to prevent layout jump */}
-          <div
-            className="flex items-center gap-1 border border-gold-700/40 rounded px-2 py-0.5"
-            style={{ minWidth: '72px' }}
-          >
+          {/* Language switcher */}
+          <div className="flex items-center gap-1 border border-gold-700/40 rounded px-2 py-0.5" style={{ minWidth: '72px' }}>
             <Globe size={12} className="text-gold-400 shrink-0" />
-            <Link
-              href="/ar"
-              className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${isAr ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}
-            >
-              ع
-            </Link>
+            <Link href="/ar" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${isAr ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>ع</Link>
             <span className="text-gold-700">|</span>
-            <Link
-              href="/en"
-              className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${!isAr ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}
-            >
-              EN
-            </Link>
+            <Link href="/en" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${!isAr ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>EN</Link>
           </div>
 
           {/* Date */}
-          <span className="text-gold-500/70 text-[11px] hidden sm:block">
-            {getArabicDate()}
-          </span>
+          <span className="text-gold-500/70 text-[11px] hidden sm:block">{getDate(locale)}</span>
 
-          {/* Spacer */}
           <div className="flex-1" />
 
           {/* Social icons */}
@@ -120,12 +118,10 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
             ))}
           </div>
 
-          {/* Back to The Arab Collector */}
-          <a
-            href="https://arabcollector.com"
+          {/* Back to Arab Collector */}
+          <a href="https://arabcollector.com"
             className="hidden md:flex items-center gap-1 text-gold-500 hover:text-gold-300 text-[11px] transition-colors shrink-0"
-            target="_blank" rel="noopener"
-          >
+            target="_blank" rel="noopener">
             {isAr ? '← العودة إلى المقتني العربي' : '← Return to The Arab Collector'}
           </a>
         </div>
@@ -150,8 +146,8 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
               />
             </Link>
 
-            {/* Desktop nav — 2 menus + 2 buttons only */}
-            <nav ref={menuRef} className="hidden xl:flex items-center flex-1 gap-0.5 mx-2" dir="rtl">
+            {/* Desktop nav */}
+            <nav ref={menuRef} className="hidden xl:flex items-center flex-1 gap-0.5 mx-2" dir={isAr ? 'rtl' : 'ltr'}>
               {TOP_NAV_ITEMS.map((item) => (
                 <div key={item.label} className="relative group">
                   <button
@@ -167,22 +163,16 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
 
                   {activeMenu === item.label && item.children && (
                     <div
-                      className="absolute top-full right-0 mt-1 bg-ink border border-gold-800/50 rounded-lg shadow-2xl min-w-[200px] py-1 z-50 animate-fade-in"
+                      className="absolute top-full right-0 mt-1 bg-ink border border-gold-800/50 rounded-lg shadow-2xl min-w-[220px] py-1 z-50 animate-fade-in"
                       onMouseLeave={() => setActiveMenu(null)}
                     >
                       {item.children.map((child) => (
-                        <a
-                          key={child.label}
-                          href={child.href}
-                          target="_blank" rel="noopener noreferrer"
+                        <a key={child.label} href={child.href} target="_blank" rel="noopener noreferrer"
                           className={`block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0
                             ${(child as { highlight?: boolean }).highlight
                               ? 'text-gold-300 hover:text-gold-100 hover:bg-gold-900/30 font-medium'
-                              : 'text-white/70 hover:text-white hover:bg-white/5'}`}
-                        >
-                          {(child as { highlight?: boolean }).highlight && (
-                            <span className="mr-1 text-gold-500">★</span>
-                          )}
+                              : 'text-white/70 hover:text-white hover:bg-white/5'}`}>
+                          {(child as { highlight?: boolean }).highlight && <span className="mr-1 text-gold-500">★</span>}
                           {child.label}
                         </a>
                       ))}
@@ -191,88 +181,83 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
                 </div>
               ))}
 
-              {/* بوابة المعرفة — filled gold pill */}
-              <a
-                href={`${WP}/knowledge-portal/`}
-                target="_blank" rel="noopener"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold text-ink bg-gold-500 hover:bg-gold-400 transition-colors mr-2 shrink-0"
-              >
+              {/* Knowledge Portal pill */}
+              <a href={`${WP}/knowledge-portal/`} target="_blank" rel="noopener"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold text-ink bg-gold-500 hover:bg-gold-400 transition-colors mx-2 shrink-0">
                 <BookOpen size={12} />
-                بوابة المعرفة
+                {isAr ? 'بوابة المعرفة' : 'Knowledge Portal'}
               </a>
 
-              {/* أدوات التقييم — outlined pill */}
-              <a
-                href={`${WP}/grading-tools/`}
-                target="_blank" rel="noopener"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500 text-gold-300 hover:bg-gold-900/40 transition-colors shrink-0"
-              >
-                أدوات التقييم
+              {/* Grading Tools pill */}
+              <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500 text-gold-300 hover:bg-gold-900/40 transition-colors shrink-0">
+                {isAr ? 'أدوات التقييم' : 'Grading Tools'}
               </a>
             </nav>
 
-            {/* Right actions — no cart, no dark mode */}
+            {/* Right actions */}
             <div className="flex items-center gap-2 mr-auto xl:mr-0">
+
+              {/* Admin Panel button — always visible */}
+              <button
+                onClick={onAdminOpen}
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-500 hover:border-gold-500 hover:text-gold-300 transition-colors"
+                title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}
+              >
+                <Settings size={12} />
+                <span className="hidden lg:block">{isAr ? 'الإدارة' : 'Admin'}</span>
+              </button>
+
               {/* Auth button */}
               {user ? (
-                <button
-                  onClick={onDashOpen}
-                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 hover:bg-gold-500/25 transition-colors"
-                >
+                <button onClick={onDashOpen}
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 hover:bg-gold-500/25 transition-colors">
                   <span>👤</span>
                   <span className="max-w-[80px] truncate">{user.email.split('@')[0]}</span>
                 </button>
               ) : (
-                <button
-                  onClick={onAuthOpen}
-                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-400 hover:border-gold-500/60 hover:text-gold-300 transition-colors"
-                >
-                  {locale === 'ar' ? 'دخول / تسجيل' : 'Sign in'}
+                <button onClick={onAuthOpen}
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-400 hover:border-gold-500/60 hover:text-gold-300 transition-colors">
+                  {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>
               )}
 
               {/* AI Identify */}
-              <button
-                onClick={() => setIdentifyOpen(true)}
+              <button onClick={() => setIdentifyOpen(true)}
                 className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700 text-gold-300 hover:bg-gold-900/40 transition-colors"
-                title="تحديد العملة بالصورة"
-              >
+                title={isAr ? 'تحديد العملة بالصورة' : 'Identify coin by image'}>
                 <span>🔍</span>
-                تحديد بالصورة
+                {isAr ? 'تحديد بالصورة' : 'Identify'}
               </button>
 
               {/* Tools */}
-              <button
-                onClick={() => setToolsOpen(true)}
+              <button onClick={() => setToolsOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-gold-700 hover:bg-gold-600 text-gold-100 transition-colors"
-                title={t('tools.open')}
-              >
+                title={t('tools.open')}>
                 <Wrench size={13} />
-                <span className="hidden sm:block">الأدوات</span>
+                <span className="hidden sm:block">{isAr ? 'الأدوات' : 'Tools'}</span>
               </button>
 
               {/* Mobile toggle */}
-              <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="xl:hidden flex items-center justify-center w-9 h-9 rounded-full text-white hover:bg-white/10 transition-colors"
-              >
+              <button onClick={() => setMobileOpen(!mobileOpen)}
+                className="xl:hidden flex items-center justify-center w-9 h-9 rounded-full text-white hover:bg-white/10 transition-colors">
                 {mobileOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
             </div>
           </div>
         </div>
 
-        {/* ── MOBILE MENU ─────────────────────────────────────────────── */}
+        {/* ── MOBILE MENU ─────────────────────────────────────────────────── */}
         {mobileOpen && (
-          <div className="xl:hidden bg-ink border-t border-gold-800/50 max-h-[80vh] overflow-y-auto animate-fade-in" dir="rtl">
+          <div className="xl:hidden bg-ink border-t border-gold-800/50 max-h-[80vh] overflow-y-auto animate-fade-in" dir={isAr ? 'rtl' : 'ltr'}>
             <div className="px-4 py-3 border-b border-gold-800/30 flex gap-2 flex-wrap">
               <a href={`${WP}/knowledge-portal/`} target="_blank" rel="noopener"
                 className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-semibold text-ink bg-gold-500">
-                <BookOpen size={12} /> بوابة المعرفة
+                <BookOpen size={12} /> {isAr ? 'بوابة المعرفة' : 'Knowledge Portal'}
               </a>
               <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
                 className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] border border-gold-500 text-gold-300">
-                أدوات التقييم
+                {isAr ? 'أدوات التقييم' : 'Grading Tools'}
               </a>
             </div>
 
@@ -280,8 +265,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
               <div key={item.label}>
                 <button
                   className="w-full flex items-center justify-between px-5 py-3 text-[13px] text-white/80 border-b border-gold-900/20"
-                  onClick={() => setActiveMenu(activeMenu === item.label ? null : item.label)}
-                >
+                  onClick={() => setActiveMenu(activeMenu === item.label ? null : item.label)}>
                   <span>{item.label}</span>
                   <ChevronDown size={14} className={`transition-transform ${activeMenu === item.label ? 'rotate-180' : ''}`} />
                 </button>
@@ -299,6 +283,12 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
             ))}
 
             <div className="px-4 py-4 flex gap-3 border-t border-gold-800/30 flex-wrap">
+              {/* Admin Panel mobile */}
+              <button onClick={() => { onAdminOpen?.(); setMobileOpen(false); }}
+                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500 text-center flex items-center justify-center gap-1">
+                <Settings size={12} /> {isAr ? 'الإدارة' : 'Admin'}
+              </button>
+
               {user ? (
                 <button onClick={() => { onDashOpen?.(); setMobileOpen(false); }}
                   className="flex-1 py-2 text-[12px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 text-center">
@@ -307,20 +297,16 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
               ) : (
                 <button onClick={() => { onAuthOpen?.(); setMobileOpen(false); }}
                   className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-400 text-center">
-                  {locale === 'ar' ? 'دخول / تسجيل' : 'Sign in'}
+                  {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>
               )}
-              <button
-                onClick={() => { setIdentifyOpen(true); setMobileOpen(false); }}
-                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700 text-gold-300 text-center"
-              >
-                تحديد بالصورة
+              <button onClick={() => { setIdentifyOpen(true); setMobileOpen(false); }}
+                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700 text-gold-300 text-center">
+                {isAr ? 'تحديد بالصورة' : 'Identify'}
               </button>
-              <button
-                onClick={() => { setToolsOpen(true); setMobileOpen(false); }}
-                className="flex-1 py-2 text-[12px] rounded-full bg-gold-700 text-gold-100 font-semibold text-center"
-              >
-                الأدوات المهنية
+              <button onClick={() => { setToolsOpen(true); setMobileOpen(false); }}
+                className="flex-1 py-2 text-[12px] rounded-full bg-gold-700 text-gold-100 font-semibold text-center">
+                {isAr ? 'الأدوات' : 'Tools'}
               </button>
             </div>
           </div>
@@ -331,4 +317,4 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, user }: Sit
       <IdentifyModal open={identifyOpen} onClose={() => setIdentifyOpen(false)} locale={locale} />
     </>
   );
-} 
+}

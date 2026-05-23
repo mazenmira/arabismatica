@@ -8,6 +8,7 @@ import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown, Moon, Sun } 
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
 import AdminPanel from './AdminPanel';
+import HeroBanner from './HeroBanner';
 import AuthModal from '@/components/auth/AuthModal';
 import Dashboard from '@/components/dashboard/Dashboard';
 import { supabase } from '@/lib/supabase';
@@ -328,42 +329,13 @@ export default function CataloguePage({
   return (
     <div className={darkMode ? 'dark' : ''} style={darkMode ? {filter:'invert(1) hue-rotate(180deg)'} : {}}>
       {/* ── HERO ── */}
+      <HeroBanner locale={locale} totalCoins={COINS.length} totalCountries={19} />
+
       <section className="relative overflow-hidden" style={{ background: 'linear-gradient(155deg, #16100A 0%, #241605 55%, #301B06 100%)' }}>
-        {/* Decorative coin shadows */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="absolute rounded-full opacity-5"
-              style={{
-                width: 120 + i * 40, height: 120 + i * 40,
-                background: 'radial-gradient(circle at 36% 36%, #E8C97A, #C9A84C)',
-                top: `${20 + i * 12}%`, left: `${5 + i * 15}%`,
-                filter: 'blur(30px)',
-              }} />
-          ))}
-        </div>
-
-        <div className="relative max-w-[1440px] mx-auto px-4 py-10 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <h1 className="font-amiri text-gold-300 mb-2" style={{ fontSize: 'clamp(26px, 5vw, 52px)' }}>
-              {t('hero.title')}
-            </h1>
-            <p className="text-gold-600/70 text-sm mb-6">{t('hero.subtitle')}</p>
-          </motion.div>
-
-          {/* Stats */}
+        <div className="relative max-w-[1440px] mx-auto px-4 py-6 text-center">
           <motion.div
-            className="flex flex-wrap justify-center gap-6 mb-8"
+            className="flex flex-wrap justify-center gap-6 mb-0"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-            {[
-              { n: '4,737', label: isAr ? t('hero.total') : t('hero.total') },
-              { n: '19', label: isAr ? t('hero.countries') : t('hero.countries') },
-              { n: t('hero.years'), label: '' },
-            ].map(({ n, label }) => (
-              <div key={n} className="flex flex-col items-center">
-                <span className="font-amiri text-gold-300 text-2xl font-bold">{n}</span>
-                {label && <span className="text-gold-600/60 text-[11px]">{label}</span>}
-              </div>
-            ))}
           </motion.div>
 
           {/* Search bar */}
