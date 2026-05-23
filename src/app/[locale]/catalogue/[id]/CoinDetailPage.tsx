@@ -14,7 +14,7 @@ import COINS_RAW from '@/data/coins.json';
 const ALL_COINS = COINS_RAW as unknown as Coin[];
 
 // Related coins: same country+metal, exclude self, up to 6
-function getRelated(coin: Coin, locale: string): Coin[] {
+function getRelated(coin: Coin): Coin[] {
   return ALL_COINS
     .filter(c => c.id !== coin.id && c.cc === coin.cc && c.metal === coin.metal)
     .slice(0, 6);
@@ -280,7 +280,7 @@ export default function CoinDetailPage({ coin, locale }: Props) {
 
               {/* ── Related Coins ── */}
               {(() => {
-                const related = getRelated(coin, locale);
+                const related = getRelated(coin);
                 if (related.length === 0) return null;
                 return (
                   <div className="mb-6">
