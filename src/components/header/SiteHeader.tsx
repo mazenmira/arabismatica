@@ -35,6 +35,13 @@ const TOP_NAV_ITEMS_AR = [
     { label: '🇲🇷 موريتانيا',                href: '/ar/country/mauritania' },
     { label: '🇵🇸 فلسطين',                   href: '/ar/country/palestine' },
   ]},
+  { label: 'الأدوات', isTools: true, children: [
+    { label: '📚 بوابة المعرفة',  href: `${WP}/knowledge-portal/` },
+    { label: '🎓 أدوات التقييم', href: `${WP}/grading-tools/` },
+    { label: '🔬 مختبر المقتني الصغير', href: `${WP}/young-collector-lab/` },
+    { label: '🎓 أكاديمية المقتني', href: `${WP}/ac-academy/` },
+    { label: '📖 المكتبة الإلكترونية', href: 'https://library.arabcollector.com/' },
+  ]},
 ];
 
 const TOP_NAV_ITEMS_EN = [
@@ -60,6 +67,13 @@ const TOP_NAV_ITEMS_EN = [
     { label: '🇸🇩 Sudan',        href: '/en/country/sudan' },
     { label: '🇲🇷 Mauritania',   href: '/en/country/mauritania' },
     { label: '🇵🇸 Palestine',    href: '/en/country/palestine' },
+  ]},
+  { label: 'Tools', isTools: true, children: [
+    { label: '📚 Knowledge Portal',       href: `${WP}/knowledge-portal/` },
+    { label: '🎓 Grading Tools',          href: `${WP}/grading-tools/` },
+    { label: '🔬 Young Collector Lab',    href: `${WP}/young-collector-lab/` },
+    { label: '🎓 Arab Collector Academy', href: `${WP}/ac-academy/` },
+    { label: '📖 Digital Library',        href: 'https://library.arabcollector.com/' },
   ]},
 ];
 
@@ -175,11 +189,15 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
               {TOP_NAV_ITEMS.map((item) => (
                 <div key={item.label} className="relative group">
                   <button
-                    className={`flex items-center gap-1 px-3 py-2 text-[13px] font-medium rounded transition-colors whitespace-nowrap text-gold-400 hover:text-white hover:bg-white/5
-                      ${activeMenu === item.label ? 'bg-white/10 text-white' : ''}`}
+                    className={`flex items-center gap-1 px-3 py-2 text-[13px] font-medium rounded transition-colors whitespace-nowrap
+                      ${ (item as { isTools?: boolean }).isTools
+                          ? 'bg-gold-700/80 hover:bg-gold-600 text-gold-100 rounded-full px-3'
+                          : 'text-gold-400 hover:text-white hover:bg-white/5' }
+                      ${activeMenu === item.label ? (item as { isTools?: boolean }).isTools ? 'bg-gold-600' : 'bg-white/10 text-white' : ''}`}
                     onClick={() => setActiveMenu(activeMenu === item.label ? null : item.label)}
                     onMouseEnter={() => setActiveMenu(item.label)}
                   >
+                    {(item as { isTools?: boolean }).isTools && <Wrench size={12} className="shrink-0" />}
                     {item.label}
                     <ChevronDown size={12} className={`transition-transform ${activeMenu === item.label ? 'rotate-180' : ''}`} />
                   </button>
@@ -190,15 +208,19 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                       onMouseLeave={() => setActiveMenu(null)}
                     >
                       {item.children.map((child) => {
+                        if (child.href === '#tools-sidebar') {
+                          return (
+                            <button key={child.label} onClick={() => { setToolsOpen(true); setActiveMenu(null); }}
+                              className="w-full text-start block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0 text-white/70 hover:text-white hover:bg-white/5">
+                              {child.label}
+                            </button>
+                          );
+                        }
                         const isExternal = child.href.startsWith('http');
                         return (
                           <a key={child.label} href={child.href}
                             {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                            className={`block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0
-                              ${(child as { highlight?: boolean }).highlight
-                                ? 'text-gold-300 hover:text-gold-100 hover:bg-gold-900/30 font-medium'
-                                : 'text-white/70 hover:text-white hover:bg-white/5'}`}>
-                            {(child as { highlight?: boolean }).highlight && <span className="mr-1 text-gold-500">★</span>}
+                            className="block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0 text-white/70 hover:text-white hover:bg-white/5">
                             {child.label}
                           </a>
                         );
@@ -212,27 +234,6 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
 
             {/* Right actions */}
             <div className="flex items-center gap-2 mr-auto xl:mr-0">
-
-              {/* Knowledge Portal */}
-              <a href={`${WP}/knowledge-portal/`} target="_blank" rel="noopener"
-                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold text-ink bg-gold-500 hover:bg-gold-400 transition-colors shrink-0">
-                <BookOpen size={12} />
-                {isAr ? 'بوابة المعرفة' : 'Knowledge Portal'}
-              </a>
-
-              {/* Grading Tools */}
-              <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
-                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500/70 text-gold-400 hover:text-white hover:border-gold-400 transition-colors shrink-0">
-                {isAr ? 'أدوات التقييم' : 'Grading Tools'}
-              </a>
-
-              {/* Tools — sits right after Grading Tools */}
-              <button onClick={() => setToolsOpen(true)}
-                className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold border border-gold-500/70 text-gold-400 hover:text-white hover:border-gold-400 transition-colors"
-                title={t('tools.open')}>
-                <Wrench size={13} />
-                {isAr ? 'الأدوات' : 'Tools'}
-              </button>
 
               {/* AI Identify */}
               <button onClick={() => setIdentifyOpen(true)}
@@ -278,20 +279,7 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
         {/* ── MOBILE MENU ─────────────────────────────────────────────────── */}
         {mobileOpen && (
           <div className="xl:hidden bg-ink border-t border-gold-800/50 max-h-[80vh] overflow-y-auto animate-fade-in" dir={isAr ? 'rtl' : 'ltr'}>
-            <div className="px-4 py-3 border-b border-gold-800/30 flex gap-2 flex-wrap">
-              <a href={`${WP}/knowledge-portal/`} target="_blank" rel="noopener"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-semibold text-ink bg-gold-500">
-                <BookOpen size={12} /> {isAr ? 'بوابة المعرفة' : 'Knowledge Portal'}
-              </a>
-              <a href={`${WP}/grading-tools/`} target="_blank" rel="noopener"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] border border-gold-500/70 text-gold-400">
-                {isAr ? 'أدوات التقييم' : 'Grading Tools'}
-              </a>
-              <button onClick={() => { setToolsOpen(true); setMobileOpen(false); }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] border border-gold-500/70 text-gold-400">
-                <Wrench size={12} /> {isAr ? 'الأدوات' : 'Tools'}
-              </button>
-            </div>
+
 
             {TOP_NAV_ITEMS.map((item) => (
               <div key={item.label}>

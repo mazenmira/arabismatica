@@ -131,12 +131,13 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
   const coinName = getCoinName(coin, locale);
   const yearRange = getCardYearRange(c, locale);
 
-  const metaLabel = isAr
-    ? (coin.metal === 'Gold' ? 'ذهب'
-      : coin.metal === 'Silver' ? 'فضة'
-      : coin.metal === 'Copper' || coin.metal === 'Bronze' ? 'نحاس'
-      : coin.metal)
-    : coin.metal;
+  const METAL_AR: Record<string, string> = {
+    'Gold': 'ذهب', 'Silver': 'فضة', 'Copper': 'نحاس', 'Bronze': 'برونز',
+    'Nickel': 'نيكل', 'Cupro-Nickel': 'نحاس-نيكل', 'Aluminium': 'ألمنيوم',
+    'Aluminum': 'ألمنيوم', 'Bimetallic': 'ثنائي المعدن', 'Billon': 'بليون',
+    'Brass': 'نحاس أصفر', 'Steel': 'فولاذ', 'Other': 'أخرى',
+  };
+  const metaLabel = isAr ? (METAL_AR[coin.metal] ?? coin.metal) : coin.metal;
 
   const mintageData: MintageEntry[] = c.mintageData ?? [];
   const totalMintage = mintageData.length > 0

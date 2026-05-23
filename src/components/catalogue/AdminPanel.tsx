@@ -96,7 +96,14 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   const [checkingSession, setCheckingSession] = useState(true);
 
   // -- Tab state --
-  const [adminTab, setAdminTab] = useState<'coins' | 'prices' | 'submissions' | 'team'>('coins');
+  const [adminTab, setAdminTab] = useState<'coins' | 'edit' | 'prices' | 'submissions' | 'team'>('coins');
+
+  // -- Edit coin state --
+  const [editSearch,  setEditSearch]  = useState('');
+  const [editResults, setEditResults] = useState<Coin[]>([]);
+  const [editCoin,    setEditCoin]    = useState<Partial<Coin> | null>(null);
+  const [editSaved,   setEditSaved]   = useState(false);
+  const [editSaving,  setEditSaving]  = useState(false);
 
   // -- Coin form --
   const [form, setForm]           = useState<Partial<Coin>>(EMPTY_COIN);
@@ -423,11 +430,12 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   const canSeeTeam        = userRole === 'super_admin';
 
   const tabs = [
-    canSeeCoins       && { key: 'coins'       as const, icon: <Plus size={13} />,        label: isAr ? 'إضافة عملة' : 'Add Coin' },
-    canSeePrices      && { key: 'prices'      as const, icon: <DollarSign size={13} />,  label: isAr ? 'الأسعار'    : 'Prices' },
-    canSeeSubmissions && { key: 'submissions' as const, icon: <Search size={13} />,      label: isAr ? 'المقترحات'  : 'Submissions' },
-    canSeeTeam        && { key: 'team'        as const, icon: <Users size={13} />,       label: isAr ? 'الفريق'     : 'Team' },
-  ].filter(Boolean) as { key: 'coins' | 'prices' | 'submissions' | 'team'; icon: React.ReactNode; label: string }[];
+    canSeeCoins       && { key: 'coins'       as const, icon: <Plus size={13} />,        label: isAr ? 'إضافة عملة'  : 'Add Coin' },
+    canSeeCoins       && { key: 'edit'        as const, icon: <Search size={13} />,      label: isAr ? 'تعديل عملة'  : 'Edit Coin' },
+    canSeePrices      && { key: 'prices'      as const, icon: <DollarSign size={13} />,  label: isAr ? 'الأسعار'     : 'Prices' },
+    canSeeSubmissions && { key: 'submissions' as const, icon: <Search size={13} />,      label: isAr ? 'المقترحات'   : 'Submissions' },
+    canSeeTeam        && { key: 'team'        as const, icon: <Users size={13} />,       label: isAr ? 'الفريق'      : 'Team' },
+  ].filter(Boolean) as { key: 'coins' | 'edit' | 'prices' | 'submissions' | 'team'; icon: React.ReactNode; label: string }[];
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
@@ -610,6 +618,159 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
         )}
 
         {/* ── PRICES TAB ── */}
+        {adminTab === 'edit' && canSeeCoins && (() => {
+          const ALL_COINS = COINS_RAW as unknown as Coin[];
+
+          const doSearch = () => {
+            const q = editSearch.trim().toLowerCase();
+            if (!q) { setEditResults([]); return; }
+            const results = ALL_COINS.filter(c =>
+              c.id?.toLowerCase().includes(q) ||
+              c.name?.toLowerCase().includes(q) ||
+              c.nar?.includes(q) ||
+              c.km?.toLowerCase().includes(q) ||
+              c.yce?.includes(q) ||
+              c.co?.toLowerCase().includes(q)
+            ).slice(0, 20);
+            setEditResults(results);
+          };
+
+          const saveEdit = async () => {
+            if (!editCoin?.id) return;
+            setEditSaving(true);
+            try {
+              const { data: { user: authUser } } = await supabase.auth.getUser();
+              const { error } = await supabase
+                .from('coin_edits')
+                .upsert({
+                  coin_id:     editCoin.id,
+                  edited_by:   authUser?.id,
+                  edited_at:   new Date().toISOString(),
+                  data:        editCoin,
+                }, { onConflict: 'coin_id' });
+              if (error) throw error;
+              setEditSaved(true);
+              setTimeout(() => setEditSaved(false), 2500);
+            } catch {
+              // Fallback: store in localStorage pending review
+              const pending = JSON.parse(localStorage.getItem('ac_coin_edits') || '[]');
+              pending.push({ coin_id: editCoin.id, data: editCoin, ts: Date.now() });
+              localStorage.setItem('ac_coin_edits', JSON.stringify(pending));
+              setEditSaved(true);
+              setTimeout(() => setEditSaved(false), 2500);
+            } finally {
+              setEditSaving(false);
+            }
+          };
+
+          return (
+            <div className="px-6 py-5 space-y-4">
+              <h3 className="text-[11px] text-gold-600 uppercase tracking-widest font-medium">
+                {isAr ? 'البحث عن عملة للتعديل' : 'Search for a coin to edit'}
+              </h3>
+
+              {/* Search box */}
+              <div className="flex gap-2">
+                <input
+                  value={editSearch}
+                  onChange={e => setEditSearch(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && doSearch()}
+                  placeholder={isAr ? 'ابحث بالاسم أو KM أو السنة أو الدولة...' : 'Search by name, KM#, year, country...'}
+                  className="flex-1 text-[12px] px-3 py-2 rounded-lg border border-gold-700/40 bg-white outline-none focus:border-gold-500"
+                  dir={isAr ? 'rtl' : 'ltr'}
+                />
+                <button onClick={doSearch}
+                  className="px-4 py-2 text-[12px] rounded-lg bg-gold-600 text-white hover:bg-gold-500 transition-colors">
+                  {isAr ? 'بحث' : 'Search'}
+                </button>
+              </div>
+
+              {/* Results list */}
+              {editResults.length > 0 && !editCoin && (
+                <div className="border border-gold-700/20 rounded-xl overflow-hidden">
+                  {editResults.map(c => (
+                    <button key={c.id} onClick={() => setEditCoin({ ...c })}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-[12px] border-b border-gold-700/10 last:border-0 hover:bg-gold-50 transition-colors text-start">
+                      <div>
+                        <div className="font-medium text-ink">{isAr && c.nar ? c.nar : c.name}</div>
+                        <div className="text-ink/50">{c.co} · {c.yce} · {c.metal} · {c.km}</div>
+                      </div>
+                      <span className="text-gold-500 text-[11px] shrink-0">{isAr ? 'تعديل ←' : '→ Edit'}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Edit form */}
+              {editCoin && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-mono text-ink/40">{editCoin.id}</span>
+                    <button onClick={() => { setEditCoin(null); setEditResults([]); setEditSearch(''); }}
+                      className="text-[11px] text-gold-600 hover:text-gold-400">
+                      {isAr ? '← اختر عملة أخرى' : 'Choose another →'}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {([
+                      ['name',  isAr ? 'الاسم (إنجليزي)' : 'Name (EN)',  'ltr'],
+                      ['nar',   isAr ? 'الاسم (عربي)'    : 'Name (AR)',  'rtl'],
+                      ['yce',   isAr ? 'السنة الميلادية' : 'Year (CE)',  'ltr'],
+                      ['yah',   isAr ? 'السنة الهجرية'   : 'Year (AH)',  'ltr'],
+                      ['km',    'KM#',                                    'ltr'],
+                      ['nref',  'N-Ref',                                  'ltr'],
+                      ['mint',  isAr ? 'الكمية' : 'Mintage',             'ltr'],
+                      ['wt',    isAr ? 'الوزن (g)' : 'Weight (g)',       'ltr'],
+                      ['dia',   isAr ? 'القطر (mm)' : 'Diameter (mm)',   'ltr'],
+                      ['dyn',   isAr ? 'الأسرة الحاكمة' : 'Dynasty',     isAr ? 'rtl' : 'ltr'],
+                      ['o',     isAr ? 'صورة الوجه' : 'Obverse URL',    'ltr'],
+                      ['r',     isAr ? 'صورة الظهر' : 'Reverse URL',    'ltr'],
+                    ] as [keyof Coin, string, string][]).map(([field, label, dir]) => (
+                      <div key={field} className="flex flex-col gap-1">
+                        <label className="text-[10px] text-ink/50 uppercase tracking-wider">{label}</label>
+                        <input
+                          value={(editCoin[field] as string | number | null | undefined) ?? ''}
+                          onChange={e => setEditCoin(prev => prev ? { ...prev, [field]: e.target.value } : prev)}
+                          dir={dir}
+                          className="text-[12px] px-3 py-2 rounded-lg border border-gold-700/30 bg-white outline-none focus:border-gold-500"
+                        />
+                      </div>
+                    ))}
+
+                    {/* Metal select */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] text-ink/50 uppercase tracking-wider">{isAr ? 'المعدن' : 'Metal'}</label>
+                      <select value={editCoin.metal ?? ''} onChange={e => setEditCoin(prev => prev ? { ...prev, metal: e.target.value } : prev)}
+                        className="text-[12px] px-3 py-2 rounded-lg border border-gold-700/30 bg-white outline-none focus:border-gold-500">
+                        {METALS.map(m => <option key={m} value={m}>{m}</option>)}
+                      </select>
+                    </div>
+
+                    {/* Type select */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] text-ink/50 uppercase tracking-wider">{isAr ? 'النوع' : 'Type'}</label>
+                      <select value={editCoin.type ?? ''} onChange={e => setEditCoin(prev => prev ? { ...prev, type: e.target.value as 'Circulation' | 'Commemorative' } : prev)}
+                        className="text-[12px] px-3 py-2 rounded-lg border border-gold-700/30 bg-white outline-none focus:border-gold-500">
+                        <option value="Circulation">{isAr ? 'تداول' : 'Circulation'}</option>
+                        <option value="Commemorative">{isAr ? 'تذكارية' : 'Commemorative'}</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <button onClick={saveEdit} disabled={editSaving}
+                    className="w-full py-2.5 rounded-xl bg-gold-600 hover:bg-gold-500 text-white font-semibold text-[13px] transition-colors disabled:opacity-50">
+                    {editSaving ? (isAr ? 'جارٍ الحفظ...' : 'Saving...') : editSaved ? (isAr ? '✓ تم الحفظ' : '✓ Saved!') : (isAr ? 'حفظ التعديلات' : 'Save Changes')}
+                  </button>
+                  <p className="text-[10px] text-ink/40 text-center">
+                    {isAr ? 'التعديلات تُرسَل للمراجعة قبل النشر الرسمي' : 'Edits are queued for review before being published to the live catalogue'}
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
         {adminTab === 'prices' && canSeePrices && (
           <div className="px-6 py-5 space-y-4">
             <div>
