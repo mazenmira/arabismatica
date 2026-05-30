@@ -252,6 +252,18 @@ export const COUNTRY_META: CountryMeta[] = [
     },
   },
   {
+    cc: 'KM', slug: 'comoros',
+    co: 'Comoros', co_ar: 'جزر القمر',
+    history: {
+      en: 'The Comoros archipelago issued its first national coins in 1890 under French colonial administration, with the franc as currency. After independence in 1975, the Comorian franc replaced colonial issues. Comorian coins are among the rarest in the Arab world due to small mintages and limited collector awareness, making them highly sought by specialists.',
+      ar: 'أصدرت جزر القمر أولى عملاتها الوطنية عام 1890 في ظل الإدارة الاستعمارية الفرنسية بعملة الفرنك. بعد الاستقلال عام 1975، حلّ الفرنك القمري محل الإصدارات الاستعمارية. تُعدّ عملات جزر القمر من أندر العملات في العالم العربي نظراً لضآلة كميات سكّها وقلة وعي الجامعين بها، مما يجعلها مطلوبة بشدة لدى المتخصصين.',
+    },
+    collectingTips: {
+      en: 'The complete Comorian series is achievable in under 40 coins. French colonial francs (1890–1912) are the key rarities. Post-independence francs (1975–present) are affordable. An ideal specialist collection for those interested in Indian Ocean numismatics.',
+      ar: 'يمكن إكمال السلسلة القمرية الكاملة بأقل من 40 عملة. فرنكات الحقبة الاستعمارية الفرنسية (1890–1912) هي الندرات الرئيسية. فرنكات ما بعد الاستقلال (1975–حتى الآن) بأسعار معقولة. مجموعة متخصصة مثالية لمن يهتم بنمسماتيا المحيط الهندي.',
+    },
+  },
+  {
     cc: 'QD', slug: 'qatar-dubai',
     co: 'Qatar & Dubai', co_ar: 'قطر ودبي',
     history: {
