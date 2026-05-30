@@ -7,6 +7,16 @@ export interface MintageEntry {
   Rarity: 'Common' | 'Uncommon' | 'Scarce' | 'Rare' | null;
 }
 
+export interface CoinPrices {
+  G:   number | null;
+  VG:  number | null;
+  F:   number | null;
+  VF:  number | null;
+  XF:  number | null;
+  AU:  number | null;
+  UNC: number | null;
+}
+
 export interface Coin {
   id: string;
   cc: string;
@@ -24,8 +34,9 @@ export interface Coin {
   nref: string;
   nid: string;
   type: string;
-  mint: string;             // legacy mintage as string
+  mint: string;
   mintageData?: MintageEntry[];
+  prices?: CoinPrices;
   o: string;
   r: string;
 }

@@ -33,7 +33,8 @@ const TOP_NAV_ITEMS_AR = [
     { label: '🇸🇩 السودان',                   href: '/ar/country/sudan' },
     { label: '🇲🇷 موريتانيا',                href: '/ar/country/mauritania' },
     { label: '🇵🇸 فلسطين',                   href: '/ar/country/palestine' },
-    { label: '🇰🇲 جزر القمر',               href: '/ar/country/comoros' },
+    { label: '🇰🇲 جزر القمر',                 href: '/ar/country/comoros' },
+    { label: '🇶🇦 قطر ودبي',                  href: '/ar/country/qatar-dubai' },
   ]},
   { label: 'الأدوات', isTools: true, children: [
     { label: '📅 محول الهجري ↔ الميلادي', href: '#hijri-converter' },
@@ -69,7 +70,8 @@ const TOP_NAV_ITEMS_EN = [
     { label: '🇸🇩 Sudan',        href: '/en/country/sudan' },
     { label: '🇲🇷 Mauritania',   href: '/en/country/mauritania' },
     { label: '🇵🇸 Palestine',    href: '/en/country/palestine' },
-    { label: '🇰🇲 Comoros',     href: '/en/country/comoros' },
+    { label: '🇰🇲 Comoros',      href: '/en/country/comoros' },
+    { label: '🇶🇦 Qatar & Dubai', href: '/en/country/qatar-dubai' },
   ]},
   { label: 'Tools', isTools: true, children: [
     { label: '📅 Hijri ↔ Gregorian Converter', href: '#hijri-converter' },
