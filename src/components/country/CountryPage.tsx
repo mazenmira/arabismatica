@@ -75,6 +75,10 @@ const ERA_RULES: Record<string, EraRule[]> = {
     { label_en: 'King Hussein',               label_ar: 'عهد الملك حسين',             from: 1953, to: 1999 },
     { label_en: 'King Abdullah II',           label_ar: 'عهد الملك عبدالله الثاني',   from: 2000, to: 2099 },
   ],
+  KM: [
+    { label_en: 'French Colonial',            label_ar: 'الحقبة الاستعمارية الفرنسية', from: 1800, to: 1974 },
+    { label_en: 'Independent Republic',       label_ar: 'الجمهورية المستقلة',          from: 1975, to: 2099 },
+  ],
 };
 
 function getEraLabel(coin: Coin, cc: string, locale: string): string {

@@ -18,7 +18,7 @@ const METAL_AR: Record<string, string> = {
 const COUNTRY_FLAGS: Record<string, string> = {
   EG:'🇪🇬',MA:'🇲🇦',TN:'🇹🇳',SA:'🇸🇦',IQ:'🇮🇶',AE:'🇦🇪',OM:'🇴🇲',
   LY:'🇱🇾',DZ:'🇩🇿',SY:'🇸🇾',JO:'🇯🇴',LB:'🇱🇧',KW:'🇰🇼',QA:'🇶🇦',
-  SD:'🇸🇩',YE:'🇾🇪',MR:'🇲🇷',PS:'🇵🇸',QD:'🇶🇦',
+  SD:'🇸🇩',YE:'🇾🇪',MR:'🇲🇷',PS:'🇵🇸',QD:'🇶🇦',KM:'🇰🇲',
 };
 
 interface Filters {

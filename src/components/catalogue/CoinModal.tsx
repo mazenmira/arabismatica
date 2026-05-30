@@ -669,6 +669,39 @@ export default function CoinModal({
               </div>
             ) : null}
 
+            {/* Catalogue prices (from Excel merge) */}
+            {coin.prices && Object.values(coin.prices).some(v => v !== null) && (() => {
+              const grades = [
+                { key: 'G',   label: 'G' },
+                { key: 'VG',  label: 'VG' },
+                { key: 'F',   label: 'F' },
+                { key: 'VF',  label: 'VF' },
+                { key: 'XF',  label: 'XF' },
+                { key: 'AU',  label: 'AU' },
+                { key: 'UNC', label: 'UNC' },
+              ] as { key: keyof typeof coin.prices; label: string }[];
+              const filled = grades.filter(g => coin.prices![g.key] !== null);
+              return (
+                <div className="mb-4 rounded-xl border border-gold-500/30 overflow-hidden">
+                  <div className="bg-gold-500/10 px-4 py-2 flex items-center gap-2">
+                    <span className="text-base">💰</span>
+                    <span className="text-[11px] font-semibold text-ink/70 uppercase tracking-wider">
+                      {isAr ? 'أسعار الكتالوج (USD)' : 'Catalogue Prices (USD)'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 sm:grid-cols-7">
+                    {filled.map((g, i) => (
+                      <div key={g.key}
+                        className={`flex flex-col items-center py-2.5 px-1 ${i < filled.length - 1 ? 'border-e border-gold-500/20' : ''}`}>
+                        <div className="text-[9px] text-ink/40 font-semibold uppercase mb-1">{g.label}</div>
+                        <div className="text-[13px] font-bold text-ink font-amiri">${coin.prices![g.key]}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Specs grid */}
             <div className="grid grid-cols-2 gap-2 mb-4">
               <SpecCard label={t('metal')} value={metalLabel} />
