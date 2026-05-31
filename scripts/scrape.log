@@ -1,0 +1,212 @@
+Target    : Umayyad
+Limit     : all coins per category
+Output    : D:\GitHub\arab-catalogue-next\arabismatica\scripts\zeno_raw.json
+Progress  : D:\GitHub\arab-catalogue-next\arabismatica\scripts\zeno_progress.json
+
+── Establishing Zeno.ru session...
+   Session ready. Cookie: PHPSESSID=6o33n5ldrcg0pv82mrdfu9mhs2; pp
+
+══ Umayyad (cat=609, limit=all) ══
+  Collecting coin IDs (recursive gallery walk)...
+  Found 4769 unique photo IDs.
+  3719 to fetch (1050 already done).
+  ✓ 50 scraped from Umayyad  (total output: 1100)
+  ✓ 100 scraped from Umayyad  (total output: 1150)
+  💾 Checkpoint at 100 coins.
+  ✓ 150 scraped from Umayyad  (total output: 1200)
+  ✓ 200 scraped from Umayyad  (total output: 1250)
+  💾 Checkpoint at 200 coins.
+  ✓ 250 scraped from Umayyad  (total output: 1300)
+  ✓ 300 scraped from Umayyad  (total output: 1350)
+  💾 Checkpoint at 300 coins.
+  ✓ 350 scraped from Umayyad  (total output: 1400)
+  ✓ 400 scraped from Umayyad  (total output: 1450)
+  💾 Checkpoint at 400 coins.
+  ✓ 450 scraped from Umayyad  (total output: 1500)
+  ✓ 500 scraped from Umayyad  (total output: 1550)
+  💾 Checkpoint at 500 coins.
+  ✓ 550 scraped from Umayyad  (total output: 1600)
+  ✓ 600 scraped from Umayyad  (total output: 1650)
+  💾 Checkpoint at 600 coins.
+  ✓ 650 scraped from Umayyad  (total output: 1700)
+  ✓ 700 scraped from Umayyad  (total output: 1750)
+  💾 Checkpoint at 700 coins.
+  ✓ 750 scraped from Umayyad  (total output: 1800)
+  ✓ 800 scraped from Umayyad  (total output: 1850)
+  💾 Checkpoint at 800 coins.
+  ✓ 850 scraped from Umayyad  (total output: 1900)
+  ✓ 900 scraped from Umayyad  (total output: 1950)
+  💾 Checkpoint at 900 coins.
+  ✓ 950 scraped from Umayyad  (total output: 2000)
+  ✓ 1000 scraped from Umayyad  (total output: 2050)
+  💾 Checkpoint at 1000 coins.
+  ✓ 1050 scraped from Umayyad  (total output: 2100)
+  ✓ 1100 scraped from Umayyad  (total output: 2150)
+  💾 Checkpoint at 1100 coins.
+  ✓ 1150 scraped from Umayyad  (total output: 2200)
+  ✓ 1200 scraped from Umayyad  (total output: 2250)
+  💾 Checkpoint at 1200 coins.
+  ✓ 1250 scraped from Umayyad  (total output: 2300)
+  ✓ 1300 scraped from Umayyad  (total output: 2350)
+  💾 Checkpoint at 1300 coins.
+  ✓ 1350 scraped from Umayyad  (total output: 2400)
+  ✓ 1400 scraped from Umayyad  (total output: 2450)
+  💾 Checkpoint at 1400 coins.
+  ✓ 1450 scraped from Umayyad  (total output: 2500)
+  ✓ 1500 scraped from Umayyad  (total output: 2550)
+  💾 Checkpoint at 1500 coins.
+  ✓ 1550 scraped from Umayyad  (total output: 2600)
+  ✓ 1600 scraped from Umayyad  (total output: 2650)
+  💾 Checkpoint at 1600 coins.
+  ✓ 1650 scraped from Umayyad  (total output: 2700)
+  ✓ 1700 scraped from Umayyad  (total output: 2750)
+  💾 Checkpoint at 1700 coins.
+  ✓ 1750 scraped from Umayyad  (total output: 2800)
+  ✓ 1800 scraped from Umayyad  (total output: 2850)
+  💾 Checkpoint at 1800 coins.
+  ✓ 1850 scraped from Umayyad  (total output: 2900)
+  ✓ 1900 scraped from Umayyad  (total output: 2950)
+  💾 Checkpoint at 1900 coins.
+  ✓ 1950 scraped from Umayyad  (total output: 3000)
+  ✓ 2000 scraped from Umayyad  (total output: 3050)
+  💾 Checkpoint at 2000 coins.
+  ✓ 2050 scraped from Umayyad  (total output: 3100)
+  ✓ 2100 scraped from Umayyad  (total output: 3150)
+  💾 Checkpoint at 2100 coins.
+  ✓ 2150 scraped from Umayyad  (total output: 3200)
+  ✓ 2200 scraped from Umayyad  (total output: 3250)
+  💾 Checkpoint at 2200 coins.
+  ✓ 2250 scraped from Umayyad  (total output: 3300)
+  ✓ 2300 scraped from Umayyad  (total output: 3350)
+  💾 Checkpoint at 2300 coins.
+  ✓ 2350 scraped from Umayyad  (total output: 3400)
+  ✓ 2400 scraped from Umayyad  (total output: 3450)
+  💾 Checkpoint at 2400 coins.
+  ✓ 2450 scraped from Umayyad  (total output: 3500)
+  ✓ 2500 scraped from Umayyad  (total output: 3550)
+  💾 Checkpoint at 2500 coins.
+  ✓ 2550 scraped from Umayyad  (total output: 3600)
+  ✓ 2600 scraped from Umayyad  (total output: 3650)
+  💾 Checkpoint at 2600 coins.
+  ✓ 2650 scraped from Umayyad  (total output: 3700)
+  ✓ 2700 scraped from Umayyad  (total output: 3750)
+  💾 Checkpoint at 2700 coins.
+  ✓ 2750 scraped from Umayyad  (total output: 3800)
+  ✓ 2800 scraped from Umayyad  (total output: 3850)
+  💾 Checkpoint at 2800 coins.
+  ✓ 2850 scraped from Umayyad  (total output: 3900)
+  ✓ 2900 scraped from Umayyad  (total output: 3950)
+  💾 Checkpoint at 2900 coins.
+  ✓ 2950 scraped from Umayyad  (total output: 4000)
+  ✓ 3000 scraped from Umayyad  (total output: 4050)
+  💾 Checkpoint at 3000 coins.
+  ✓ 3050 scraped from Umayyad  (total output: 4100)
+  ✓ 3100 scraped from Umayyad  (total output: 4150)
+  💾 Checkpoint at 3100 coins.
+  ✓ 3150 scraped from Umayyad  (total output: 4200)
+  ✓ 3200 scraped from Umayyad  (total output: 4250)
+  💾 Checkpoint at 3200 coins.
+  ✓ 3250 scraped from Umayyad  (total output: 4300)
+  ✓ 3300 scraped from Umayyad  (total output: 4350)
+  💾 Checkpoint at 3300 coins.
+  ✓ 3350 scraped from Umayyad  (total output: 4400)
+  ✓ 3400 scraped from Umayyad  (total output: 4450)
+  💾 Checkpoint at 3400 coins.
+  ✓ 3450 scraped from Umayyad  (total output: 4500)
+  ✓ 3500 scraped from Umayyad  (total output: 4550)
+  💾 Checkpoint at 3500 coins.
+  ✓ 3550 scraped from Umayyad  (total output: 4600)
+  ✓ 3600 scraped from Umayyad  (total output: 4650)
+  💾 Checkpoint at 3600 coins.
+  ✓ 3650 scraped from Umayyad  (total output: 4700)
+  ✓ 3700 scraped from Umayyad  (total output: 4750)
+  💾 Checkpoint at 3700 coins.
+  ✓ Umayyad complete: 3719 scraped, 0 failed.
+
+✅ Done! Scraped 3719 new coins. Total in file: 4769
+
+─── Sample coins (first 3) ────────────────────────────────────────────
+{
+  "id": "zeno-381260",
+  "cc": "IS",
+  "co": "Islamic",
+  "co_ar": "إسلامي",
+  "dyn": "الدولة الأموية",
+  "name": "Umayyad, AR Dirham, temp. Marwan II, Wasit, AH 131",
+  "nar": "",
+  "yce": "749",
+  "yah": "131",
+  "metal": "Silver",
+  "wt": 2.34,
+  "dia": 24,
+  "km": "",
+  "nref": "Z#381260",
+  "nid": "381260",
+  "type": "Circulation",
+  "mint": "Wasit",
+  "mint_ar": "",
+  "ruler": "Marwan II",
+  "ruler_ar": "",
+  "obverse_legend": "",
+  "reverse_legend": "",
+  "o": "https://www.zeno.ru/data/2358/medium/zeno_381260.jpg",
+  "r": "",
+  "prices": null,
+  "mintageData": []
+}
+{
+  "id": "zeno-380877",
+  "cc": "IS",
+  "co": "Islamic",
+  "co_ar": "إسلامي",
+  "dyn": "الدولة الأموية",
+  "name": "Umayyad, al-Walid I ibn 'Abd al-Malik. (86-96 AH) AR Dirham from Istakhr, year 91AH.",
+  "nar": "",
+  "yce": "710",
+  "yah": "91",
+  "metal": "Silver",
+  "wt": 2.72,
+  "dia": 25,
+  "km": "",
+  "nref": "Z#380877",
+  "nid": "380877",
+  "type": "Circulation",
+  "mint": "Istakhr",
+  "mint_ar": "اصطخر",
+  "ruler": "",
+  "ruler_ar": "",
+  "obverse_legend": "",
+  "reverse_legend": "",
+  "o": "https://www.zeno.ru/data/2365/medium/zeno_380877.JPG",
+  "r": "",
+  "prices": null,
+  "mintageData": []
+}
+{
+  "id": "zeno-380871",
+  "cc": "IS",
+  "co": "Islamic",
+  "co_ar": "إسلامي",
+  "dyn": "الدولة الأموية",
+  "name": "Abd al-Malik bin Marwan (65-86 AH) AR Dirham from Jayy, Year 81 AH",
+  "nar": "",
+  "yce": "701",
+  "yah": "81",
+  "metal": "Silver",
+  "wt": 2.69,
+  "dia": 26.6,
+  "km": "",
+  "nref": "Z#380871",
+  "nid": "380871",
+  "type": "Circulation",
+  "mint": "Jayy",
+  "mint_ar": "جي",
+  "ruler": "Abd al-Malik bin Marwan",
+  "ruler_ar": "",
+  "obverse_legend": "",
+  "reverse_legend": "",
+  "o": "https://www.zeno.ru/data/2366/medium/zeno_380871.JPG",
+  "r": "",
+  "prices": null,
+  "mintageData": []
+}

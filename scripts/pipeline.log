@@ -1,0 +1,226 @@
+[07:51:18] ╔══════════════════════════════════════════════════════════╗
+[07:51:18] ║          Zeno.ru Islamic Coins — Full Pipeline           ║
+[07:51:18] ╚══════════════════════════════════════════════════════════╝
+[07:51:18] Dynasties: Umayyad → Abbasid → Fatimid → Ayyubid → Mamluk
+[07:51:18] Output   : D:\GitHub\arab-catalogue-next\arabismatica\scripts\zeno_raw.json
+[07:51:18] Merge    : D:\GitHub\arab-catalogue-next\arabismatica\src\data\coins.json
+
+[07:51:22] Session ready. Cookie: PHPSESSID=n3qtlog1b20nmjvq0q5672g010; ppid=de...
+[07:51:22] 
+════════════════════════════════════════════════════════════
+[07:51:22] Dynasty: Umayyad  (cat=609, limit=all)
+[07:51:22] ════════════════════════════════════════════════════════════
+[07:51:22]   Collecting coin IDs...
+[08:10:56]   Found 4769 IDs, 3319 to fetch (1450 already done)
+[08:12:26]   ✓ 50/3319 scraped from Umayyad  (raw total: 1500)
+[08:13:58]   ✓ 100/3319 scraped from Umayyad  (raw total: 1550)
+[08:13:58]   💾 Checkpoint at 100
+[08:15:23]   ✓ 150/3319 scraped from Umayyad  (raw total: 1600)
+[08:16:46]   ✓ 200/3319 scraped from Umayyad  (raw total: 1650)
+[08:16:46]   💾 Checkpoint at 200
+[08:18:14]   ✓ 250/3319 scraped from Umayyad  (raw total: 1700)
+[08:19:43]   ✓ 300/3319 scraped from Umayyad  (raw total: 1750)
+[08:19:43]   💾 Checkpoint at 300
+[08:21:09]   ✓ 350/3319 scraped from Umayyad  (raw total: 1800)
+[08:22:35]   ✓ 400/3319 scraped from Umayyad  (raw total: 1850)
+[08:22:35]   💾 Checkpoint at 400
+[08:24:00]   ✓ 450/3319 scraped from Umayyad  (raw total: 1900)
+[08:25:27]   ✓ 500/3319 scraped from Umayyad  (raw total: 1950)
+[08:25:27]   💾 Checkpoint at 500
+[08:26:48]   ✓ 550/3319 scraped from Umayyad  (raw total: 2000)
+[08:28:11]   ✓ 600/3319 scraped from Umayyad  (raw total: 2050)
+[08:28:11]   💾 Checkpoint at 600
+[08:29:46]   ✓ 650/3319 scraped from Umayyad  (raw total: 2100)
+[08:31:13]   ✓ 700/3319 scraped from Umayyad  (raw total: 2150)
+[08:31:13]   💾 Checkpoint at 700
+[08:32:34]   ✓ 750/3319 scraped from Umayyad  (raw total: 2200)
+[08:34:05]   ✓ 800/3319 scraped from Umayyad  (raw total: 2250)
+[08:34:05]   💾 Checkpoint at 800
+[08:35:31]   ✓ 850/3319 scraped from Umayyad  (raw total: 2300)
+[08:36:56]   ✓ 900/3319 scraped from Umayyad  (raw total: 2350)
+[08:36:56]   💾 Checkpoint at 900
+[08:38:23]   ✓ 950/3319 scraped from Umayyad  (raw total: 2400)
+[08:39:49]   ✓ 1000/3319 scraped from Umayyad  (raw total: 2450)
+[08:39:49]   💾 Checkpoint at 1000
+[08:41:18]   ✓ 1050/3319 scraped from Umayyad  (raw total: 2500)
+[08:42:46]   ✓ 1100/3319 scraped from Umayyad  (raw total: 2550)
+[08:42:46]   💾 Checkpoint at 1100
+[08:44:12]   ✓ 1150/3319 scraped from Umayyad  (raw total: 2600)
+[08:45:37]   ✓ 1200/3319 scraped from Umayyad  (raw total: 2650)
+[08:45:37]   💾 Checkpoint at 1200
+[08:46:59]   ✓ 1250/3319 scraped from Umayyad  (raw total: 2700)
+[08:48:22]   ✓ 1300/3319 scraped from Umayyad  (raw total: 2750)
+[08:48:22]   💾 Checkpoint at 1300
+[08:49:59]   ✓ 1350/3319 scraped from Umayyad  (raw total: 2800)
+[08:51:23]   ✓ 1400/3319 scraped from Umayyad  (raw total: 2850)
+[08:51:23]   💾 Checkpoint at 1400
+[08:52:52]   ✓ 1450/3319 scraped from Umayyad  (raw total: 2900)
+[08:54:17]   ✓ 1500/3319 scraped from Umayyad  (raw total: 2950)
+[08:54:17]   💾 Checkpoint at 1500
+[08:55:40]   ✓ 1550/3319 scraped from Umayyad  (raw total: 3000)
+[08:57:06]   ✓ 1600/3319 scraped from Umayyad  (raw total: 3050)
+[08:57:06]   💾 Checkpoint at 1600
+[08:58:36]   ✓ 1650/3319 scraped from Umayyad  (raw total: 3100)
+[09:00:13]   ✓ 1700/3319 scraped from Umayyad  (raw total: 3150)
+[09:00:13]   💾 Checkpoint at 1700
+[09:01:44]   ✓ 1750/3319 scraped from Umayyad  (raw total: 3200)
+[09:03:18]   ✓ 1800/3319 scraped from Umayyad  (raw total: 3250)
+[09:03:18]   💾 Checkpoint at 1800
+[09:04:48]   ✓ 1850/3319 scraped from Umayyad  (raw total: 3300)
+[09:06:17]   ✓ 1900/3319 scraped from Umayyad  (raw total: 3350)
+[09:06:17]   💾 Checkpoint at 1900
+[09:07:42]   ✓ 1950/3319 scraped from Umayyad  (raw total: 3400)
+[09:09:09]   ✓ 2000/3319 scraped from Umayyad  (raw total: 3450)
+[09:09:09]   💾 Checkpoint at 2000
+[09:10:32]   ✓ 2050/3319 scraped from Umayyad  (raw total: 3500)
+[09:11:56]   ✓ 2100/3319 scraped from Umayyad  (raw total: 3550)
+[09:11:56]   💾 Checkpoint at 2100
+[09:13:23]   ✓ 2150/3319 scraped from Umayyad  (raw total: 3600)
+[09:14:53]   ✓ 2200/3319 scraped from Umayyad  (raw total: 3650)
+[09:14:53]   💾 Checkpoint at 2200
+[09:16:20]   ✓ 2250/3319 scraped from Umayyad  (raw total: 3700)
+[09:17:51]   ✓ 2300/3319 scraped from Umayyad  (raw total: 3750)
+[09:17:51]   💾 Checkpoint at 2300
+[09:19:16]   ✓ 2350/3319 scraped from Umayyad  (raw total: 3800)
+[09:20:45]   ✓ 2400/3319 scraped from Umayyad  (raw total: 3850)
+[09:20:46]   💾 Checkpoint at 2400
+[09:22:13]   ✓ 2450/3319 scraped from Umayyad  (raw total: 3900)
+[09:23:48]   ✓ 2500/3319 scraped from Umayyad  (raw total: 3950)
+[09:23:48]   💾 Checkpoint at 2500
+[09:25:21]   ✓ 2550/3319 scraped from Umayyad  (raw total: 4000)
+[09:26:49]   ✓ 2600/3319 scraped from Umayyad  (raw total: 4050)
+[09:26:49]   💾 Checkpoint at 2600
+[09:28:18]   ✓ 2650/3319 scraped from Umayyad  (raw total: 4100)
+[09:29:45]   ✓ 2700/3319 scraped from Umayyad  (raw total: 4150)
+[09:29:45]   💾 Checkpoint at 2700
+[09:31:12]   ✓ 2750/3319 scraped from Umayyad  (raw total: 4200)
+[09:32:36]   ✓ 2800/3319 scraped from Umayyad  (raw total: 4250)
+[09:32:36]   💾 Checkpoint at 2800
+[09:34:13]   ✓ 2850/3319 scraped from Umayyad  (raw total: 4300)
+[09:35:43]   ✓ 2900/3319 scraped from Umayyad  (raw total: 4350)
+[09:35:43]   💾 Checkpoint at 2900
+[09:37:11]   ✓ 2950/3319 scraped from Umayyad  (raw total: 4400)
+[09:38:33]   ✓ 3000/3319 scraped from Umayyad  (raw total: 4450)
+[09:38:33]   💾 Checkpoint at 3000
+[09:39:58]   ✓ 3050/3319 scraped from Umayyad  (raw total: 4500)
+[09:41:20]   ✓ 3100/3319 scraped from Umayyad  (raw total: 4550)
+[09:41:20]   💾 Checkpoint at 3100
+[09:42:44]   ✓ 3150/3319 scraped from Umayyad  (raw total: 4600)
+[09:44:14]   ✓ 3200/3319 scraped from Umayyad  (raw total: 4650)
+[09:44:14]   💾 Checkpoint at 3200
+[09:45:40]   ✓ 3250/3319 scraped from Umayyad  (raw total: 4700)
+[09:47:11]   ✓ 3300/3319 scraped from Umayyad  (raw total: 4750)
+[09:47:11]   💾 Checkpoint at 3300
+[09:47:44]   ✓ Umayyad complete: 3319 scraped, 0 null/failed
+[09:47:45]   Merge [Umayyad]: 5812 → 9499 (+3687 new, 1082 skipped as dupes)
+[09:47:45]     3687  الدولة الأموية
+[09:47:45] 
+  ↳ Umayyad: 3319 scraped, 3687 merged in 116.4 min
+
+[09:47:45] 
+════════════════════════════════════════════════════════════
+[09:47:45] Dynasty: Abbasid  (cat=543, limit=2000)
+[09:47:45] ════════════════════════════════════════════════════════════
+[09:47:45]   Collecting coin IDs...
+[09:55:04]   Found 2000 IDs, 2000 to fetch (0 already done)
+[09:56:35]   ✓ 50/2000 scraped from Abbasid  (raw total: 4819)
+[09:58:05]   ✓ 100/2000 scraped from Abbasid  (raw total: 4869)
+[09:58:07]   💾 Checkpoint at 100
+[09:59:30]   ✓ 150/2000 scraped from Abbasid  (raw total: 4919)
+[10:01:06]   ✓ 200/2000 scraped from Abbasid  (raw total: 4969)
+[10:01:07]   💾 Checkpoint at 200
+[10:02:37]   ✓ 250/2000 scraped from Abbasid  (raw total: 5019)
+[10:04:10]   ✓ 300/2000 scraped from Abbasid  (raw total: 5069)
+[10:04:12]   💾 Checkpoint at 300
+[10:05:37]   ✓ 350/2000 scraped from Abbasid  (raw total: 5119)
+[10:07:04]   ✓ 400/2000 scraped from Abbasid  (raw total: 5169)
+[10:07:05]   💾 Checkpoint at 400
+[10:08:32]   ✓ 450/2000 scraped from Abbasid  (raw total: 5219)
+[10:10:02]   ✓ 500/2000 scraped from Abbasid  (raw total: 5269)
+[10:10:04]   💾 Checkpoint at 500
+[10:11:32]   ✓ 550/2000 scraped from Abbasid  (raw total: 5319)
+[10:13:01]   ✓ 600/2000 scraped from Abbasid  (raw total: 5369)
+[10:13:03]   💾 Checkpoint at 600
+[10:14:29]   ✓ 650/2000 scraped from Abbasid  (raw total: 5419)
+[10:15:57]   ✓ 700/2000 scraped from Abbasid  (raw total: 5469)
+[10:15:58]   💾 Checkpoint at 700
+[10:17:31]   ✓ 750/2000 scraped from Abbasid  (raw total: 5519)
+[10:19:03]   ✓ 800/2000 scraped from Abbasid  (raw total: 5569)
+[10:19:04]   💾 Checkpoint at 800
+[10:20:28]   ✓ 850/2000 scraped from Abbasid  (raw total: 5619)
+[10:21:54]   ✓ 900/2000 scraped from Abbasid  (raw total: 5669)
+[10:21:55]   💾 Checkpoint at 900
+[10:23:21]   ✓ 950/2000 scraped from Abbasid  (raw total: 5719)
+[10:24:49]   ✓ 1000/2000 scraped from Abbasid  (raw total: 5769)
+[10:24:51]   💾 Checkpoint at 1000
+[10:26:19]   ✓ 1050/2000 scraped from Abbasid  (raw total: 5819)
+[10:27:47]   ✓ 1100/2000 scraped from Abbasid  (raw total: 5869)
+[10:27:49]   💾 Checkpoint at 1100
+[10:29:19]   ✓ 1150/2000 scraped from Abbasid  (raw total: 5919)
+[10:30:47]   ✓ 1200/2000 scraped from Abbasid  (raw total: 5969)
+[10:30:49]   💾 Checkpoint at 1200
+[10:32:20]   ✓ 1250/2000 scraped from Abbasid  (raw total: 6019)
+[10:33:53]   ✓ 1300/2000 scraped from Abbasid  (raw total: 6069)
+[10:33:55]   💾 Checkpoint at 1300
+[10:35:20]   ✓ 1350/2000 scraped from Abbasid  (raw total: 6119)
+[10:36:47]   ✓ 1400/2000 scraped from Abbasid  (raw total: 6169)
+[10:36:47]   💾 Checkpoint at 1400
+[10:38:18]   ✓ 1450/2000 scraped from Abbasid  (raw total: 6219)
+[10:39:51]   ✓ 1500/2000 scraped from Abbasid  (raw total: 6269)
+[10:39:53]   💾 Checkpoint at 1500
+[10:41:25]   ✓ 1550/2000 scraped from Abbasid  (raw total: 6319)
+[10:42:57]   ✓ 1600/2000 scraped from Abbasid  (raw total: 6369)
+[10:42:59]   💾 Checkpoint at 1600
+[10:44:27]   ✓ 1650/2000 scraped from Abbasid  (raw total: 6419)
+[10:45:55]   ✓ 1700/2000 scraped from Abbasid  (raw total: 6469)
+[10:45:56]   💾 Checkpoint at 1700
+[10:47:31]   ✓ 1750/2000 scraped from Abbasid  (raw total: 6519)
+[10:49:27]   ✓ 1800/2000 scraped from Abbasid  (raw total: 6569)
+[10:49:29]   💾 Checkpoint at 1800
+[10:51:04]   ✓ 1850/2000 scraped from Abbasid  (raw total: 6619)
+[10:52:47]   ✓ 1900/2000 scraped from Abbasid  (raw total: 6669)
+[10:52:48]   💾 Checkpoint at 1900
+[10:54:14]   ✓ 1950/2000 scraped from Abbasid  (raw total: 6719)
+[10:55:46]   ✓ 2000/2000 scraped from Abbasid  (raw total: 6769)
+[10:55:48]   💾 Checkpoint at 2000
+[10:55:48]   ✓ Abbasid complete: 2000 scraped, 0 null/failed
+[10:55:48]   Merge [Abbasid]: 9499 → 11476 (+1977 new, 4792 skipped as dupes)
+[10:55:48]     1977  الخلافة العباسية
+[10:55:48] 
+  ↳ Abbasid: 2000 scraped, 1977 merged in 68.1 min
+
+[10:55:48] 
+════════════════════════════════════════════════════════════
+[10:55:48] Dynasty: Fatimid  (cat=5362, limit=all)
+[10:55:48] ════════════════════════════════════════════════════════════
+[10:55:48]   Collecting coin IDs...
+[10:58:39]   Found 600 IDs, 600 to fetch (0 already done)
+[11:00:07]   ✓ 50/600 scraped from Fatimid  (raw total: 6819)
+[11:01:36]   ✓ 100/600 scraped from Fatimid  (raw total: 6869)
+[11:01:38]   💾 Checkpoint at 100
+[11:03:09]   ✓ 150/600 scraped from Fatimid  (raw total: 6919)
+[11:04:41]   ✓ 200/600 scraped from Fatimid  (raw total: 6969)
+[11:04:43]   💾 Checkpoint at 200
+[11:06:14]   ✓ 250/600 scraped from Fatimid  (raw total: 7019)
+[11:07:42]   ✓ 300/600 scraped from Fatimid  (raw total: 7069)
+[11:07:43]   💾 Checkpoint at 300
+[11:09:13]   ✓ 350/600 scraped from Fatimid  (raw total: 7119)
+[11:10:40]   ✓ 400/600 scraped from Fatimid  (raw total: 7169)
+[11:10:41]   💾 Checkpoint at 400
+[11:12:08]   ✓ 450/600 scraped from Fatimid  (raw total: 7219)
+[11:13:36]   ✓ 500/600 scraped from Fatimid  (raw total: 7269)
+[11:13:36]   💾 Checkpoint at 500
+[11:15:03]   ✓ 550/600 scraped from Fatimid  (raw total: 7319)
+[11:16:32]   ✓ 600/600 scraped from Fatimid  (raw total: 7369)
+[11:16:34]   💾 Checkpoint at 600
+[11:16:34]   ✓ Fatimid complete: 600 scraped, 0 null/failed
+[11:16:34]   Merge [Fatimid]: 11476 → 12072 (+596 new, 6773 skipped as dupes)
+[11:16:34]     596  الخلافة الفاطمية
+[11:16:34] 
+  ↳ Fatimid: 600 scraped, 596 merged in 20.8 min
+
+[11:16:34] 
+════════════════════════════════════════════════════════════
+[11:16:34] Dynasty: Ayyubid  (cat=14353, limit=all)
+[11:16:34] ════════════════════════════════════════════════════════════
+[11:16:34]   Collecting coin IDs...
