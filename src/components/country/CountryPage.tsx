@@ -27,7 +27,8 @@ const ERA_RULES: Record<string, EraRule[]> = {
     { label_en: 'Republic',                   label_ar: 'الجمهورية',                 from: 1953, to: 2099 },
   ],
   SA: [
-    { label_en: 'Hejaz (Pre-Kingdom)',        label_ar: 'الحجاز قبل المملكة',        from: 1800, to: 1931 },
+    { label_en: 'Hejaz (Ottoman era)',        label_ar: 'الحجاز (العهد العثماني)',    from: 1800, to: 1915 },
+    { label_en: 'Hejaz & Najd (1916–1932)',   label_ar: 'الحجاز ونجد (1916–1932)',   from: 1916, to: 1931 },
     { label_en: 'King Abdulaziz',             label_ar: 'عهد الملك عبد العزيز',      from: 1932, to: 1953 },
     { label_en: 'King Saud',                  label_ar: 'عهد الملك سعود',            from: 1954, to: 1964 },
     { label_en: 'King Faisal',                label_ar: 'عهد الملك فيصل',            from: 1965, to: 1975 },

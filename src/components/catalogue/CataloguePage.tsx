@@ -354,7 +354,7 @@ export default function CataloguePage({
   return (
     <div className={darkMode ? 'dark' : ''} style={darkMode ? {filter:'invert(1) hue-rotate(180deg)'} : {}}>
       {/* ── HERO ── */}
-      <HeroBanner locale={locale} totalCoins={COINS.length} totalCountries={19} />
+      <HeroBanner locale={locale} totalCoins={COINS.length} totalCountries={COUNTRIES.length} />
 
       <section className="relative overflow-hidden" style={{ background: 'linear-gradient(155deg, #16100A 0%, #241605 55%, #301B06 100%)' }}>
         <div className="relative max-w-[1440px] mx-auto px-4 py-6 text-center">

@@ -219,7 +219,7 @@ function convertPrice(amount: number, fromCurrency: string, toCurrency: string):
   return Math.round(inUSD * (FX[toCurrency] ?? 1));
 }
 
-function PriceGuide({ coinId, locale }: { coinId: string; locale: string }) {
+function PriceGuide({ coinId, locale, cataloguePrices }: { coinId: string; locale: string; cataloguePrices?: import('@/types/coin').CoinPrices }) {
   const isAr = locale === 'ar';
   const [prices, setPrices] = useState<PriceRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -314,17 +314,42 @@ function PriceGuide({ coinId, locale }: { coinId: string; locale: string }) {
           {isAr ? 'جاري التحميل...' : 'Loading...'}
         </div>
       ) : prices.length === 0 ? (
-        <div className="bg-parch-dark/30 rounded-xl border border-gold-700/15 px-4 py-4 text-center">
-          <p className="text-[12px] text-ink/40 font-amiri mb-2">
-            {isAr ? 'لا توجد بيانات أسعار لهذه العملة بعد' : 'No price data for this coin yet'}
-          </p>
-          {isLoggedIn ? (
-            <button onClick={() => setSubmitPrice(true)}
-              className="text-[11px] text-gold-600 border border-gold-700/30 rounded-full px-3 py-1 hover:border-gold-500 transition-colors">
-              {isAr ? '+ سجّل سعر ملاحَظ' : '+ Submit observed price'}
-            </button>
+        <div className="bg-parch-dark/30 rounded-xl border border-gold-700/15 px-4 py-4">
+          {/* Show catalogue prices as reference if available */}
+          {cataloguePrices && Object.values(cataloguePrices).some(v => v !== null) ? (
+            <div>
+              <p className="text-[10px] text-ink/40 uppercase tracking-wider mb-2 text-center">
+                {isAr ? 'أسعار كتالوج مرجعية (USD)' : 'Reference catalogue prices (USD)'}
+              </p>
+              <div className="grid grid-cols-4 sm:grid-cols-7 border border-gold-700/20 rounded-xl overflow-hidden mb-3">
+                {(['G','VG','F','VF','XF','AU','UNC'] as const)
+                  .filter(g => cataloguePrices![g] !== null)
+                  .map((g, i, arr) => (
+                    <div key={g}
+                      className={`flex flex-col items-center py-2 px-1 bg-parch-cream/40 ${i < arr.length-1 ? 'border-e border-gold-700/15' : ''}`}>
+                      <div className="text-[9px] text-ink/40 font-semibold mb-0.5">{g}</div>
+                      <div className="text-[12px] font-bold text-gold-700 font-amiri">${cataloguePrices![g]}</div>
+                    </div>
+                  ))}
+              </div>
+              <p className="text-[10px] text-ink/30 text-center mb-2">
+                {isAr ? 'أسعار المجتمع: لا توجد بيانات بعد' : 'Community prices: none yet'}
+              </p>
+            </div>
           ) : (
-            <p className="text-[11px] text-ink/30">
+            <p className="text-[12px] text-ink/40 font-amiri mb-2 text-center">
+              {isAr ? 'لا توجد بيانات أسعار لهذه العملة بعد' : 'No price data for this coin yet'}
+            </p>
+          )}
+          {isLoggedIn ? (
+            <div className="text-center">
+              <button onClick={() => setSubmitPrice(true)}
+                className="text-[11px] text-gold-600 border border-gold-700/30 rounded-full px-3 py-1 hover:border-gold-500 transition-colors">
+                {isAr ? '+ سجّل سعر ملاحَظ' : '+ Submit observed price'}
+              </button>
+            </div>
+          ) : (
+            <p className="text-[11px] text-ink/30 text-center">
               {isAr ? 'سجّل دخولك لاقتراح سعر' : 'Sign in to suggest a price'}
             </p>
           )}
@@ -353,6 +378,25 @@ function PriceGuide({ coinId, locale }: { coinId: string; locale: string }) {
                 </tr>
               </thead>
               <tbody>
+                {/* Catalogue reference row if available */}
+                {cataloguePrices && Object.values(cataloguePrices).some(v => v !== null) && (
+                  <tr className="border-b border-gold-700/10 bg-gold-500/5">
+                    <td className="px-2 py-2" colSpan={3}>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[9px] text-gold-600 font-semibold uppercase tracking-wider">
+                          {isAr ? 'كتالوج' : 'Catalogue'}
+                        </span>
+                        {(['G','VG','F','VF','XF','AU','UNC'] as const)
+                          .filter(g => cataloguePrices![g] !== null)
+                          .map(g => (
+                            <span key={g} className="text-[10px] text-ink/70">
+                              <span className="font-semibold text-gold-600">{g}</span> ${cataloguePrices![g]}
+                            </span>
+                          ))}
+                      </div>
+                    </td>
+                  </tr>
+                )}
                 {prices.map((p, i) => {
                   const low  = p.price_low  ? convertPrice(p.price_low,  p.currency, displayCurrency) : null;
                   const high = p.price_high ? convertPrice(p.price_high, p.currency, displayCurrency) : null;
@@ -669,38 +713,7 @@ export default function CoinModal({
               </div>
             ) : null}
 
-            {/* Catalogue prices (from Excel merge) */}
-            {coin.prices && Object.values(coin.prices).some(v => v !== null) && (() => {
-              const grades = [
-                { key: 'G',   label: 'G' },
-                { key: 'VG',  label: 'VG' },
-                { key: 'F',   label: 'F' },
-                { key: 'VF',  label: 'VF' },
-                { key: 'XF',  label: 'XF' },
-                { key: 'AU',  label: 'AU' },
-                { key: 'UNC', label: 'UNC' },
-              ] as { key: keyof typeof coin.prices; label: string }[];
-              const filled = grades.filter(g => coin.prices![g.key] !== null);
-              return (
-                <div className="mb-4 rounded-xl border border-gold-500/30 overflow-hidden">
-                  <div className="bg-gold-500/10 px-4 py-2 flex items-center gap-2">
-                    <span className="text-base">💰</span>
-                    <span className="text-[11px] font-semibold text-ink/70 uppercase tracking-wider">
-                      {isAr ? 'أسعار الكتالوج (USD)' : 'Catalogue Prices (USD)'}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-4 sm:grid-cols-7">
-                    {filled.map((g, i) => (
-                      <div key={g.key}
-                        className={`flex flex-col items-center py-2.5 px-1 ${i < filled.length - 1 ? 'border-e border-gold-500/20' : ''}`}>
-                        <div className="text-[9px] text-ink/40 font-semibold uppercase mb-1">{g.label}</div>
-                        <div className="text-[13px] font-bold text-ink font-amiri">${coin.prices![g.key]}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
+
 
             {/* Specs grid */}
             <div className="grid grid-cols-2 gap-2 mb-4">
@@ -728,7 +741,7 @@ export default function CoinModal({
             </div>
 
             {/* Price Guide */}
-            <PriceGuide coinId={coin.id} locale={locale} />
+            <PriceGuide coinId={coin.id} locale={locale} cataloguePrices={coin.prices} />
 
             {/* Numista link + coin page link */}
             <div className="flex items-center gap-2 flex-wrap">
