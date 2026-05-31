@@ -224,3 +224,20 @@
 [11:16:34] Dynasty: Ayyubid  (cat=14353, limit=all)
 [11:16:34] ════════════════════════════════════════════════════════════
 [11:16:34]   Collecting coin IDs...
+[11:32:40]   Found 3931 IDs, 3931 to fetch (0 already done)
+[11:34:13]   ✓ 50/3931 scraped from Ayyubid  (raw total: 7419)
+[11:35:45]   ✓ 100/3931 scraped from Ayyubid  (raw total: 7469)
+[11:35:47]   💾 Checkpoint at 100
+[11:37:18]   ✓ 150/3931 scraped from Ayyubid  (raw total: 7519)
+[11:38:47]   ✓ 200/3931 scraped from Ayyubid  (raw total: 7569)
+[11:38:48]   💾 Checkpoint at 200
+[11:40:16]   ✓ 250/3931 scraped from Ayyubid  (raw total: 7619)
+[11:41:51]   ✓ 300/3931 scraped from Ayyubid  (raw total: 7669)
+[11:41:53]   💾 Checkpoint at 300
+[11:43:33]   ✓ 350/3931 scraped from Ayyubid  (raw total: 7719)
+[11:44:59]   ✓ 400/3931 scraped from Ayyubid  (raw total: 7769)
+[11:45:00]   💾 Checkpoint at 400
+[11:46:32]   ✓ 450/3931 scraped from Ayyubid  (raw total: 7819)
+[11:47:57]   ✓ 500/3931 scraped from Ayyubid  (raw total: 7869)
+[11:47:57]   💾 Checkpoint at 500
+[11:49:26]   ✓ 550/3931 scraped from Ayyubid  (raw total: 7919)
