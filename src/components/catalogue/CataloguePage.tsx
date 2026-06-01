@@ -86,7 +86,7 @@ const DYNASTIC_GROUPS: DynastyGroup[] = [
     icon: '☪️', period: '661–750 CE',
     desc_ar: 'أول خلافة إسلامية كبرى. ضربت عملاتها الفضية الدراهم والذهبية الدنانير في دمشق وسائر الأمصار.',
     desc_en: 'The first major Islamic caliphate. Struck silver dirhams and gold dinars from Damascus and across the empire.',
-    dynMatch: ['أموي', 'Umayyad'],
+    dynMatch: ['أموي', 'Umayyad', 'الدولة الأموية', 'Umayyad Caliphate'],
     yearRanges: [{ cc: '*', from: 661, to: 750 }],
   },
   {
@@ -94,7 +94,7 @@ const DYNASTIC_GROUPS: DynastyGroup[] = [
     icon: '🕌', period: '750–1258 CE',
     desc_ar: 'الخلافة الإسلامية الكبرى الثانية. مركزها بغداد. أنتجت أوفر العملات الإسلامية وأجملها خطاً.',
     desc_en: 'The second great Islamic caliphate, centred in Baghdad. Produced the most prolific and calligraphically refined Islamic coinage.',
-    dynMatch: ['عباسي', 'عباسية', 'Abbasid'],
+    dynMatch: ['عباسي', 'عباسية', 'Abbasid', 'الخلافة العباسية', 'Abbasid Caliphate'],
     yearRanges: [{ cc: '*', from: 750, to: 1258 }],
   },
   {
@@ -102,7 +102,7 @@ const DYNASTIC_GROUPS: DynastyGroup[] = [
     icon: '⭐', period: '909–1171 CE',
     desc_ar: 'خلافة شيعية إسماعيلية حكمت مصر وشمال أفريقيا والشام. اشتُهرت بالدنانير الذهبية الرفيعة.',
     desc_en: 'Ismaili Shia caliphate ruling Egypt, North Africa and the Levant. Renowned for their refined gold dinars.',
-    dynMatch: ['فاطمي', 'فاطمية', 'Fatimid'],
+    dynMatch: ['فاطمي', 'فاطمية', 'Fatimid', 'الدولة الفاطمية', 'Fatimid Caliphate'],
     yearRanges: [{ cc: '*', from: 909, to: 1171 }],
   },
   {
@@ -110,7 +110,7 @@ const DYNASTIC_GROUPS: DynastyGroup[] = [
     icon: '⚔️', period: '1171–1260 CE',
     desc_ar: 'أسسها صلاح الدين الأيوبي في مصر والشام. عملاتها النحاسية والفضية تتميز بأسماء السلاطين وألقابهم.',
     desc_en: 'Founded by Saladin in Egypt and Syria. Copper and silver coins feature sultan names and titles.',
-    dynMatch: ['أيوبي', 'أيوبية', 'Ayyubid'],
+    dynMatch: ['أيوبي', 'أيوبية', 'Ayyubid', 'الدولة الأيوبية', 'Ayyubid Dynasty'],
     yearRanges: [{ cc: '*', from: 1171, to: 1260 }],
   },
   {
@@ -118,7 +118,7 @@ const DYNASTIC_GROUPS: DynastyGroup[] = [
     icon: '🏇', period: '1250–1517 CE',
     desc_ar: 'سلطنة المماليك في مصر والشام. عملاتها النحاسية الفلوس من أكثر العملات الإسلامية الوسيطة تنوعاً.',
     desc_en: 'The Mamluk sultanate of Egypt and Syria. Their copper fulus are among the most varied medieval Islamic coins.',
-    dynMatch: ['مملوك', 'مملوكي', 'Mamluk'],
+    dynMatch: ['مملوك', 'مملوكي', 'Mamluk', 'دولة المماليك', 'Mamluk Sultanate'],
     yearRanges: [{ cc: '*', from: 1250, to: 1517 }],
   },
   {
@@ -196,12 +196,20 @@ const DYNASTIC_GROUPS: DynastyGroup[] = [
 function coinMatchesDynasticGroup(coin: Coin, groupKey: string): boolean {
   const group = DYNASTIC_GROUPS.find(g => g.key === groupKey);
   if (!group) return false;
-  // Try dyn field match first (most accurate)
+
+  // 1. dyn field match — works for both IS coins (Zeno) and national coins
   if (group.dynMatch && coin.dyn) {
     if (group.dynMatch.some(m => coin.dyn.includes(m))) return true;
   }
-  // Fall back to year+cc ranges
-  if (group.yearRanges) {
+
+  // 2. For IS (Islamic/Zeno) coins, also match on coin name if dyn is missing
+  if (coin.cc === 'IS' && group.dynMatch && coin.name) {
+    if (group.dynMatch.some(m => coin.name.toLowerCase().includes(m.toLowerCase()))) return true;
+  }
+
+  // 3. Year+cc ranges — for national coins where dyn field may be inconsistent
+  //    Skip for IS coins — they're already handled by dyn matching above
+  if (group.yearRanges && coin.cc !== 'IS') {
     const year = parseInt(coin.yce || '0');
     if (year > 0 && group.yearRanges.some(r =>
       (r.cc === '*' || r.cc === coin.cc) && year >= r.from && year <= r.to
@@ -230,13 +238,15 @@ const METAL_OPTIONS = [
 ];
 
 const ERA_OPTIONS = [
-  { value: '1500-1800', label_ar: '١٥٠٠–١٨٠٠', label_en: '1500–1800' },
-  { value: '1800-1863', label_ar: '١٨٠٠–١٨٦٣', label_en: '1800–1863' },
-  { value: '1863-1914', label_ar: '١٨٦٣–١٩١٤', label_en: '1863–1914' },
-  { value: '1914-1952', label_ar: '١٩١٤–١٩٥٢', label_en: '1914–1952' },
-  { value: '1952-1970', label_ar: '١٩٥٢–١٩٧٠', label_en: '1952–1970' },
-  { value: '1971-2000', label_ar: '١٩٧١–٢٠٠٠', label_en: '1971–2000' },
-  { value: '2001-2026', label_ar: '٢٠٠١–٢٠٢٦', label_en: '2001–2026' },
+  { value: '661-750',   label_ar: '٦٦١–٧٥٠ (الأموي)',   label_en: '661–750 (Umayyad)' },
+  { value: '750-1258',  label_ar: '٧٥٠–١٢٥٨ (العباسي)', label_en: '750–1258 (Abbasid)' },
+  { value: '1258-1517', label_ar: '١٢٥٨–١٥١٧ (وسيط)',   label_en: '1258–1517 (Medieval)' },
+  { value: '1299-1918', label_ar: '١٢٩٩–١٩١٨ (عثماني)', label_en: '1299–1918 (Ottoman)' },
+  { value: '1500-1800', label_ar: '١٥٠٠–١٨٠٠',          label_en: '1500–1800' },
+  { value: '1800-1914', label_ar: '١٨٠٠–١٩١٤',          label_en: '1800–1914' },
+  { value: '1914-1952', label_ar: '١٩١٤–١٩٥٢',          label_en: '1914–1952' },
+  { value: '1952-2000', label_ar: '١٩٥٢–٢٠٠٠',          label_en: '1952–2000' },
+  { value: '2001-2026', label_ar: '٢٠٠١–٢٠٢٦',          label_en: '2001–2026' },
 ];
 
 
@@ -489,7 +499,7 @@ export default function CataloguePage({
     if (sortBy === 'common') result = [...result].sort((a, b) => parseInt(b.mint||'0') - parseInt(a.mint||'0'));
     if (sortBy === 'az')     result = [...result].sort((a, b) => a.name.localeCompare(b.name));
     return result;
-  }, [filters, dynasty, yearFrom, yearTo, sortBy]);
+  }, [filters, dynasty, dynastyMode, dynasticGroup, yearFrom, yearTo, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
@@ -807,12 +817,12 @@ export default function CataloguePage({
             <input type="number" placeholder={isAr ? 'من' : 'From'} value={yearFrom}
               onChange={e => { setYearFrom(e.target.value); setPage(1); }}
               className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500"
-              min="1500" max="2026" />
+              min="661" max="2026" />
             <span className="text-ink/30 text-[11px]">—</span>
             <input type="number" placeholder={isAr ? 'إلى' : 'To'} value={yearTo}
               onChange={e => { setYearTo(e.target.value); setPage(1); }}
               className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500"
-              min="1500" max="2026" />
+              min="661" max="2026" />
           </div>
 
           {/* Sort */}

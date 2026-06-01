@@ -51,7 +51,7 @@ export default function HeroBanner({ locale, totalCoins = 4737, totalCountries =
           <div className="flex items-center gap-2 mb-4">
             <div className="h-[1px] w-8 bg-gold-500/60" />
             <span className="text-gold-400 text-[11px] uppercase tracking-[0.2em] font-medium">
-              {isAr ? 'المرجع الشامل للعملات العربية' : 'The Comprehensive Arab Coin Reference'}
+              {isAr ? 'المرجع الشامل للعملات العربية والإسلامية' : 'The Comprehensive Arab & Islamic Coin Reference'}
             </span>
             <div className="h-[1px] w-8 bg-gold-500/60" />
           </div>
@@ -59,25 +59,25 @@ export default function HeroBanner({ locale, totalCoins = 4737, totalCountries =
           {/* Main heading */}
           <h1 className="font-amiri text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-4 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
             {isAr ? (
-              <>أرابيزماتيكا<br /><span className="text-gold-300">كتالوج العملات العربية</span></>
+              <>أرابيزماتيكا<br /><span className="text-gold-300">كتالوج العملات العربية والإسلامية</span></>
             ) : (
-              <>Arabismatica<br /><span className="text-gold-300">The Arab Coin Catalogue</span></>
+              <>Arabismatica<br /><span className="text-gold-300">The Arab & Islamic Coin Catalogue</span></>
             )}
           </h1>
 
           {/* Description */}
           <p className="text-white/75 text-[14px] md:text-[15px] leading-relaxed mb-8 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
             {isAr
-              ? `الكتالوج الأكثر شمولاً للعملات العربية والإسلامية. يضم ${totalCoins.toLocaleString('ar-EG')} عملة من ${totalCountries} دولة عربية، تمتد من عام ١٥٠٠ حتى اليوم. ابحث حسب الاسم، رقم KM، المعدن، الأسرة الحاكمة، أو السنة.`
-              : `The most comprehensive online catalogue of Arab and Islamic coins. Browse ${totalCoins.toLocaleString()} coins from ${totalCountries} Arab countries spanning 1500 to the present day. Search by name, KM number, metal, dynasty, or year.`}
+              ? `الكتالوج الأكثر شمولاً للعملات العربية والإسلامية عبر الإنترنت. يضم ${totalCoins.toLocaleString('ar-EG')} عملة من ${totalCountries} دولة و٥ خلافات إسلامية، تمتد من عام ٦٦١م حتى اليوم. ابحث حسب الاسم، رقم KM، المعدن، الأسرة الحاكمة، أو السنة.`
+              : `The most comprehensive online catalogue of Arab and Islamic coins. Browse ${totalCoins.toLocaleString()} coins spanning ${totalCountries} countries and 5 Islamic caliphates from 661 CE to the present day. Search by name, KM number, metal, dynasty, or year.`}
           </p>
 
           {/* Stats row */}
           <div className="flex items-center gap-6 flex-wrap">
             {[
               { value: totalCoins.toLocaleString(isAr ? 'ar-EG' : 'en'), label: isAr ? 'عملة مفهرسة' : 'Coins indexed' },
-              { value: totalCountries.toString(), label: isAr ? 'دولة عربية' : 'Arab countries' },
-              { value: isAr ? '١٥٠٠–٢٠٢٦' : '1500–2026', label: isAr ? 'حقبة زمنية' : 'Year range' },
+              { value: totalCountries.toString(), label: isAr ? 'دولة ومنطقة' : 'Countries & regions' },
+              { value: isAr ? '٦٦١–٢٠٢٦' : '661–2026', label: isAr ? 'حقبة زمنية' : 'Year range' },
             ].map(({ value, label }, i) => (
               <div key={label} className="flex items-center gap-3">
                 {i > 0 && <div className="h-6 w-[1px] bg-gold-700/50" />}

@@ -656,36 +656,60 @@ export default function CoinModal({
           </div>
 
           <div className="px-5 py-5">
-            {/* Coin images */}
-            <div className="flex items-start justify-center gap-8 mb-6">
-              {(['obverse', 'reverse'] as const).map(side => {
-                const src = side === 'obverse' ? coin.o : coin.r;
+            {/* Coin images — single panel for Zeno (one combined photo), two circles for standard */}
+            {(() => {
+              const isZeno = coin.nref?.startsWith('Z#');
+              const singleImage = isZeno || !coin.r || coin.o === coin.r;
+              if (singleImage && isValidImageUrl(coin.o)) {
                 return (
-                  <div key={side} className="flex flex-col items-center gap-2">
-                    <button onClick={() => setLightbox(side)} className="group relative" title={t(side)}>
-                      {isValidImageUrl(src) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={src} alt={`${coinName} — ${t(side)}`}
-                          className="w-[130px] h-[130px] rounded-full object-cover transition-all duration-300 group-hover:scale-110 group-hover:shadow-2xl group-hover:rounded-none group-hover:w-[200px] group-hover:h-[200px] group-hover:z-30 group-hover:relative"
-                          style={{ border: '3px solid #F0E8D4', outline: '2px solid #8B6D2E', boxShadow: '0 4px 20px rgba(80,50,10,.18)', transformOrigin: 'center' }} />
-                      ) : (
-                        <div className="w-[130px] h-[130px] rounded-full flex items-center justify-center font-amiri font-bold text-3xl text-ink"
-                          style={{ background: getDiscGradient(coin.metal), border: '3px solid #F0E8D4', outline: '2px solid #8B6D2E' }}>
-                          {getMetalSymbol(coin.metal)}
-                        </div>
-                      )}
-                      <div className="absolute inset-0 rounded-full bg-ink/0 group-hover:bg-ink/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                  <div className="flex flex-col items-center gap-2 mb-6">
+                    <button onClick={() => setLightbox('obverse')} className="group relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={coin.o} alt={coinName}
+                        className="max-w-[280px] max-h-[200px] w-auto h-auto rounded-xl object-contain transition-all group-hover:scale-105 group-hover:shadow-2xl"
+                        style={{ border: '2px solid #F0E8D4', outline: '1.5px solid #8B6D2E', boxShadow: '0 4px 20px rgba(80,50,10,.18)' }} />
+                      <div className="absolute inset-0 rounded-xl bg-ink/0 group-hover:bg-ink/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
                         <ZoomIn size={20} className="text-gold-300" />
                       </div>
                     </button>
-                    <button onClick={() => setLightbox(side)}
-                      className="text-[11px] text-gold-600 border border-gold-700/30 rounded-full px-3 py-1 hover:border-gold-500 hover:text-gold-500 transition-colors">
-                      {t(side)}
-                    </button>
+                    <span className="text-[10px] text-ink/30 italic">
+                      {isZeno ? (locale === 'ar' ? 'صورة مجمعة (وجه وظهر)' : 'Combined obverse & reverse photo') : t('obverse')}
+                    </span>
                   </div>
                 );
-              })}
-            </div>
+              }
+              return (
+                <div className="flex items-start justify-center gap-8 mb-6">
+                  {(['obverse', 'reverse'] as const).map(side => {
+                    const imgSrc = side === 'obverse' ? coin.o : coin.r;
+                    return (
+                      <div key={side} className="flex flex-col items-center gap-2">
+                        <button onClick={() => setLightbox(side)} className="group relative" title={t(side)}>
+                          {isValidImageUrl(imgSrc) ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={imgSrc} alt={`${coinName} — ${t(side)}`}
+                              className="w-[130px] h-[130px] rounded-full object-cover transition-all duration-300 group-hover:scale-110 group-hover:shadow-2xl group-hover:rounded-none group-hover:w-[200px] group-hover:h-[200px] group-hover:z-30 group-hover:relative"
+                              style={{ border: '3px solid #F0E8D4', outline: '2px solid #8B6D2E', boxShadow: '0 4px 20px rgba(80,50,10,.18)', transformOrigin: 'center' }} />
+                          ) : (
+                            <div className="w-[130px] h-[130px] rounded-full flex items-center justify-center font-amiri font-bold text-3xl text-ink"
+                              style={{ background: getDiscGradient(coin.metal), border: '3px solid #F0E8D4', outline: '2px solid #8B6D2E' }}>
+                              {getMetalSymbol(coin.metal)}
+                            </div>
+                          )}
+                          <div className="absolute inset-0 rounded-full bg-ink/0 group-hover:bg-ink/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                            <ZoomIn size={20} className="text-gold-300" />
+                          </div>
+                        </button>
+                        <button onClick={() => setLightbox(side)}
+                          className="text-[11px] text-gold-600 border border-gold-700/30 rounded-full px-3 py-1 hover:border-gold-500 hover:text-gold-500 transition-colors">
+                          {t(side)}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
 
             {/* Coin title */}
             <div className={`mb-5 ${isAr ? 'text-right' : 'text-left'}`}>
@@ -723,7 +747,12 @@ export default function CoinModal({
               {coin.wt != null && <SpecCard label={`${t('weight')} (غ)`} value={`${coin.wt} g`} />}
               {coin.dia != null && <SpecCard label={`${t('diameter')} (مم)`} value={`${coin.dia} mm`} />}
               {coin.km && <SpecCard label="KM#" value={coin.km} />}
-              {coin.nref && <SpecCard label="N# Numista" value={coin.nref} />}
+              {coin.nref && (
+                <SpecCard
+                  label={coin.nref.startsWith('Z#') ? 'Z# Zeno' : 'N# Numista'}
+                  value={coin.nref}
+                />
+              )}
             </div>
 
             {/* Tags */}
@@ -743,16 +772,24 @@ export default function CoinModal({
             {/* Price Guide */}
             <PriceGuide coinId={coin.id} locale={locale} cataloguePrices={coin.prices} />
 
-            {/* Numista link + coin page link */}
+            {/* External reference link + coin page link */}
             <div className="flex items-center gap-2 flex-wrap">
-              {coin.nid && (
-                <a href={`https://en.numista.com/catalogue/pieces${coin.nid}.html`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-[12px] text-gold-600 border border-gold-700/30 rounded-full px-4 py-2 hover:border-gold-500 hover:text-gold-500 transition-colors">
-                  <ExternalLink size={12} />
-                  {t('viewOnNumista')}
-                </a>
-              )}
+              {coin.nid && (() => {
+                const isZeno = coin.nref?.startsWith('Z#');
+                const href = isZeno
+                  ? `https://zeno.ru/show_coin.php?id=${coin.nid}`
+                  : `https://en.numista.com/catalogue/pieces${coin.nid}.html`;
+                const label = isZeno
+                  ? (locale === 'ar' ? '🔗 عرض في Zeno' : '🔗 View on Zeno')
+                  : t('viewOnNumista');
+                return (
+                  <a href={href} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-[12px] text-gold-600 border border-gold-700/30 rounded-full px-4 py-2 hover:border-gold-500 hover:text-gold-500 transition-colors">
+                    <ExternalLink size={12} />
+                    {label}
+                  </a>
+                );
+              })()}
               <a href={`/${locale}/catalogue/${coin.id}`}
                 className="inline-flex items-center gap-2 text-[12px] text-gold-600 border border-gold-700/30 rounded-full px-4 py-2 hover:border-gold-500 hover:text-gold-500 transition-colors">
                 <ExternalLink size={12} />

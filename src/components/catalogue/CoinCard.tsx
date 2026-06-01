@@ -201,15 +201,36 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
           {metaLabel}
         </span>
       </div>
-      <div className="relative flex bg-parch-dark/60 h-[96px] overflow-hidden">
-        <div className="flex-1 flex items-center justify-center">
-          <CoinImage src={coin.o} alt={`${coinName} — ${isAr ? 'الوجه' : 'Obverse'}`} metal={coin.metal} side="obverse" />
-        </div>
-        <div className="w-px bg-gold-700/20 my-3" />
-        <div className="flex-1 flex items-center justify-center">
-          <CoinImage src={coin.r} alt={`${coinName} — ${isAr ? 'الظهر' : 'Reverse'}`} metal={coin.metal} side="reverse" />
-        </div>
-      </div>
+      {/* Coin image area — single panel for Zeno, two circles for standard */}
+      {(() => {
+        const isZeno = coin.nref?.startsWith('Z#');
+        if (isZeno) {
+          return (
+            <div className="relative bg-parch-dark/60 h-[96px] flex items-center justify-center overflow-hidden">
+              {isValidImageUrl(coin.o) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={coin.o} alt={coinName}
+                  className="max-h-[90px] w-auto max-w-full object-contain"
+                  style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.3))' }} />
+              ) : (
+                <CoinImage src={coin.o} alt={coinName} metal={coin.metal} side="obverse" />
+              )}
+              <span className="absolute bottom-1 right-1 text-[7px] text-gold-600/40 font-mono">Zeno</span>
+            </div>
+          );
+        }
+        return (
+          <div className="relative flex bg-parch-dark/60 h-[96px] overflow-hidden">
+            <div className="flex-1 flex items-center justify-center">
+              <CoinImage src={coin.o} alt={`${coinName} — ${isAr ? 'الوجه' : 'Obverse'}`} metal={coin.metal} side="obverse" />
+            </div>
+            <div className="w-px bg-gold-700/20 my-3" />
+            <div className="flex-1 flex items-center justify-center">
+              <CoinImage src={coin.r} alt={`${coinName} — ${isAr ? 'الظهر' : 'Reverse'}`} metal={coin.metal} side="reverse" />
+            </div>
+          </div>
+        );
+      })()}
 
       <div className="px-2.5 pt-2 pb-1 flex-1 flex flex-col gap-0.5">
         <div className="flex items-center gap-1">
