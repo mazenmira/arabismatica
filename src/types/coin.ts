@@ -35,6 +35,10 @@ export interface Coin {
   nid: string;
   type: string;
   mint: string;
+  mint_ar?: string;
+  ruler?: string;
+  ruler_ar?: string;
+  denomination?: 'Dirham' | 'Dinar' | 'Fals' | 'Fils' | 'Other';
   mintageData?: MintageEntry[];
   prices?: CoinPrices;
   o: string;
