@@ -85,3 +85,241 @@
 [09:18:40] ══════════════════════════════════════════════════════════
 [09:18:40]   Collecting IDs...
 [09:19:17]   Found 91 IDs, 91 to fetch (0 already done)
+[09:20:47]   ✓ 50/91 from Aghlabid (raw: 1026)
+[09:22:10]   ✓ Aghlabid: 91 scraped, 0 failed
+[09:22:12]   Merge [Aghlabid]: 24430 → 24517 (+87 new, 980 dupes)
+[09:22:12]     87  الأغالبة
+[09:22:12] 
+  ↳ Aghlabid: 91 scraped, 87 merged in 3.5 min
+
+[09:22:12] 
+══════════════════════════════════════════════════════════
+[09:22:12] Dynasty: Idrisid  (cat=5074, limit=all)
+[09:22:12] ══════════════════════════════════════════════════════════
+[09:22:12]   Collecting IDs...
+[09:24:13]   Found 109 IDs, 109 to fetch (0 already done)
+[09:25:43]   ✓ 50/109 from Idrisid (raw: 1117)
+[09:27:12]   ✓ 100/109 from Idrisid (raw: 1167)
+[09:27:13]   💾 Checkpoint at 100
+[09:27:34]   ✓ Idrisid: 109 scraped, 0 failed
+[09:27:34]   Merge [Idrisid]: 24517 → 24625 (+108 new, 1068 dupes)
+[09:27:34]     108  الأدارسة
+[09:27:34] 
+  ↳ Idrisid: 109 scraped, 108 merged in 5.4 min
+
+[09:27:34] 
+══════════════════════════════════════════════════════════
+[09:27:34] Dynasty: Hafsid  (cat=6311, limit=all)
+[09:27:34] ══════════════════════════════════════════════════════════
+[09:27:34]   Collecting IDs...
+[09:28:50]   Found 140 IDs, 140 to fetch (0 already done)
+[09:30:23]   ✓ 50/140 from Hafsid (raw: 1226)
+[09:31:52]   ✓ 100/140 from Hafsid (raw: 1276)
+[09:31:54]   💾 Checkpoint at 100
+[09:32:59]   ✓ Hafsid: 140 scraped, 0 failed
+[09:33:01]   Merge [Hafsid]: 24625 → 24763 (+138 new, 1178 dupes)
+[09:33:01]     138  الحفصيون
+[09:33:01] 
+  ↳ Hafsid: 140 scraped, 138 merged in 5.4 min
+
+[09:33:01] 
+══════════════════════════════════════════════════════════
+[09:33:01] Dynasty: Merinid  (cat=4783, limit=all)
+[09:33:01] ══════════════════════════════════════════════════════════
+[09:33:01]   Collecting IDs...
+[09:35:48]   Found 172 IDs, 172 to fetch (0 already done)
+[09:37:21]   ✓ 50/172 from Merinid (raw: 1366)
+[09:39:09]   ✓ 100/172 from Merinid (raw: 1416)
+[09:39:11]   💾 Checkpoint at 100
+[09:40:51]   ✓ 150/172 from Merinid (raw: 1466)
+[09:41:33]   ✓ Merinid: 172 scraped, 0 failed
+[09:41:35]   Merge [Merinid]: 24763 → 24933 (+170 new, 1318 dupes)
+[09:41:35]     170  المرينيون
+[09:41:35] 
+  ↳ Merinid: 172 scraped, 170 merged in 8.6 min
+
+[09:41:35] 
+══════════════════════════════════════════════════════════
+[09:41:35] Dynasty: Almoravid  (cat=927, limit=all)
+[09:41:35] ══════════════════════════════════════════════════════════
+[09:41:35]   Collecting IDs...
+[09:44:21]   Found 334 IDs, 334 to fetch (0 already done)
+[09:45:45]   ✓ 50/334 from Almoravid (raw: 1538)
+[09:47:12]   ✓ 100/334 from Almoravid (raw: 1588)
+[09:47:14]   💾 Checkpoint at 100
+[09:48:37]   ✓ 150/334 from Almoravid (raw: 1638)
+[09:50:05]   ✓ 200/334 from Almoravid (raw: 1688)
+[09:50:05]   💾 Checkpoint at 200
+[09:51:34]   ✓ 250/334 from Almoravid (raw: 1738)
+[09:53:01]   ✓ 300/334 from Almoravid (raw: 1788)
+[09:53:01]   💾 Checkpoint at 300
+[09:53:58]   ✓ Almoravid: 334 scraped, 0 failed
+[09:53:59]   Merge [Almoravid]: 24933 → 25260 (+327 new, 1495 dupes)
+[09:53:59]     327  المرابطون
+[09:53:59] 
+  ↳ Almoravid: 334 scraped, 327 merged in 12.4 min
+
+[09:53:59] 
+══════════════════════════════════════════════════════════
+[09:53:59] Dynasty: Almohad  (cat=1029, limit=all)
+[09:53:59] ══════════════════════════════════════════════════════════
+[09:53:59]   Collecting IDs...
+[09:57:09]   Found 472 IDs, 472 to fetch (0 already done)
+[09:58:35]   ✓ 50/472 from Almohad (raw: 1872)
+[10:00:00]   ✓ 100/472 from Almohad (raw: 1922)
+[10:00:01]   💾 Checkpoint at 100
+[10:01:27]   ✓ 150/472 from Almohad (raw: 1972)
+[10:02:54]   ✓ 200/472 from Almohad (raw: 2022)
+[10:02:54]   💾 Checkpoint at 200
+[10:04:45]   ✓ 250/472 from Almohad (raw: 2072)
+[10:06:18]   ✓ 300/472 from Almohad (raw: 2122)
+[10:06:19]   💾 Checkpoint at 300
+[10:07:53]   ✓ 350/472 from Almohad (raw: 2172)
+[10:09:32]   ✓ 400/472 from Almohad (raw: 2222)
+[10:09:32]   💾 Checkpoint at 400
+[10:11:01]   ✓ 450/472 from Almohad (raw: 2272)
+[10:11:40]   ✓ Almohad: 472 scraped, 0 failed
+[10:11:40]   Merge [Almohad]: 25260 → 25727 (+467 new, 1827 dupes)
+[10:11:40]     467  الموحدون
+[10:11:40] 
+  ↳ Almohad: 472 scraped, 467 merged in 17.7 min
+
+[10:11:40] 
+══════════════════════════════════════════════════════════
+[10:11:40] Dynasty: Zangid  (cat=1102, limit=all)
+[10:11:40] ══════════════════════════════════════════════════════════
+[10:11:40]   Collecting IDs...
+[10:15:01]   Found 691 IDs, 691 to fetch (0 already done)
+[10:16:35]   ✓ 50/691 from Zangid (raw: 2344)
+[10:18:06]   ✓ 100/691 from Zangid (raw: 2394)
+[10:18:08]   💾 Checkpoint at 100
+[10:19:35]   ✓ 150/691 from Zangid (raw: 2444)
+[10:21:13]   ✓ 200/691 from Zangid (raw: 2494)
+[10:21:13]   💾 Checkpoint at 200
+[10:22:41]   ✓ 250/691 from Zangid (raw: 2544)
+[10:24:11]   ✓ 300/691 from Zangid (raw: 2594)
+[10:24:13]   💾 Checkpoint at 300
+[10:25:44]   ✓ 350/691 from Zangid (raw: 2644)
+[10:27:16]   ✓ 400/691 from Zangid (raw: 2694)
+[10:27:17]   💾 Checkpoint at 400
+[10:28:53]   ✓ 450/691 from Zangid (raw: 2744)
+[10:30:26]   ✓ 500/691 from Zangid (raw: 2794)
+[10:30:28]   💾 Checkpoint at 500
+[10:32:14]   ✓ 550/691 from Zangid (raw: 2844)
+[10:33:54]   ✓ 600/691 from Zangid (raw: 2894)
+[10:33:54]   💾 Checkpoint at 600
+[10:35:33]   ✓ 650/691 from Zangid (raw: 2944)
+[10:36:45]   ✓ Zangid: 691 scraped, 0 failed
+[10:36:48]   Merge [Zangid]: 25727 → 26415 (+688 new, 2297 dupes)
+[10:36:48]     688  الزنكيون
+[10:36:48] 
+  ↳ Zangid: 691 scraped, 688 merged in 25.1 min
+
+[10:36:48] 
+══════════════════════════════════════════════════════════
+[10:36:48] Dynasty: Artuqid  (cat=1478, limit=all)
+[10:36:48] ══════════════════════════════════════════════════════════
+[10:36:48]   Collecting IDs...
+[10:43:02]   Found 1361 IDs, 1361 to fetch (0 already done)
+[10:44:38]   ✓ 50/1361 from Artuqid (raw: 3035)
+[10:46:05]   ✓ 100/1361 from Artuqid (raw: 3085)
+[10:46:07]   💾 Checkpoint at 100
+[10:47:36]   ✓ 150/1361 from Artuqid (raw: 3135)
+[10:49:12]   ✓ 200/1361 from Artuqid (raw: 3185)
+[10:49:12]   💾 Checkpoint at 200
+[10:50:43]   ✓ 250/1361 from Artuqid (raw: 3235)
+[10:52:08]   ✓ 300/1361 from Artuqid (raw: 3285)
+[10:52:08]   💾 Checkpoint at 300
+[10:53:37]   ✓ 350/1361 from Artuqid (raw: 3335)
+[10:55:31]   ✓ 400/1361 from Artuqid (raw: 3385)
+[10:55:32]   💾 Checkpoint at 400
+[10:57:11]   ✓ 450/1361 from Artuqid (raw: 3435)
+[10:58:36]   ✓ 500/1361 from Artuqid (raw: 3485)
+[10:58:37]   💾 Checkpoint at 500
+[11:00:04]   ✓ 550/1361 from Artuqid (raw: 3535)
+[11:01:38]   ✓ 600/1361 from Artuqid (raw: 3585)
+[11:01:40]   💾 Checkpoint at 600
+[11:03:19]   ✓ 650/1361 from Artuqid (raw: 3635)
+[11:05:03]   ✓ 700/1361 from Artuqid (raw: 3685)
+[11:05:05]   💾 Checkpoint at 700
+[11:06:29]   ✓ 750/1361 from Artuqid (raw: 3735)
+[11:08:14]   ✓ 800/1361 from Artuqid (raw: 3785)
+[11:08:16]   💾 Checkpoint at 800
+[11:09:43]   ✓ 850/1361 from Artuqid (raw: 3835)
+[11:11:08]   ✓ 900/1361 from Artuqid (raw: 3885)
+[11:11:10]   💾 Checkpoint at 900
+[11:12:47]   ✓ 950/1361 from Artuqid (raw: 3935)
+[11:14:25]   ✓ 1000/1361 from Artuqid (raw: 3985)
+[11:14:27]   💾 Checkpoint at 1000
+[11:15:55]   ✓ 1050/1361 from Artuqid (raw: 4035)
+[11:17:28]   ✓ 1100/1361 from Artuqid (raw: 4085)
+[11:17:29]   💾 Checkpoint at 1100
+[11:19:01]   ✓ 1150/1361 from Artuqid (raw: 4135)
+[11:20:27]   ✓ 1200/1361 from Artuqid (raw: 4185)
+[11:20:28]   💾 Checkpoint at 1200
+[11:22:00]   ✓ 1250/1361 from Artuqid (raw: 4235)
+[11:23:28]   ✓ 1300/1361 from Artuqid (raw: 4285)
+[11:23:30]   💾 Checkpoint at 1300
+[11:24:58]   ✓ 1350/1361 from Artuqid (raw: 4335)
+[11:25:20]   ✓ Artuqid: 1361 scraped, 0 failed
+[11:25:20]   Merge [Artuqid]: 26415 → 27763 (+1348 new, 2998 dupes)
+[11:25:20]     1348  الأرتقيون
+[11:25:20] 
+  ↳ Artuqid: 1361 scraped, 1348 merged in 48.5 min
+
+[11:25:20] 
+══════════════════════════════════════════════════════════
+[11:25:20] Dynasty: East Africa sultanates  (cat=2576, limit=all)
+[11:25:20] ══════════════════════════════════════════════════════════
+[11:25:20]   Collecting IDs...
+[11:26:18]   Found 203 IDs, 203 to fetch (0 already done)
+[11:27:45]   ✓ 50/203 from East Africa sultanates (raw: 4396)
+[11:29:17]   ✓ 100/203 from East Africa sultanates (raw: 4446)
+[11:29:19]   💾 Checkpoint at 100
+[11:30:50]   ✓ 150/203 from East Africa sultanates (raw: 4496)
+[11:32:22]   ✓ 200/203 from East Africa sultanates (raw: 4546)
+[11:32:23]   💾 Checkpoint at 200
+[11:32:28]   ✓ East Africa sultanates: 203 scraped, 0 failed
+[11:32:28]   Merge [East Africa sultanates]: 27763 → 27964 (+201 new, 4348 dupes)
+[11:32:28]     201  سلطنات شرق أفريقيا
+[11:32:28] 
+  ↳ East Africa sultanates: 203 scraped, 201 merged in 7.1 min
+
+[11:32:28] 
+╔══════════════════════════════════════════════════════╗
+[11:32:28] ║              13-Dynasty Pipeline Complete            ║
+[11:32:28] ╠══════════════════════════════════════════════════════╣
+[11:32:28] ║  Umayyad of al-Andalus   :   510 scraped,   504 merged  ║
+[11:32:28] ║  Tulunid                 :   115 scraped,   114 merged  ║
+[11:32:28] ║  Ikhshidid               :   118 scraped,   117 merged  ║
+[11:32:28] ║  Hamdanid                :   233 scraped,   226 merged  ║
+[11:32:28] ║  Aghlabid                :    91 scraped,    87 merged  ║
+[11:32:28] ║  Idrisid                 :   109 scraped,   108 merged  ║
+[11:32:28] ║  Hafsid                  :   140 scraped,   138 merged  ║
+[11:32:28] ║  Merinid                 :   172 scraped,   170 merged  ║
+[11:32:28] ║  Almoravid               :   334 scraped,   327 merged  ║
+[11:32:28] ║  Almohad                 :   472 scraped,   467 merged  ║
+[11:32:28] ║  Zangid                  :   691 scraped,   688 merged  ║
+[11:32:28] ║  Artuqid                 :  1361 scraped,  1348 merged  ║
+[11:32:28] ║  East Africa sultanates  :   203 scraped,   201 merged  ║
+[11:32:28] ╠══════════════════════════════════════════════════════╣
+[11:32:28] ║  TOTAL                   :  4549 scraped,  4495 merged  ║
+[11:32:28] ╚══════════════════════════════════════════════════════╝
+[11:32:29] 
+coins.json before: 23,469
+[11:32:29] coins.json after : 27,964 (+4,495)
+[11:32:29] 
+Per-dynasty breakdown:
+[11:32:29]   Umayyad of al-Andalus     : +504
+[11:32:29]   Tulunid                   : +114
+[11:32:29]   Ikhshidid                 : +117
+[11:32:29]   Hamdanid                  : +226
+[11:32:29]   Aghlabid                  : +87
+[11:32:29]   Idrisid                   : +108
+[11:32:29]   Hafsid                    : +138
+[11:32:29]   Merinid                   : +170
+[11:32:29]   Almoravid                 : +327
+[11:32:29]   Almohad                   : +467
+[11:32:29]   Zangid                    : +688
+[11:32:29]   Artuqid                   : +1348
+[11:32:29]   East Africa sultanates    : +201

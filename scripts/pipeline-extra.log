@@ -1,0 +1,18 @@
+[08:27:07] ╔══════════════════════════════════════════════════════════╗
+[08:27:07] ║   Extra Pipeline: Abbasid (full) + Pre-Reform + Ilkhanid ║
+[08:27:07] ╚══════════════════════════════════════════════════════════╝
+[08:27:08] Seeding progress from previous pipelines...
+[08:27:08]   Loaded 18,862 IDs from zeno_progress.json
+[08:27:08]   Loaded 4,549 IDs from zeno_progress_13.json
+[08:27:08]   Progress seeded: 23,411 total known IDs
+[08:27:08] 
+coins.json starting count: 27,964
+
+[08:27:12] Session ready. PHPSESSID=f03l4jc14tp6oia971ijkfhd35; ppid=deleted...
+[08:27:12] 
+════════════════════════════════════════════════════════════
+[08:27:12] Dynasty : Abbasid (full)  (cat=543, limit=all)
+[08:27:12] dyn     : الخلافة العباسية   cc: IS
+[08:27:12] ════════════════════════════════════════════════════════════
+[08:27:12]   Progress: 23,411 IDs already done
+[08:27:12]   Collecting IDs...
