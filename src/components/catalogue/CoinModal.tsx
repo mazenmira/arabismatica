@@ -777,7 +777,7 @@ export default function CoinModal({
               {coin.nid && (() => {
                 const isZeno = coin.nref?.startsWith('Z#');
                 const href = isZeno
-                  ? `https://zeno.ru/show_coin.php?id=${coin.nid}`
+                  ? `https://zeno.ru/#${coin.nid}`
                   : `https://en.numista.com/catalogue/pieces${coin.nid}.html`;
                 const label = isZeno
                   ? (locale === 'ar' ? '🔗 عرض في Zeno' : '🔗 View on Zeno')

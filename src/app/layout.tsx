@@ -47,11 +47,13 @@ export const metadata: Metadata = {
   verification: {
     google: 'FJoYVJeXodhSwEHl68oXJwO2Yqge0DlfiD2NEKbpQYE',
   },
+  // Root layout does NOT set a canonical — each [locale]/page.tsx sets its own
+  // self-referencing canonical via generateMetadata to avoid GSC duplicate warnings.
   alternates: {
-    canonical: 'https://arabismatica.arabcollector.com',
     languages: {
-      'ar': 'https://arabismatica.arabcollector.com/ar',
-      'en': 'https://arabismatica.arabcollector.com/en',
+      'ar':        'https://arabismatica.arabcollector.com/ar',
+      'en':        'https://arabismatica.arabcollector.com/en',
+      'x-default': 'https://arabismatica.arabcollector.com/ar',
     },
   },
 };
