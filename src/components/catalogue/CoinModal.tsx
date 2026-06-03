@@ -266,7 +266,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
   }, [coin.id, locale]);
 
   const externalHref = isZeno
-    ? `https://zeno.ru/#${coin.nid}`
+    ? `https://www.zeno.ru/showphoto.php?photo=${coin.nid}`
     : `https://en.numista.com/catalogue/pieces${coin.nid}.html`;
   const externalLabel = isZeno
     ? (isAr ? 'عرض في Zeno' : 'View on Zeno')

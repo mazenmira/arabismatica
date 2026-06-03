@@ -205,7 +205,7 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                 {coin.nid  && (() => {
                   const isZeno = coin.nref?.startsWith('Z#');
                   const href = isZeno
-                    ? `https://zeno.ru/#${coin.nid}`
+                    ? `https://www.zeno.ru/showphoto.php?photo=${coin.nid}`
                     : `https://en.numista.com/catalogue/pieces${coin.nid}.html`;
                   const label = isZeno ? 'Zeno' : 'Numista';
                   return (
