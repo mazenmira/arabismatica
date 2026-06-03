@@ -1,3 +1,10 @@
 User-agent: *
 Allow: /
+
 Sitemap: https://arabismatica.arabcollector.com/sitemap.xml
+Sitemap: https://arabismatica.arabcollector.com/sitemap/countries
+Sitemap: https://arabismatica.arabcollector.com/sitemap/national
+Sitemap: https://arabismatica.arabcollector.com/sitemap/islamic/1
+Sitemap: https://arabismatica.arabcollector.com/sitemap/islamic/2
+Sitemap: https://arabismatica.arabcollector.com/sitemap/islamic/3
+Sitemap: https://arabismatica.arabcollector.com/sitemap/islamic/4

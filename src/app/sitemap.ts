@@ -1,28 +1,21 @@
+// src/app/sitemap.ts
+// Lightweight index — sub-sitemaps handle the bulk of URLs
+// This stays well under Vercel's 19MB limit
 import type { MetadataRoute } from 'next';
-import COINS_RAW from '@/data/coins.json';
-import type { Coin } from '@/types/coin';
 import { COUNTRY_META } from '@/lib/countries';
 
-const ALL_COINS = COINS_RAW as unknown as Coin[];
-const BASE      = 'https://arabismatica.arabcollector.com';
-const LOCALES   = ['ar', 'en'] as const;
+const BASE    = 'https://arabismatica.arabcollector.com';
+const LOCALES = ['ar', 'en'] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes: MetadataRoute.Sitemap = LOCALES.map(locale => ({
-    url: `${BASE}/${locale}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: 1.0,
-  }));
+  // Homepage + Islamic page (highest priority)
+  const corePages: MetadataRoute.Sitemap = LOCALES.flatMap(locale => [
+    { url: `${BASE}/${locale}`,         lastModified: new Date(), changeFrequency: 'daily'  as const, priority: 1.0  },
+    { url: `${BASE}/${locale}/islamic`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.95 },
+  ]);
 
-  const islamicRoutes: MetadataRoute.Sitemap = LOCALES.map(locale => ({
-    url: `${BASE}/${locale}/islamic`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.95,
-  }));
-
-  const countryRoutes: MetadataRoute.Sitemap = LOCALES.flatMap(locale =>
+  // Country pages (40 URLs — fast)
+  const countryPages: MetadataRoute.Sitemap = LOCALES.flatMap(locale =>
     COUNTRY_META.map(c => ({
       url: `${BASE}/${locale}/country/${c.slug}`,
       lastModified: new Date(),
@@ -31,14 +24,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 
-  const coinRoutes: MetadataRoute.Sitemap = LOCALES.flatMap(locale =>
-    ALL_COINS.map(coin => ({
-      url: `${BASE}/${locale}/catalogue/${coin.id}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: coin.cc === 'IS' ? 0.65 : 0.75,
-    }))
-  );
+  // Sub-sitemap discovery URLs (tell Google where to find coin pages)
+  const subSitemaps: MetadataRoute.Sitemap = [
+    { url: `${BASE}/sitemap/countries`, lastModified: new Date(), changeFrequency: 'weekly'  as const, priority: 0.5 },
+    { url: `${BASE}/sitemap/national`,  lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.5 },
+    { url: `${BASE}/sitemap/islamic/1`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.5 },
+    { url: `${BASE}/sitemap/islamic/2`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.5 },
+    { url: `${BASE}/sitemap/islamic/3`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.5 },
+    { url: `${BASE}/sitemap/islamic/4`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.5 },
+  ];
 
-  return [...staticRoutes, ...islamicRoutes, ...countryRoutes, ...coinRoutes];
+  return [...corePages, ...countryPages, ...subSitemaps];
 }
