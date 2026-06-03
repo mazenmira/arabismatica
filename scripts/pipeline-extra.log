@@ -16,3 +16,544 @@ coins.json starting count: 27,964
 [08:27:12] ════════════════════════════════════════════════════════════
 [08:27:12]   Progress: 23,411 IDs already done
 [08:27:12]   Collecting IDs...
+[09:16:44]   Found 8,336 IDs, 6,336 to fetch (2,000 already done)
+[09:18:27]   ✓ 50/6,336 from Abbasid (full)  (raw total: 50)
+[09:20:01]   ✓ 100/6,336 from Abbasid (full)  (raw total: 100)
+[09:20:02]   💾 Checkpoint at 100
+[09:21:37]   ✓ 150/6,336 from Abbasid (full)  (raw total: 150)
+[09:23:12]   ✓ 200/6,336 from Abbasid (full)  (raw total: 200)
+[09:23:14]   💾 Checkpoint at 200
+[09:24:38]   ✓ 250/6,336 from Abbasid (full)  (raw total: 250)
+[09:26:04]   ✓ 300/6,336 from Abbasid (full)  (raw total: 300)
+[09:26:05]   💾 Checkpoint at 300
+[09:28:10]   ✓ 350/6,336 from Abbasid (full)  (raw total: 350)
+[09:29:46]   ✓ 400/6,336 from Abbasid (full)  (raw total: 400)
+[09:29:47]   💾 Checkpoint at 400
+[09:31:27]   ✓ 450/6,336 from Abbasid (full)  (raw total: 450)
+[09:32:56]   ✓ 500/6,336 from Abbasid (full)  (raw total: 500)
+[09:32:57]   💾 Checkpoint at 500
+[09:34:22]   ✓ 550/6,336 from Abbasid (full)  (raw total: 550)
+[09:35:53]   ✓ 600/6,336 from Abbasid (full)  (raw total: 600)
+[09:35:55]   💾 Checkpoint at 600
+[09:37:34]   ✓ 650/6,336 from Abbasid (full)  (raw total: 650)
+[09:39:52]   ✓ 700/6,336 from Abbasid (full)  (raw total: 700)
+[09:39:53]   💾 Checkpoint at 700
+[09:41:28]   ✓ 750/6,336 from Abbasid (full)  (raw total: 750)
+[09:42:55]   ✓ 800/6,336 from Abbasid (full)  (raw total: 800)
+[09:42:56]   💾 Checkpoint at 800
+[09:44:23]   ✓ 850/6,336 from Abbasid (full)  (raw total: 850)
+[09:45:52]   ✓ 900/6,336 from Abbasid (full)  (raw total: 900)
+[09:45:54]   💾 Checkpoint at 900
+[09:47:27]   ✓ 950/6,336 from Abbasid (full)  (raw total: 950)
+[09:49:00]   ✓ 1,000/6,336 from Abbasid (full)  (raw total: 1,000)
+[09:49:02]   💾 Checkpoint at 1,000
+[09:50:34]   ✓ 1,050/6,336 from Abbasid (full)  (raw total: 1,050)
+[09:52:10]   ✓ 1,100/6,336 from Abbasid (full)  (raw total: 1,100)
+[09:52:11]   💾 Checkpoint at 1,100
+[09:54:02]   ✓ 1,150/6,336 from Abbasid (full)  (raw total: 1,150)
+[09:55:54]   ✓ 1,200/6,336 from Abbasid (full)  (raw total: 1,200)
+[09:55:56]   💾 Checkpoint at 1,200
+[09:57:35]   ✓ 1,250/6,336 from Abbasid (full)  (raw total: 1,250)
+[09:59:20]   ✓ 1,300/6,336 from Abbasid (full)  (raw total: 1,300)
+[09:59:21]   💾 Checkpoint at 1,300
+[10:00:58]   ✓ 1,350/6,336 from Abbasid (full)  (raw total: 1,350)
+[10:02:28]   ✓ 1,400/6,336 from Abbasid (full)  (raw total: 1,400)
+[10:02:29]   💾 Checkpoint at 1,400
+[10:03:59]   ✓ 1,450/6,336 from Abbasid (full)  (raw total: 1,450)
+[10:05:35]   ✓ 1,500/6,336 from Abbasid (full)  (raw total: 1,500)
+[10:05:37]   💾 Checkpoint at 1,500
+[10:07:05]   ✓ 1,550/6,336 from Abbasid (full)  (raw total: 1,550)
+[10:08:34]   ✓ 1,600/6,336 from Abbasid (full)  (raw total: 1,600)
+[10:08:36]   💾 Checkpoint at 1,600
+[10:10:04]   ✓ 1,650/6,336 from Abbasid (full)  (raw total: 1,650)
+[10:11:35]   ✓ 1,700/6,336 from Abbasid (full)  (raw total: 1,700)
+[10:11:37]   💾 Checkpoint at 1,700
+[10:13:03]   ✓ 1,750/6,336 from Abbasid (full)  (raw total: 1,750)
+[10:14:27]   ✓ 1,800/6,336 from Abbasid (full)  (raw total: 1,800)
+[10:14:28]   💾 Checkpoint at 1,800
+[10:15:54]   ✓ 1,850/6,336 from Abbasid (full)  (raw total: 1,850)
+[10:17:18]   ✓ 1,900/6,336 from Abbasid (full)  (raw total: 1,900)
+[10:17:20]   💾 Checkpoint at 1,900
+[10:18:47]   ✓ 1,950/6,336 from Abbasid (full)  (raw total: 1,950)
+[10:20:31]   ✓ 2,000/6,336 from Abbasid (full)  (raw total: 2,000)
+[10:20:32]   💾 Checkpoint at 2,000
+[10:21:58]   ✓ 2,050/6,336 from Abbasid (full)  (raw total: 2,050)
+[10:23:23]   ✓ 2,100/6,336 from Abbasid (full)  (raw total: 2,100)
+[10:23:25]   💾 Checkpoint at 2,100
+[10:24:58]   ✓ 2,150/6,336 from Abbasid (full)  (raw total: 2,150)
+[10:26:21]   ✓ 2,200/6,336 from Abbasid (full)  (raw total: 2,200)
+[10:26:22]   💾 Checkpoint at 2,200
+[10:27:51]   ✓ 2,250/6,336 from Abbasid (full)  (raw total: 2,250)
+[10:29:14]   ✓ 2,300/6,336 from Abbasid (full)  (raw total: 2,300)
+[10:29:15]   💾 Checkpoint at 2,300
+[10:30:42]   ✓ 2,350/6,336 from Abbasid (full)  (raw total: 2,350)
+[10:32:08]   ✓ 2,400/6,336 from Abbasid (full)  (raw total: 2,400)
+[10:32:10]   💾 Checkpoint at 2,400
+[10:33:56]   ✓ 2,450/6,336 from Abbasid (full)  (raw total: 2,450)
+[10:35:24]   ✓ 2,500/6,336 from Abbasid (full)  (raw total: 2,500)
+[10:35:26]   💾 Checkpoint at 2,500
+[10:36:50]   ✓ 2,550/6,336 from Abbasid (full)  (raw total: 2,550)
+[10:38:22]   ✓ 2,600/6,336 from Abbasid (full)  (raw total: 2,600)
+[10:38:22]   💾 Checkpoint at 2,600
+[10:39:51]   ✓ 2,650/6,336 from Abbasid (full)  (raw total: 2,650)
+[10:41:17]   ✓ 2,700/6,336 from Abbasid (full)  (raw total: 2,700)
+[10:41:18]   💾 Checkpoint at 2,700
+[10:42:46]   ✓ 2,750/6,336 from Abbasid (full)  (raw total: 2,750)
+[10:44:11]   ✓ 2,800/6,336 from Abbasid (full)  (raw total: 2,800)
+[10:44:11]   💾 Checkpoint at 2,800
+[10:45:37]   ✓ 2,850/6,336 from Abbasid (full)  (raw total: 2,850)
+[10:47:01]   ✓ 2,900/6,336 from Abbasid (full)  (raw total: 2,900)
+[10:47:02]   💾 Checkpoint at 2,900
+[10:48:28]   ✓ 2,950/6,336 from Abbasid (full)  (raw total: 2,950)
+[10:49:54]   ✓ 3,000/6,336 from Abbasid (full)  (raw total: 3,000)
+[10:49:55]   💾 Checkpoint at 3,000
+[10:51:24]   ✓ 3,050/6,336 from Abbasid (full)  (raw total: 3,050)
+[10:52:49]   ✓ 3,100/6,336 from Abbasid (full)  (raw total: 3,100)
+[10:52:51]   💾 Checkpoint at 3,100
+[10:54:15]   ✓ 3,150/6,336 from Abbasid (full)  (raw total: 3,150)
+[10:55:45]   ✓ 3,200/6,336 from Abbasid (full)  (raw total: 3,200)
+[10:55:45]   💾 Checkpoint at 3,200
+[10:57:26]   ✓ 3,250/6,336 from Abbasid (full)  (raw total: 3,250)
+[10:58:58]   ✓ 3,300/6,336 from Abbasid (full)  (raw total: 3,300)
+[10:59:00]   💾 Checkpoint at 3,300
+[11:00:38]   ✓ 3,350/6,336 from Abbasid (full)  (raw total: 3,350)
+[11:02:14]   ✓ 3,400/6,336 from Abbasid (full)  (raw total: 3,400)
+[11:02:16]   💾 Checkpoint at 3,400
+[11:03:43]   ✓ 3,450/6,336 from Abbasid (full)  (raw total: 3,450)
+[11:05:15]   ✓ 3,500/6,336 from Abbasid (full)  (raw total: 3,500)
+[11:05:16]   💾 Checkpoint at 3,500
+[11:07:00]   ✓ 3,550/6,336 from Abbasid (full)  (raw total: 3,550)
+[11:08:42]   ✓ 3,600/6,336 from Abbasid (full)  (raw total: 3,600)
+[11:08:43]   💾 Checkpoint at 3,600
+[11:10:16]   ✓ 3,650/6,336 from Abbasid (full)  (raw total: 3,650)
+[11:11:50]   ✓ 3,700/6,336 from Abbasid (full)  (raw total: 3,700)
+[11:11:52]   💾 Checkpoint at 3,700
+[11:13:23]   ✓ 3,750/6,336 from Abbasid (full)  (raw total: 3,750)
+[11:14:54]   ✓ 3,800/6,336 from Abbasid (full)  (raw total: 3,800)
+[11:14:56]   💾 Checkpoint at 3,800
+[11:16:24]   ✓ 3,850/6,336 from Abbasid (full)  (raw total: 3,850)
+[11:17:53]   ✓ 3,900/6,336 from Abbasid (full)  (raw total: 3,900)
+[11:17:55]   💾 Checkpoint at 3,900
+[11:19:32]   ✓ 3,950/6,336 from Abbasid (full)  (raw total: 3,950)
+[11:20:59]   ✓ 4,000/6,336 from Abbasid (full)  (raw total: 4,000)
+[11:21:01]   💾 Checkpoint at 4,000
+[11:22:42]   ✓ 4,050/6,336 from Abbasid (full)  (raw total: 4,050)
+[11:24:29]   ✓ 4,100/6,336 from Abbasid (full)  (raw total: 4,100)
+[11:24:29]   💾 Checkpoint at 4,100
+[11:25:59]   ✓ 4,150/6,336 from Abbasid (full)  (raw total: 4,150)
+[11:27:30]   ✓ 4,200/6,336 from Abbasid (full)  (raw total: 4,200)
+[11:27:30]   💾 Checkpoint at 4,200
+[11:28:57]   ✓ 4,250/6,336 from Abbasid (full)  (raw total: 4,250)
+[11:30:33]   ✓ 4,300/6,336 from Abbasid (full)  (raw total: 4,300)
+[11:30:35]   💾 Checkpoint at 4,300
+[11:32:08]   ✓ 4,350/6,336 from Abbasid (full)  (raw total: 4,350)
+[11:33:36]   ✓ 4,400/6,336 from Abbasid (full)  (raw total: 4,400)
+[11:33:38]   💾 Checkpoint at 4,400
+[11:35:24]   ✓ 4,450/6,336 from Abbasid (full)  (raw total: 4,450)
+[11:37:08]   ✓ 4,500/6,336 from Abbasid (full)  (raw total: 4,500)
+[11:37:10]   💾 Checkpoint at 4,500
+[11:38:42]   ✓ 4,550/6,336 from Abbasid (full)  (raw total: 4,550)
+[11:40:16]   ✓ 4,600/6,336 from Abbasid (full)  (raw total: 4,600)
+[11:40:17]   💾 Checkpoint at 4,600
+[11:41:48]   ✓ 4,650/6,336 from Abbasid (full)  (raw total: 4,650)
+[11:43:23]   ✓ 4,700/6,336 from Abbasid (full)  (raw total: 4,700)
+[11:43:25]   💾 Checkpoint at 4,700
+[11:44:59]   ✓ 4,750/6,336 from Abbasid (full)  (raw total: 4,750)
+[11:46:29]   ✓ 4,800/6,336 from Abbasid (full)  (raw total: 4,800)
+[11:46:31]   💾 Checkpoint at 4,800
+[11:48:10]   ✓ 4,850/6,336 from Abbasid (full)  (raw total: 4,850)
+[11:49:39]   ✓ 4,900/6,336 from Abbasid (full)  (raw total: 4,900)
+[11:49:40]   💾 Checkpoint at 4,900
+[11:51:11]   ✓ 4,950/6,336 from Abbasid (full)  (raw total: 4,950)
+[11:52:44]   ✓ 5,000/6,336 from Abbasid (full)  (raw total: 5,000)
+[11:52:45]   💾 Checkpoint at 5,000
+[11:54:16]   ✓ 5,050/6,336 from Abbasid (full)  (raw total: 5,050)
+[11:55:56]   ✓ 5,100/6,336 from Abbasid (full)  (raw total: 5,100)
+[11:55:56]   💾 Checkpoint at 5,100
+[11:57:25]   ✓ 5,150/6,336 from Abbasid (full)  (raw total: 5,150)
+[11:59:02]   ✓ 5,200/6,336 from Abbasid (full)  (raw total: 5,200)
+[11:59:02]   💾 Checkpoint at 5,200
+[12:00:37]   ✓ 5,250/6,336 from Abbasid (full)  (raw total: 5,250)
+[12:02:16]   ✓ 5,300/6,336 from Abbasid (full)  (raw total: 5,300)
+[12:02:18]   💾 Checkpoint at 5,300
+[12:03:49]   ✓ 5,350/6,336 from Abbasid (full)  (raw total: 5,350)
+[12:05:19]   ✓ 5,400/6,336 from Abbasid (full)  (raw total: 5,400)
+[12:05:20]   💾 Checkpoint at 5,400
+[12:06:51]   ✓ 5,450/6,336 from Abbasid (full)  (raw total: 5,450)
+[12:08:21]   ✓ 5,500/6,336 from Abbasid (full)  (raw total: 5,500)
+[12:08:22]   💾 Checkpoint at 5,500
+[12:09:56]   ✓ 5,550/6,336 from Abbasid (full)  (raw total: 5,550)
+[12:11:50]   ✓ 5,600/6,336 from Abbasid (full)  (raw total: 5,600)
+[12:11:52]   💾 Checkpoint at 5,600
+[12:13:29]   ✓ 5,650/6,336 from Abbasid (full)  (raw total: 5,650)
+[12:15:25]   ✓ 5,700/6,336 from Abbasid (full)  (raw total: 5,700)
+[12:15:27]   💾 Checkpoint at 5,700
+[12:16:53]   ✓ 5,750/6,336 from Abbasid (full)  (raw total: 5,750)
+[12:18:20]   ✓ 5,800/6,336 from Abbasid (full)  (raw total: 5,800)
+[12:18:22]   💾 Checkpoint at 5,800
+[12:19:49]   ✓ 5,850/6,336 from Abbasid (full)  (raw total: 5,850)
+[12:21:18]   ✓ 5,900/6,336 from Abbasid (full)  (raw total: 5,900)
+[12:21:19]   💾 Checkpoint at 5,900
+[12:22:55]   ✓ 5,950/6,336 from Abbasid (full)  (raw total: 5,950)
+[12:24:27]   ✓ 6,000/6,336 from Abbasid (full)  (raw total: 6,000)
+[12:24:29]   💾 Checkpoint at 6,000
+[12:25:56]   ✓ 6,050/6,336 from Abbasid (full)  (raw total: 6,050)
+[12:27:33]   ✓ 6,100/6,336 from Abbasid (full)  (raw total: 6,100)
+[12:27:34]   💾 Checkpoint at 6,100
+[12:29:04]   ✓ 6,150/6,336 from Abbasid (full)  (raw total: 6,150)
+[12:30:34]   ✓ 6,200/6,336 from Abbasid (full)  (raw total: 6,200)
+[12:30:36]   💾 Checkpoint at 6,200
+[12:31:57]   ✓ 6,250/6,336 from Abbasid (full)  (raw total: 6,250)
+[12:33:24]   ✓ 6,300/6,336 from Abbasid (full)  (raw total: 6,300)
+[12:33:25]   💾 Checkpoint at 6,300
+[12:34:32]   ✓ Abbasid (full): 6,336 scraped, 0 failed
+[12:34:34]   Merge [Abbasid (full)]: 27,964 → 34,234 (+6270 new, 66 dupes)
+[12:34:34]     6,270  الخلافة العباسية
+[12:34:34] 
+  ↳ Abbasid (full): 6,336 scraped, 6,270 merged in 247.4 min
+
+[12:34:34] 
+════════════════════════════════════════════════════════════
+[12:34:34] Dynasty : Pre-Reform coinage  (cat=2333, limit=all)
+[12:34:34] dyn     : الإسلام المبكر   cc: IS
+[12:34:34] ════════════════════════════════════════════════════════════
+[12:34:35]   Progress: 29,747 IDs already done
+[12:34:35]   Collecting IDs...
+[12:51:31]   Found 3,085 IDs, 3,085 to fetch (0 already done)
+[12:53:05]   ✓ 50/3,085 from Pre-Reform coinage  (raw total: 6,386)
+[12:54:36]   ✓ 100/3,085 from Pre-Reform coinage  (raw total: 6,436)
+[12:54:38]   💾 Checkpoint at 100
+[12:56:11]   ✓ 150/3,085 from Pre-Reform coinage  (raw total: 6,486)
+[12:57:43]   ✓ 200/3,085 from Pre-Reform coinage  (raw total: 6,536)
+[12:57:45]   💾 Checkpoint at 200
+[12:59:15]   ✓ 250/3,085 from Pre-Reform coinage  (raw total: 6,586)
+[13:00:39]   ✓ 300/3,085 from Pre-Reform coinage  (raw total: 6,636)
+[13:00:41]   💾 Checkpoint at 300
+[13:02:16]   ✓ 350/3,085 from Pre-Reform coinage  (raw total: 6,686)
+[13:03:54]   ✓ 400/3,085 from Pre-Reform coinage  (raw total: 6,736)
+[13:03:56]   💾 Checkpoint at 400
+[13:05:24]   ✓ 450/3,085 from Pre-Reform coinage  (raw total: 6,786)
+[13:06:53]   ✓ 500/3,085 from Pre-Reform coinage  (raw total: 6,836)
+[13:06:54]   💾 Checkpoint at 500
+[13:08:14]   ✓ 550/3,085 from Pre-Reform coinage  (raw total: 6,886)
+[13:09:39]   ✓ 600/3,085 from Pre-Reform coinage  (raw total: 6,936)
+[13:09:40]   💾 Checkpoint at 600
+[13:11:07]   ✓ 650/3,085 from Pre-Reform coinage  (raw total: 6,986)
+[13:12:39]   ✓ 700/3,085 from Pre-Reform coinage  (raw total: 7,036)
+[13:12:40]   💾 Checkpoint at 700
+[13:14:06]   ✓ 750/3,085 from Pre-Reform coinage  (raw total: 7,086)
+[13:15:39]   ✓ 800/3,085 from Pre-Reform coinage  (raw total: 7,136)
+[13:15:40]   💾 Checkpoint at 800
+[13:17:16]   ✓ 850/3,085 from Pre-Reform coinage  (raw total: 7,186)
+[13:18:42]   ✓ 900/3,085 from Pre-Reform coinage  (raw total: 7,236)
+[13:18:44]   💾 Checkpoint at 900
+[13:20:08]   ✓ 950/3,085 from Pre-Reform coinage  (raw total: 7,286)
+[13:21:35]   ✓ 1,000/3,085 from Pre-Reform coinage  (raw total: 7,336)
+[13:21:37]   💾 Checkpoint at 1,000
+[13:23:04]   ✓ 1,050/3,085 from Pre-Reform coinage  (raw total: 7,386)
+[13:24:33]   ✓ 1,100/3,085 from Pre-Reform coinage  (raw total: 7,436)
+[13:24:35]   💾 Checkpoint at 1,100
+[13:26:03]   ✓ 1,150/3,085 from Pre-Reform coinage  (raw total: 7,486)
+[13:27:27]   ✓ 1,200/3,085 from Pre-Reform coinage  (raw total: 7,536)
+[13:27:27]   💾 Checkpoint at 1,200
+[13:28:52]   ✓ 1,250/3,085 from Pre-Reform coinage  (raw total: 7,586)
+[13:30:26]   ✓ 1,300/3,085 from Pre-Reform coinage  (raw total: 7,636)
+[13:30:28]   💾 Checkpoint at 1,300
+[13:31:57]   ✓ 1,350/3,085 from Pre-Reform coinage  (raw total: 7,686)
+[13:33:25]   ✓ 1,400/3,085 from Pre-Reform coinage  (raw total: 7,736)
+[13:33:27]   💾 Checkpoint at 1,400
+[13:34:56]   ✓ 1,450/3,085 from Pre-Reform coinage  (raw total: 7,786)
+[13:36:21]   ✓ 1,500/3,085 from Pre-Reform coinage  (raw total: 7,836)
+[13:36:23]   💾 Checkpoint at 1,500
+[13:37:46]   ✓ 1,550/3,085 from Pre-Reform coinage  (raw total: 7,886)
+[13:39:14]   ✓ 1,600/3,085 from Pre-Reform coinage  (raw total: 7,936)
+[13:39:16]   💾 Checkpoint at 1,600
+[13:40:39]   ✓ 1,650/3,085 from Pre-Reform coinage  (raw total: 7,986)
+[13:42:04]   ✓ 1,700/3,085 from Pre-Reform coinage  (raw total: 8,036)
+[13:42:06]   💾 Checkpoint at 1,700
+[13:43:34]   ✓ 1,750/3,085 from Pre-Reform coinage  (raw total: 8,086)
+[13:45:02]   ✓ 1,800/3,085 from Pre-Reform coinage  (raw total: 8,136)
+[13:45:04]   💾 Checkpoint at 1,800
+[13:46:40]   ✓ 1,850/3,085 from Pre-Reform coinage  (raw total: 8,186)
+[13:48:07]   ✓ 1,900/3,085 from Pre-Reform coinage  (raw total: 8,236)
+[13:48:09]   💾 Checkpoint at 1,900
+[13:49:57]   ✓ 1,950/3,085 from Pre-Reform coinage  (raw total: 8,286)
+[13:51:43]   ✓ 2,000/3,085 from Pre-Reform coinage  (raw total: 8,336)
+[13:51:44]   💾 Checkpoint at 2,000
+[13:53:19]   ✓ 2,050/3,085 from Pre-Reform coinage  (raw total: 8,386)
+[13:54:57]   ✓ 2,100/3,085 from Pre-Reform coinage  (raw total: 8,436)
+[13:54:58]   💾 Checkpoint at 2,100
+[13:56:30]   ✓ 2,150/3,085 from Pre-Reform coinage  (raw total: 8,486)
+[13:58:01]   ✓ 2,200/3,085 from Pre-Reform coinage  (raw total: 8,536)
+[13:58:02]   💾 Checkpoint at 2,200
+[13:59:27]   ✓ 2,250/3,085 from Pre-Reform coinage  (raw total: 8,586)
+[14:00:55]   ✓ 2,300/3,085 from Pre-Reform coinage  (raw total: 8,636)
+[14:00:57]   💾 Checkpoint at 2,300
+[14:02:24]   ✓ 2,350/3,085 from Pre-Reform coinage  (raw total: 8,686)
+[14:03:52]   ✓ 2,400/3,085 from Pre-Reform coinage  (raw total: 8,736)
+[14:03:54]   💾 Checkpoint at 2,400
+[14:05:25]   ✓ 2,450/3,085 from Pre-Reform coinage  (raw total: 8,786)
+[14:06:50]   ✓ 2,500/3,085 from Pre-Reform coinage  (raw total: 8,836)
+[14:06:52]   💾 Checkpoint at 2,500
+[14:08:14]   ✓ 2,550/3,085 from Pre-Reform coinage  (raw total: 8,886)
+[14:09:38]   ✓ 2,600/3,085 from Pre-Reform coinage  (raw total: 8,936)
+[14:09:39]   💾 Checkpoint at 2,600
+[14:11:02]   ✓ 2,650/3,085 from Pre-Reform coinage  (raw total: 8,986)
+[14:12:36]   ✓ 2,700/3,085 from Pre-Reform coinage  (raw total: 9,036)
+[14:12:37]   💾 Checkpoint at 2,700
+[14:14:07]   ✓ 2,750/3,085 from Pre-Reform coinage  (raw total: 9,086)
+[14:15:39]   ✓ 2,800/3,085 from Pre-Reform coinage  (raw total: 9,136)
+[14:15:41]   💾 Checkpoint at 2,800
+[14:17:16]   ✓ 2,850/3,085 from Pre-Reform coinage  (raw total: 9,186)
+[14:18:42]   ✓ 2,900/3,085 from Pre-Reform coinage  (raw total: 9,236)
+[14:18:43]   💾 Checkpoint at 2,900
+[14:20:15]   ✓ 2,950/3,085 from Pre-Reform coinage  (raw total: 9,286)
+[14:21:49]   ✓ 3,000/3,085 from Pre-Reform coinage  (raw total: 9,336)
+[14:21:50]   💾 Checkpoint at 3,000
+[14:23:17]   ✓ 3,050/3,085 from Pre-Reform coinage  (raw total: 9,386)
+[14:24:24]   ✓ Pre-Reform coinage: 3,085 scraped, 0 failed
+[14:24:26]   Merge [Pre-Reform coinage]: 34,234 → 37,290 (+3056 new, 6365 dupes)
+[14:24:26]     3,056  الإسلام المبكر
+[14:24:26] 
+  ↳ Pre-Reform coinage: 3,085 scraped, 3,056 merged in 109.9 min
+
+[14:24:26] 
+════════════════════════════════════════════════════════════
+[14:24:26] Dynasty : Ilkhanid  (cat=653, limit=all)
+[14:24:26] dyn     : الإيلخانيون   cc: IS
+[14:24:26] ════════════════════════════════════════════════════════════
+[14:24:26]   Progress: 32,832 IDs already done
+[14:24:26]   Collecting IDs...
+[15:22:19]   Found 7,131 IDs, 7,131 to fetch (0 already done)
+[15:23:49]   ✓ 50/7,131 from Ilkhanid  (raw total: 9,471)
+[15:25:22]   ✓ 100/7,131 from Ilkhanid  (raw total: 9,521)
+[15:25:24]   💾 Checkpoint at 100
+[15:27:00]   ✓ 150/7,131 from Ilkhanid  (raw total: 9,571)
+[15:28:28]   ✓ 200/7,131 from Ilkhanid  (raw total: 9,621)
+[15:28:30]   💾 Checkpoint at 200
+[15:29:55]   ✓ 250/7,131 from Ilkhanid  (raw total: 9,671)
+[15:31:24]   ✓ 300/7,131 from Ilkhanid  (raw total: 9,721)
+[15:31:26]   💾 Checkpoint at 300
+[15:33:00]   ✓ 350/7,131 from Ilkhanid  (raw total: 9,771)
+[15:34:38]   ✓ 400/7,131 from Ilkhanid  (raw total: 9,821)
+[15:34:40]   💾 Checkpoint at 400
+[15:36:05]   ✓ 450/7,131 from Ilkhanid  (raw total: 9,871)
+[15:37:37]   ✓ 500/7,131 from Ilkhanid  (raw total: 9,921)
+[15:37:39]   💾 Checkpoint at 500
+[15:39:10]   ✓ 550/7,131 from Ilkhanid  (raw total: 9,971)
+[15:40:53]   ✓ 600/7,131 from Ilkhanid  (raw total: 10,021)
+[15:40:55]   💾 Checkpoint at 600
+[15:42:33]   ✓ 650/7,131 from Ilkhanid  (raw total: 10,071)
+[15:44:05]   ✓ 700/7,131 from Ilkhanid  (raw total: 10,121)
+[15:44:07]   💾 Checkpoint at 700
+[15:45:49]   ✓ 750/7,131 from Ilkhanid  (raw total: 10,171)
+[15:47:16]   ✓ 800/7,131 from Ilkhanid  (raw total: 10,221)
+[15:47:18]   💾 Checkpoint at 800
+[15:48:51]   ✓ 850/7,131 from Ilkhanid  (raw total: 10,271)
+[15:50:46]   ✓ 900/7,131 from Ilkhanid  (raw total: 10,321)
+[15:50:47]   💾 Checkpoint at 900
+[15:52:18]   ✓ 950/7,131 from Ilkhanid  (raw total: 10,371)
+[15:54:07]   ✓ 1,000/7,131 from Ilkhanid  (raw total: 10,421)
+[15:54:09]   💾 Checkpoint at 1,000
+[15:55:40]   ✓ 1,050/7,131 from Ilkhanid  (raw total: 10,471)
+[15:57:23]   ✓ 1,100/7,131 from Ilkhanid  (raw total: 10,521)
+[15:57:25]   💾 Checkpoint at 1,100
+[15:59:08]   ✓ 1,150/7,131 from Ilkhanid  (raw total: 10,571)
+[16:00:40]   ✓ 1,200/7,131 from Ilkhanid  (raw total: 10,621)
+[16:00:42]   💾 Checkpoint at 1,200
+[16:02:10]   ✓ 1,250/7,131 from Ilkhanid  (raw total: 10,671)
+[16:03:45]   ✓ 1,300/7,131 from Ilkhanid  (raw total: 10,721)
+[16:03:46]   💾 Checkpoint at 1,300
+[16:05:13]   ✓ 1,350/7,131 from Ilkhanid  (raw total: 10,771)
+[16:07:02]   ✓ 1,400/7,131 from Ilkhanid  (raw total: 10,821)
+[16:07:04]   💾 Checkpoint at 1,400
+[16:08:42]   ✓ 1,450/7,131 from Ilkhanid  (raw total: 10,871)
+[16:10:12]   ✓ 1,500/7,131 from Ilkhanid  (raw total: 10,921)
+[16:10:13]   💾 Checkpoint at 1,500
+[16:11:41]   ✓ 1,550/7,131 from Ilkhanid  (raw total: 10,971)
+[16:13:11]   ✓ 1,600/7,131 from Ilkhanid  (raw total: 11,021)
+[16:13:13]   💾 Checkpoint at 1,600
+[16:14:44]   ✓ 1,650/7,131 from Ilkhanid  (raw total: 11,071)
+[16:16:17]   ✓ 1,700/7,131 from Ilkhanid  (raw total: 11,121)
+[16:16:18]   💾 Checkpoint at 1,700
+[16:17:45]   ✓ 1,750/7,131 from Ilkhanid  (raw total: 11,171)
+[16:19:14]   ✓ 1,800/7,131 from Ilkhanid  (raw total: 11,221)
+[16:19:16]   💾 Checkpoint at 1,800
+[16:20:44]   ✓ 1,850/7,131 from Ilkhanid  (raw total: 11,271)
+[16:22:20]   ✓ 1,900/7,131 from Ilkhanid  (raw total: 11,321)
+[16:22:21]   💾 Checkpoint at 1,900
+[16:23:52]   ✓ 1,950/7,131 from Ilkhanid  (raw total: 11,371)
+[16:25:26]   ✓ 2,000/7,131 from Ilkhanid  (raw total: 11,421)
+[16:25:27]   💾 Checkpoint at 2,000
+[16:27:04]   ✓ 2,050/7,131 from Ilkhanid  (raw total: 11,471)
+[16:28:39]   ✓ 2,100/7,131 from Ilkhanid  (raw total: 11,521)
+[16:28:40]   💾 Checkpoint at 2,100
+[16:30:20]   ✓ 2,150/7,131 from Ilkhanid  (raw total: 11,571)
+[16:31:50]   ✓ 2,200/7,131 from Ilkhanid  (raw total: 11,621)
+[16:31:52]   💾 Checkpoint at 2,200
+[16:33:11]   ✓ 2,250/7,131 from Ilkhanid  (raw total: 11,671)
+[16:34:48]   ✓ 2,300/7,131 from Ilkhanid  (raw total: 11,721)
+[16:34:50]   💾 Checkpoint at 2,300
+[16:36:18]   ✓ 2,350/7,131 from Ilkhanid  (raw total: 11,771)
+[16:37:49]   ✓ 2,400/7,131 from Ilkhanid  (raw total: 11,821)
+[16:37:50]   💾 Checkpoint at 2,400
+[16:39:19]   ✓ 2,450/7,131 from Ilkhanid  (raw total: 11,871)
+[16:40:52]   ✓ 2,500/7,131 from Ilkhanid  (raw total: 11,921)
+[16:40:54]   💾 Checkpoint at 2,500
+[16:42:21]   ✓ 2,550/7,131 from Ilkhanid  (raw total: 11,971)
+[16:43:48]   ✓ 2,600/7,131 from Ilkhanid  (raw total: 12,021)
+[16:43:50]   💾 Checkpoint at 2,600
+[16:45:27]   ✓ 2,650/7,131 from Ilkhanid  (raw total: 12,071)
+[16:47:02]   ✓ 2,700/7,131 from Ilkhanid  (raw total: 12,121)
+[16:47:04]   💾 Checkpoint at 2,700
+[16:48:37]   ✓ 2,750/7,131 from Ilkhanid  (raw total: 12,171)
+[16:50:18]   ✓ 2,800/7,131 from Ilkhanid  (raw total: 12,221)
+[16:50:20]   💾 Checkpoint at 2,800
+[16:51:56]   ✓ 2,850/7,131 from Ilkhanid  (raw total: 12,271)
+[16:53:32]   ✓ 2,900/7,131 from Ilkhanid  (raw total: 12,321)
+[16:53:33]   💾 Checkpoint at 2,900
+[16:54:59]   ✓ 2,950/7,131 from Ilkhanid  (raw total: 12,371)
+[16:56:30]   ✓ 3,000/7,131 from Ilkhanid  (raw total: 12,421)
+[16:56:32]   💾 Checkpoint at 3,000
+[16:57:53]   ✓ 3,050/7,131 from Ilkhanid  (raw total: 12,471)
+[16:59:25]   ✓ 3,100/7,131 from Ilkhanid  (raw total: 12,521)
+[16:59:27]   💾 Checkpoint at 3,100
+[17:01:22]   ✓ 3,150/7,131 from Ilkhanid  (raw total: 12,571)
+[17:02:51]   ✓ 3,200/7,131 from Ilkhanid  (raw total: 12,621)
+[17:02:52]   💾 Checkpoint at 3,200
+[17:04:23]   ✓ 3,250/7,131 from Ilkhanid  (raw total: 12,671)
+[17:05:54]   ✓ 3,300/7,131 from Ilkhanid  (raw total: 12,721)
+[17:05:56]   💾 Checkpoint at 3,300
+[17:07:26]   ✓ 3,350/7,131 from Ilkhanid  (raw total: 12,771)
+[17:09:01]   ✓ 3,400/7,131 from Ilkhanid  (raw total: 12,821)
+[17:09:03]   💾 Checkpoint at 3,400
+[17:10:39]   ✓ 3,450/7,131 from Ilkhanid  (raw total: 12,871)
+[17:12:09]   ✓ 3,500/7,131 from Ilkhanid  (raw total: 12,921)
+[17:12:10]   💾 Checkpoint at 3,500
+[17:13:37]   ✓ 3,550/7,131 from Ilkhanid  (raw total: 12,971)
+[17:15:08]   ✓ 3,600/7,131 from Ilkhanid  (raw total: 13,021)
+[17:15:09]   💾 Checkpoint at 3,600
+[17:16:39]   ✓ 3,650/7,131 from Ilkhanid  (raw total: 13,071)
+[17:18:12]   ✓ 3,700/7,131 from Ilkhanid  (raw total: 13,121)
+[17:18:14]   💾 Checkpoint at 3,700
+[17:19:54]   ✓ 3,750/7,131 from Ilkhanid  (raw total: 13,171)
+[17:21:40]   ✓ 3,800/7,131 from Ilkhanid  (raw total: 13,221)
+[17:21:42]   💾 Checkpoint at 3,800
+[17:23:18]   ✓ 3,850/7,131 from Ilkhanid  (raw total: 13,271)
+[17:24:53]   ✓ 3,900/7,131 from Ilkhanid  (raw total: 13,321)
+[17:24:54]   💾 Checkpoint at 3,900
+[17:26:25]   ✓ 3,950/7,131 from Ilkhanid  (raw total: 13,371)
+[17:28:04]   ✓ 4,000/7,131 from Ilkhanid  (raw total: 13,421)
+[17:28:06]   💾 Checkpoint at 4,000
+[17:29:33]   ✓ 4,050/7,131 from Ilkhanid  (raw total: 13,471)
+[17:31:02]   ✓ 4,100/7,131 from Ilkhanid  (raw total: 13,521)
+[17:31:04]   💾 Checkpoint at 4,100
+[17:32:37]   ✓ 4,150/7,131 from Ilkhanid  (raw total: 13,571)
+[17:34:17]   ✓ 4,200/7,131 from Ilkhanid  (raw total: 13,621)
+[17:34:18]   💾 Checkpoint at 4,200
+[17:35:57]   ✓ 4,250/7,131 from Ilkhanid  (raw total: 13,671)
+[17:37:49]   ✓ 4,300/7,131 from Ilkhanid  (raw total: 13,721)
+[17:37:51]   💾 Checkpoint at 4,300
+[17:39:18]   ✓ 4,350/7,131 from Ilkhanid  (raw total: 13,771)
+[17:40:49]   ✓ 4,400/7,131 from Ilkhanid  (raw total: 13,821)
+[17:40:50]   💾 Checkpoint at 4,400
+[17:42:18]   ✓ 4,450/7,131 from Ilkhanid  (raw total: 13,871)
+[17:43:51]   ✓ 4,500/7,131 from Ilkhanid  (raw total: 13,921)
+[17:43:53]   💾 Checkpoint at 4,500
+[17:45:26]   ✓ 4,550/7,131 from Ilkhanid  (raw total: 13,971)
+[17:47:03]   ✓ 4,600/7,131 from Ilkhanid  (raw total: 14,021)
+[17:47:04]   💾 Checkpoint at 4,600
+[17:48:54]   ✓ 4,650/7,131 from Ilkhanid  (raw total: 14,071)
+[17:50:33]   ✓ 4,700/7,131 from Ilkhanid  (raw total: 14,121)
+[17:50:34]   💾 Checkpoint at 4,700
+[17:52:01]   ✓ 4,750/7,131 from Ilkhanid  (raw total: 14,171)
+[17:53:41]   ✓ 4,800/7,131 from Ilkhanid  (raw total: 14,221)
+[17:53:43]   💾 Checkpoint at 4,800
+[17:55:18]   ✓ 4,850/7,131 from Ilkhanid  (raw total: 14,271)
+[17:56:46]   ✓ 4,900/7,131 from Ilkhanid  (raw total: 14,321)
+[17:56:48]   💾 Checkpoint at 4,900
+[17:58:15]   ✓ 4,950/7,131 from Ilkhanid  (raw total: 14,371)
+[17:59:48]   ✓ 5,000/7,131 from Ilkhanid  (raw total: 14,421)
+[17:59:49]   💾 Checkpoint at 5,000
+[18:01:26]   ✓ 5,050/7,131 from Ilkhanid  (raw total: 14,471)
+[18:03:02]   ✓ 5,100/7,131 from Ilkhanid  (raw total: 14,521)
+[18:03:04]   💾 Checkpoint at 5,100
+[18:04:36]   ✓ 5,150/7,131 from Ilkhanid  (raw total: 14,571)
+[18:06:36]   ✓ 5,200/7,131 from Ilkhanid  (raw total: 14,621)
+[18:06:37]   💾 Checkpoint at 5,200
+[18:08:14]   ✓ 5,250/7,131 from Ilkhanid  (raw total: 14,671)
+[18:09:47]   ✓ 5,300/7,131 from Ilkhanid  (raw total: 14,721)
+[18:09:49]   💾 Checkpoint at 5,300
+[18:11:28]   ✓ 5,350/7,131 from Ilkhanid  (raw total: 14,771)
+[18:12:59]   ✓ 5,400/7,131 from Ilkhanid  (raw total: 14,821)
+[18:13:01]   💾 Checkpoint at 5,400
+[18:14:30]   ✓ 5,450/7,131 from Ilkhanid  (raw total: 14,871)
+[18:16:18]   ✓ 5,500/7,131 from Ilkhanid  (raw total: 14,921)
+[18:16:20]   💾 Checkpoint at 5,500
+[18:17:53]   ✓ 5,550/7,131 from Ilkhanid  (raw total: 14,971)
+[18:19:24]   ✓ 5,600/7,131 from Ilkhanid  (raw total: 15,021)
+[18:19:25]   💾 Checkpoint at 5,600
+[18:20:57]   ✓ 5,650/7,131 from Ilkhanid  (raw total: 15,071)
+[18:22:32]   ✓ 5,700/7,131 from Ilkhanid  (raw total: 15,121)
+[18:22:34]   💾 Checkpoint at 5,700
+[18:24:09]   ✓ 5,750/7,131 from Ilkhanid  (raw total: 15,171)
+[18:25:46]   ✓ 5,800/7,131 from Ilkhanid  (raw total: 15,221)
+[18:25:47]   💾 Checkpoint at 5,800
+[18:27:19]   ✓ 5,850/7,131 from Ilkhanid  (raw total: 15,271)
+[18:28:52]   ✓ 5,900/7,131 from Ilkhanid  (raw total: 15,321)
+[18:28:54]   💾 Checkpoint at 5,900
+[18:30:22]   ✓ 5,950/7,131 from Ilkhanid  (raw total: 15,371)
+[18:31:49]   ✓ 6,000/7,131 from Ilkhanid  (raw total: 15,421)
+[18:31:51]   💾 Checkpoint at 6,000
+[18:33:16]   ✓ 6,050/7,131 from Ilkhanid  (raw total: 15,471)
+[18:34:42]   ✓ 6,100/7,131 from Ilkhanid  (raw total: 15,521)
+[18:34:44]   💾 Checkpoint at 6,100
+[18:36:16]   ✓ 6,150/7,131 from Ilkhanid  (raw total: 15,571)
+[18:37:52]   ✓ 6,200/7,131 from Ilkhanid  (raw total: 15,621)
+[18:37:53]   💾 Checkpoint at 6,200
+[18:39:23]   ✓ 6,250/7,131 from Ilkhanid  (raw total: 15,671)
+[18:41:01]   ✓ 6,300/7,131 from Ilkhanid  (raw total: 15,721)
+[18:41:02]   💾 Checkpoint at 6,300
+[18:42:30]   ✓ 6,350/7,131 from Ilkhanid  (raw total: 15,771)
+[18:44:06]   ✓ 6,400/7,131 from Ilkhanid  (raw total: 15,821)
+[18:44:07]   💾 Checkpoint at 6,400
+[18:45:42]   ✓ 6,450/7,131 from Ilkhanid  (raw total: 15,871)
+[18:47:14]   ✓ 6,500/7,131 from Ilkhanid  (raw total: 15,921)
+[18:47:16]   💾 Checkpoint at 6,500
+[18:48:46]   ✓ 6,550/7,131 from Ilkhanid  (raw total: 15,971)
+[18:50:20]   ✓ 6,600/7,131 from Ilkhanid  (raw total: 16,021)
+[18:50:21]   💾 Checkpoint at 6,600
+[18:51:57]   ✓ 6,650/7,131 from Ilkhanid  (raw total: 16,071)
+[18:53:35]   ✓ 6,700/7,131 from Ilkhanid  (raw total: 16,121)
+[18:53:36]   💾 Checkpoint at 6,700
+[18:55:13]   ✓ 6,750/7,131 from Ilkhanid  (raw total: 16,171)
+[18:57:01]   ✓ 6,800/7,131 from Ilkhanid  (raw total: 16,221)
+[18:57:02]   💾 Checkpoint at 6,800
+[18:58:31]   ✓ 6,850/7,131 from Ilkhanid  (raw total: 16,271)
+[19:00:05]   ✓ 6,900/7,131 from Ilkhanid  (raw total: 16,321)
+[19:00:06]   💾 Checkpoint at 6,900
+[19:01:46]   ✓ 6,950/7,131 from Ilkhanid  (raw total: 16,371)
+[19:03:19]   ✓ 7,000/7,131 from Ilkhanid  (raw total: 16,421)
+[19:03:19]   💾 Checkpoint at 7,000
+[19:04:49]   ✓ 7,050/7,131 from Ilkhanid  (raw total: 16,471)
+[19:06:17]   ✓ 7,100/7,131 from Ilkhanid  (raw total: 16,521)
+[19:06:19]   💾 Checkpoint at 7,100
+[19:07:09]   ✓ Ilkhanid: 7,131 scraped, 0 failed
+[19:07:11]   Merge [Ilkhanid]: 37,290 → 44,319 (+7029 new, 9523 dupes)
+[19:07:11]     7,029  الإيلخانيون
+[19:07:11] 
+  ↳ Ilkhanid: 7,131 scraped, 7,029 merged in 282.8 min
+
+[19:07:11] 
+╔══════════════════════════════════════════════════════════╗
+[19:07:11] ║                   Extra Pipeline Complete                ║
+[19:07:11] ╠══════════════════════════════════════════════════════════╣
+[19:07:11] ║  Abbasid (full)            :   6336 scraped,  6270 merged  ║
+[19:07:11] ║  Pre-Reform coinage        :   3085 scraped,  3056 merged  ║
+[19:07:11] ║  Ilkhanid                  :   7131 scraped,  7029 merged  ║
+[19:07:11] ╠══════════════════════════════════════════════════════════╣
+[19:07:11] ║  coins.json  27,964 → 44,319  (+16,355 new coins)   ║
+[19:07:11] ╚══════════════════════════════════════════════════════════╝
+[19:07:11] 
+Final coins.json count: 44,319
+[19:07:11]   latest_additions.json updated (20 entries).

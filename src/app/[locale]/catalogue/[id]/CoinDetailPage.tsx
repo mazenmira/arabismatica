@@ -202,13 +202,19 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                 <span className="text-[11px] text-amber-700/50">{isAr ? 'المراجع:' : 'References:'}</span>
                 {coin.km   && <CopyButton text={coin.km}   label={coin.km} />}
                 {coin.nref && <CopyButton text={coin.nref} label={coin.nref} />}
-                {coin.nid  && (
-                  <a href={`https://en.numista.com/catalogue/pieces${coin.nid}.html`}
-                    target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded border border-amber-200 text-amber-700 hover:bg-amber-50 transition-colors">
-                    <ExternalLink size={10} /> Numista
-                  </a>
-                )}
+                {coin.nid  && (() => {
+                  const isZeno = coin.nref?.startsWith('Z#');
+                  const href = isZeno
+                    ? `https://zeno.ru/#${coin.nid}`
+                    : `https://en.numista.com/catalogue/pieces${coin.nid}.html`;
+                  const label = isZeno ? 'Zeno' : 'Numista';
+                  return (
+                    <a href={href} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded border border-amber-200 text-amber-700 hover:bg-amber-50 transition-colors">
+                      <ExternalLink size={10} /> {label}
+                    </a>
+                  );
+                })()}
               </div>
 
               {/* ── Mintage table ── */}

@@ -1,0 +1,314 @@
+[19:07:13] ╔══════════════════════════════════════════════════════════╗
+[19:07:13] ║   Priority 4 Pipeline: Buyid + Samanid + Finish Tasks   ║
+[19:07:13] ╚══════════════════════════════════════════════════════════╝
+[19:07:13] Seeding progress from all previous pipelines...
+[19:07:14]   +18,862 from zeno_progress.json
+[19:07:14]   +4,549 from zeno_progress_13.json
+[19:07:14]   +39,963 from zeno_progress_extra.json
+[19:07:14]   Total seeded: 39,963 IDs
+[19:07:14] 
+coins.json start: 44,319
+
+[19:07:18] Session ready. PHPSESSID=b5iglq3lv0vjvh9tduhe4c86r4; ppid=deleted...
+[19:07:18] 
+════════════════════════════════════════════════════════════
+[19:07:18] Dynasty: Buyid (Buwayhid)  (cat=1025)  dyn: البويهيون
+[19:07:18] ════════════════════════════════════════════════════════════
+[19:07:18]   39,963 IDs already in progress
+[19:07:18]   Collecting IDs...
+[19:13:13]   Found 844 IDs, 844 to fetch (0 done)
+[19:14:47]   ✓ 50/844 from Buyid (Buwayhid) (raw: 50)
+[19:16:20]   ✓ 100/844 from Buyid (Buwayhid) (raw: 100)
+[19:16:22]   💾 Checkpoint at 100
+[19:18:01]   ✓ 150/844 from Buyid (Buwayhid) (raw: 150)
+[19:19:31]   ✓ 200/844 from Buyid (Buwayhid) (raw: 200)
+[19:19:33]   💾 Checkpoint at 200
+[19:21:09]   ✓ 250/844 from Buyid (Buwayhid) (raw: 250)
+[19:22:46]   ✓ 300/844 from Buyid (Buwayhid) (raw: 300)
+[19:22:47]   💾 Checkpoint at 300
+[19:24:41]   ✓ 350/844 from Buyid (Buwayhid) (raw: 350)
+[19:26:17]   ✓ 400/844 from Buyid (Buwayhid) (raw: 400)
+[19:26:18]   💾 Checkpoint at 400
+[19:27:54]   ✓ 450/844 from Buyid (Buwayhid) (raw: 450)
+[19:29:25]   ✓ 500/844 from Buyid (Buwayhid) (raw: 500)
+[19:29:26]   💾 Checkpoint at 500
+[19:30:56]   ✓ 550/844 from Buyid (Buwayhid) (raw: 550)
+[19:32:25]   ✓ 600/844 from Buyid (Buwayhid) (raw: 600)
+[19:32:27]   💾 Checkpoint at 600
+[19:33:53]   ✓ 650/844 from Buyid (Buwayhid) (raw: 650)
+[19:35:19]   ✓ 700/844 from Buyid (Buwayhid) (raw: 700)
+[19:35:20]   💾 Checkpoint at 700
+[19:36:46]   ✓ 750/844 from Buyid (Buwayhid) (raw: 750)
+[19:38:27]   ✓ 800/844 from Buyid (Buwayhid) (raw: 800)
+[19:38:29]   💾 Checkpoint at 800
+[19:39:49]   ✓ Buyid (Buwayhid): 844 scraped, 0 failed
+[19:39:51]   Merge [Buyid (Buwayhid)]: 44,319 → 45,150 (+831 new, 13 dupes)
+[19:39:51]     831  البويهيون
+[19:39:52] 
+  ↳ Buyid (Buwayhid): 844 scraped, 831 merged
+
+[19:39:52] 
+════════════════════════════════════════════════════════════
+[19:39:52] Dynasty: Samanid  (cat=1100)  dyn: السامانيون
+[19:39:52] ════════════════════════════════════════════════════════════
+[19:39:52]   40,807 IDs already in progress
+[19:39:52]   Collecting IDs...
+[20:09:52]   Found 7,738 IDs, 7,738 to fetch (0 done)
+[20:11:24]   ✓ 50/7738 from Samanid (raw: 894)
+[20:12:51]   ✓ 100/7738 from Samanid (raw: 944)
+[20:12:52]   💾 Checkpoint at 100
+[20:14:16]   ✓ 150/7738 from Samanid (raw: 994)
+[20:15:41]   ✓ 200/7738 from Samanid (raw: 1044)
+[20:15:43]   💾 Checkpoint at 200
+[20:17:09]   ✓ 250/7738 from Samanid (raw: 1094)
+[20:18:34]   ✓ 300/7738 from Samanid (raw: 1144)
+[20:18:35]   💾 Checkpoint at 300
+[20:19:57]   ✓ 350/7738 from Samanid (raw: 1194)
+[20:21:24]   ✓ 400/7738 from Samanid (raw: 1244)
+[20:21:25]   💾 Checkpoint at 400
+[20:22:46]   ✓ 450/7738 from Samanid (raw: 1294)
+[20:24:20]   ✓ 500/7738 from Samanid (raw: 1344)
+[20:24:22]   💾 Checkpoint at 500
+[20:25:43]   ✓ 550/7738 from Samanid (raw: 1394)
+[20:27:08]   ✓ 600/7738 from Samanid (raw: 1444)
+[20:27:09]   💾 Checkpoint at 600
+[20:28:42]   ✓ 650/7738 from Samanid (raw: 1494)
+[20:30:05]   ✓ 700/7738 from Samanid (raw: 1544)
+[20:30:07]   💾 Checkpoint at 700
+[20:31:35]   ✓ 750/7738 from Samanid (raw: 1594)
+[20:32:58]   ✓ 800/7738 from Samanid (raw: 1644)
+[20:32:59]   💾 Checkpoint at 800
+[20:34:20]   ✓ 850/7738 from Samanid (raw: 1694)
+[20:35:49]   ✓ 900/7738 from Samanid (raw: 1744)
+[20:35:50]   💾 Checkpoint at 900
+[20:37:13]   ✓ 950/7738 from Samanid (raw: 1794)
+[20:38:35]   ✓ 1000/7738 from Samanid (raw: 1844)
+[20:38:37]   💾 Checkpoint at 1000
+[20:40:00]   ✓ 1050/7738 from Samanid (raw: 1894)
+[20:41:22]   ✓ 1100/7738 from Samanid (raw: 1944)
+[20:41:24]   💾 Checkpoint at 1100
+[20:42:46]   ✓ 1150/7738 from Samanid (raw: 1994)
+[20:44:06]   ✓ 1200/7738 from Samanid (raw: 2044)
+[20:44:07]   💾 Checkpoint at 1200
+[20:45:30]   ✓ 1250/7738 from Samanid (raw: 2094)
+[20:47:02]   ✓ 1300/7738 from Samanid (raw: 2144)
+[20:47:04]   💾 Checkpoint at 1300
+[20:48:37]   ✓ 1350/7738 from Samanid (raw: 2194)
+[20:50:02]   ✓ 1400/7738 from Samanid (raw: 2244)
+[20:50:03]   💾 Checkpoint at 1400
+[20:51:28]   ✓ 1450/7738 from Samanid (raw: 2294)
+[20:52:58]   ✓ 1500/7738 from Samanid (raw: 2344)
+[20:53:00]   💾 Checkpoint at 1500
+[20:54:30]   ✓ 1550/7738 from Samanid (raw: 2394)
+[20:56:01]   ✓ 1600/7738 from Samanid (raw: 2444)
+[20:56:03]   💾 Checkpoint at 1600
+[20:57:43]   ✓ 1650/7738 from Samanid (raw: 2494)
+[20:59:15]   ✓ 1700/7738 from Samanid (raw: 2544)
+[20:59:17]   💾 Checkpoint at 1700
+[21:00:44]   ✓ 1750/7738 from Samanid (raw: 2594)
+[21:02:12]   ✓ 1800/7738 from Samanid (raw: 2644)
+[21:02:13]   💾 Checkpoint at 1800
+[21:03:45]   ✓ 1850/7738 from Samanid (raw: 2694)
+[21:05:12]   ✓ 1900/7738 from Samanid (raw: 2744)
+[21:05:14]   💾 Checkpoint at 1900
+[21:06:41]   ✓ 1950/7738 from Samanid (raw: 2794)
+[21:08:13]   ✓ 2000/7738 from Samanid (raw: 2844)
+[21:08:15]   💾 Checkpoint at 2000
+[21:09:44]   ✓ 2050/7738 from Samanid (raw: 2894)
+[21:11:18]   ✓ 2100/7738 from Samanid (raw: 2944)
+[21:11:20]   💾 Checkpoint at 2100
+[21:12:53]   ✓ 2150/7738 from Samanid (raw: 2994)
+[21:14:22]   ✓ 2200/7738 from Samanid (raw: 3044)
+[21:14:24]   💾 Checkpoint at 2200
+[21:15:53]   ✓ 2250/7738 from Samanid (raw: 3094)
+[21:17:20]   ✓ 2300/7738 from Samanid (raw: 3144)
+[21:17:22]   💾 Checkpoint at 2300
+[21:18:49]   ✓ 2350/7738 from Samanid (raw: 3194)
+[21:20:20]   ✓ 2400/7738 from Samanid (raw: 3244)
+[21:20:20]   💾 Checkpoint at 2400
+[21:21:48]   ✓ 2450/7738 from Samanid (raw: 3294)
+[21:23:17]   ✓ 2500/7738 from Samanid (raw: 3344)
+[21:23:17]   💾 Checkpoint at 2500
+[21:24:34] ✗ https://www.zeno.ru/showphoto.php?photo=231226: fetch failed
+[21:26:24]   ✓ 2550/7738 from Samanid (raw: 3394)
+[21:27:55]   ✓ 2600/7738 from Samanid (raw: 3444)
+[21:27:57]   💾 Checkpoint at 2600
+[21:29:21]   ✓ 2650/7738 from Samanid (raw: 3494)
+[21:30:47]   ✓ 2700/7738 from Samanid (raw: 3544)
+[21:30:48]   💾 Checkpoint at 2700
+[21:32:07]   ✓ 2750/7738 from Samanid (raw: 3594)
+[21:33:31]   ✓ 2800/7738 from Samanid (raw: 3644)
+[21:33:33]   💾 Checkpoint at 2800
+[21:34:53]   ✓ 2850/7738 from Samanid (raw: 3694)
+[21:36:15]   ✓ 2900/7738 from Samanid (raw: 3744)
+[21:36:17]   💾 Checkpoint at 2900
+[21:37:45]   ✓ 2950/7738 from Samanid (raw: 3794)
+[21:39:09]   ✓ 3000/7738 from Samanid (raw: 3844)
+[21:39:09]   💾 Checkpoint at 3000
+[21:40:55]   ✓ 3050/7738 from Samanid (raw: 3894)
+[21:42:16]   ✓ 3100/7738 from Samanid (raw: 3944)
+[21:42:17]   💾 Checkpoint at 3100
+[21:43:41]   ✓ 3150/7738 from Samanid (raw: 3994)
+[21:45:05]   ✓ 3200/7738 from Samanid (raw: 4044)
+[21:45:06]   💾 Checkpoint at 3200
+[21:46:36]   ✓ 3250/7738 from Samanid (raw: 4094)
+[21:48:02]   ✓ 3300/7738 from Samanid (raw: 4144)
+[21:48:02]   💾 Checkpoint at 3300
+[21:49:23]   ✓ 3350/7738 from Samanid (raw: 4194)
+[21:50:47]   ✓ 3400/7738 from Samanid (raw: 4244)
+[21:50:49]   💾 Checkpoint at 3400
+[21:52:16]   ✓ 3450/7738 from Samanid (raw: 4294)
+[21:53:40]   ✓ 3500/7738 from Samanid (raw: 4344)
+[21:53:42]   💾 Checkpoint at 3500
+[21:55:09]   ✓ 3550/7738 from Samanid (raw: 4394)
+[21:56:29]   ✓ 3600/7738 from Samanid (raw: 4444)
+[21:56:30]   💾 Checkpoint at 3600
+[21:58:11]   ✓ 3650/7738 from Samanid (raw: 4494)
+[21:59:38]   ✓ 3700/7738 from Samanid (raw: 4544)
+[21:59:40]   💾 Checkpoint at 3700
+[22:01:08]   ✓ 3750/7738 from Samanid (raw: 4594)
+[22:02:34]   ✓ 3800/7738 from Samanid (raw: 4644)
+[22:02:36]   💾 Checkpoint at 3800
+[22:03:56]   ✓ 3850/7738 from Samanid (raw: 4694)
+[22:05:18]   ✓ 3900/7738 from Samanid (raw: 4744)
+[22:05:20]   💾 Checkpoint at 3900
+[22:06:41]   ✓ 3950/7738 from Samanid (raw: 4794)
+[22:08:00]   ✓ 4000/7738 from Samanid (raw: 4844)
+[22:08:01]   💾 Checkpoint at 4000
+[22:09:21]   ✓ 4050/7738 from Samanid (raw: 4894)
+[22:10:41]   ✓ 4100/7738 from Samanid (raw: 4944)
+[22:10:43]   💾 Checkpoint at 4100
+[22:12:05]   ✓ 4150/7738 from Samanid (raw: 4994)
+[22:13:36]   ✓ 4200/7738 from Samanid (raw: 5044)
+[22:13:37]   💾 Checkpoint at 4200
+[22:14:57]   ✓ 4250/7738 from Samanid (raw: 5094)
+[22:16:20]   ✓ 4300/7738 from Samanid (raw: 5144)
+[22:16:21]   💾 Checkpoint at 4300
+[22:17:52]   ✓ 4350/7738 from Samanid (raw: 5194)
+[22:19:15]   ✓ 4400/7738 from Samanid (raw: 5244)
+[22:19:16]   💾 Checkpoint at 4400
+[22:20:44]   ✓ 4450/7738 from Samanid (raw: 5294)
+[22:22:12]   ✓ 4500/7738 from Samanid (raw: 5344)
+[22:22:14]   💾 Checkpoint at 4500
+[22:23:52]   ✓ 4550/7738 from Samanid (raw: 5394)
+[22:25:25]   ✓ 4600/7738 from Samanid (raw: 5444)
+[22:25:27]   💾 Checkpoint at 4600
+[22:26:51]   ✓ 4650/7738 from Samanid (raw: 5494)
+[22:28:13]   ✓ 4700/7738 from Samanid (raw: 5544)
+[22:28:14]   💾 Checkpoint at 4700
+[22:29:34]   ✓ 4750/7738 from Samanid (raw: 5594)
+[22:30:55]   ✓ 4800/7738 from Samanid (raw: 5644)
+[22:30:56]   💾 Checkpoint at 4800
+[22:32:17]   ✓ 4850/7738 from Samanid (raw: 5694)
+[22:33:39]   ✓ 4900/7738 from Samanid (raw: 5744)
+[22:33:40]   💾 Checkpoint at 4900
+[22:35:01]   ✓ 4950/7738 from Samanid (raw: 5794)
+[22:36:23]   ✓ 5000/7738 from Samanid (raw: 5844)
+[22:36:24]   💾 Checkpoint at 5000
+[22:37:48]   ✓ 5050/7738 from Samanid (raw: 5894)
+[22:39:13]   ✓ 5100/7738 from Samanid (raw: 5944)
+[22:39:15]   💾 Checkpoint at 5100
+[22:40:47]   ✓ 5150/7738 from Samanid (raw: 5994)
+[22:42:19]   ✓ 5200/7738 from Samanid (raw: 6044)
+[22:42:21]   💾 Checkpoint at 5200
+[22:44:10]   ✓ 5250/7738 from Samanid (raw: 6094)
+[22:45:49]   ✓ 5300/7738 from Samanid (raw: 6144)
+[22:45:50]   💾 Checkpoint at 5300
+[22:47:16]   ✓ 5350/7738 from Samanid (raw: 6194)
+[22:48:43]   ✓ 5400/7738 from Samanid (raw: 6244)
+[22:48:45]   💾 Checkpoint at 5400
+[22:50:10]   ✓ 5450/7738 from Samanid (raw: 6294)
+[22:51:36]   ✓ 5500/7738 from Samanid (raw: 6344)
+[22:51:38]   💾 Checkpoint at 5500
+[22:53:06]   ✓ 5550/7738 from Samanid (raw: 6394)
+[22:54:36]   ✓ 5600/7738 from Samanid (raw: 6444)
+[22:54:38]   💾 Checkpoint at 5600
+[22:56:23]   ✓ 5650/7738 from Samanid (raw: 6494)
+[22:57:51]   ✓ 5700/7738 from Samanid (raw: 6544)
+[22:57:53]   💾 Checkpoint at 5700
+[22:59:23]   ✓ 5750/7738 from Samanid (raw: 6594)
+[23:00:49]   ✓ 5800/7738 from Samanid (raw: 6644)
+[23:00:51]   💾 Checkpoint at 5800
+[23:02:15]   ✓ 5850/7738 from Samanid (raw: 6694)
+[23:03:44]   ✓ 5900/7738 from Samanid (raw: 6744)
+[23:03:45]   💾 Checkpoint at 5900
+[23:05:13]   ✓ 5950/7738 from Samanid (raw: 6794)
+[23:06:41]   ✓ 6000/7738 from Samanid (raw: 6844)
+[23:06:43]   💾 Checkpoint at 6000
+[23:08:09]   ✓ 6050/7738 from Samanid (raw: 6894)
+[23:09:36]   ✓ 6100/7738 from Samanid (raw: 6944)
+[23:09:38]   💾 Checkpoint at 6100
+[23:11:03]   ✓ 6150/7738 from Samanid (raw: 6994)
+[23:12:31]   ✓ 6200/7738 from Samanid (raw: 7044)
+[23:12:33]   💾 Checkpoint at 6200
+[23:13:58]   ✓ 6250/7738 from Samanid (raw: 7094)
+[23:15:31]   ✓ 6300/7738 from Samanid (raw: 7144)
+[23:15:33]   💾 Checkpoint at 6300
+[23:16:55]   ✓ 6350/7738 from Samanid (raw: 7194)
+[23:18:21]   ✓ 6400/7738 from Samanid (raw: 7244)
+[23:18:22]   💾 Checkpoint at 6400
+[23:19:45]   ✓ 6450/7738 from Samanid (raw: 7294)
+[23:21:14]   ✓ 6500/7738 from Samanid (raw: 7344)
+[23:21:16]   💾 Checkpoint at 6500
+[23:22:44]   ✓ 6550/7738 from Samanid (raw: 7394)
+[23:24:11]   ✓ 6600/7738 from Samanid (raw: 7444)
+[23:24:13]   💾 Checkpoint at 6600
+[23:25:38]   ✓ 6650/7738 from Samanid (raw: 7494)
+[23:27:09]   ✓ 6700/7738 from Samanid (raw: 7544)
+[23:27:10]   💾 Checkpoint at 6700
+[23:28:41]   ✓ 6750/7738 from Samanid (raw: 7594)
+[23:30:33]   ✓ 6800/7738 from Samanid (raw: 7644)
+[23:30:34]   💾 Checkpoint at 6800
+[23:32:02]   ✓ 6850/7738 from Samanid (raw: 7694)
+[23:33:32]   ✓ 6900/7738 from Samanid (raw: 7744)
+[23:33:33]   💾 Checkpoint at 6900
+[23:35:00]   ✓ 6950/7738 from Samanid (raw: 7794)
+[23:36:32]   ✓ 7000/7738 from Samanid (raw: 7844)
+[23:36:33]   💾 Checkpoint at 7000
+[23:38:00]   ✓ 7050/7738 from Samanid (raw: 7894)
+[23:39:48]   ✓ 7100/7738 from Samanid (raw: 7944)
+[23:39:49]   💾 Checkpoint at 7100
+[23:41:20]   ✓ 7150/7738 from Samanid (raw: 7994)
+[23:42:52]   ✓ 7200/7738 from Samanid (raw: 8044)
+[23:42:53]   💾 Checkpoint at 7200
+[23:44:15]   ✓ 7250/7738 from Samanid (raw: 8094)
+[23:45:47]   ✓ 7300/7738 from Samanid (raw: 8144)
+[23:45:49]   💾 Checkpoint at 7300
+[23:47:15]   ✓ 7350/7738 from Samanid (raw: 8194)
+[23:48:43]   ✓ 7400/7738 from Samanid (raw: 8244)
+[23:48:44]   💾 Checkpoint at 7400
+[23:50:14]   ✓ 7450/7738 from Samanid (raw: 8294)
+[23:51:51]   ✓ 7500/7738 from Samanid (raw: 8344)
+[23:51:52]   💾 Checkpoint at 7500
+[23:53:24]   ✓ 7550/7738 from Samanid (raw: 8394)
+[23:54:57]   ✓ 7600/7738 from Samanid (raw: 8444)
+[23:54:58]   💾 Checkpoint at 7600
+[23:56:27]   ✓ 7650/7738 from Samanid (raw: 8494)
+[23:57:53]   ✓ 7700/7738 from Samanid (raw: 8544)
+[23:57:55]   💾 Checkpoint at 7700
+[23:58:57]   ✓ Samanid: 7,737 scraped, 1 failed
+[23:58:59]   Merge [Samanid]: 45,150 → 52,808 (+7658 new, 923 dupes)
+[23:58:59]     7658  السامانيون
+[23:59:00] 
+  ↳ Samanid: 7,737 scraped, 7,658 merged
+
+[23:59:00] 
+── TypeScript check (npx tsc --noEmit) ────────────────────────
+[23:59:09]   ✅ tsc: no errors
+[23:59:09]   latest_additions.json updated — last 20: zeno-23550, zeno-185268, zeno-185392 ...
+[23:59:09] 
+── Creating scripts/handoff.zip ────────────────────────────────
+[23:59:09]   src/data/coins.json  (34,655 KB)
+[23:59:09]   src/data/latest_additions.json  (0 KB)
+[23:59:12]   ✅ handoff.zip created: 2,206 KB
+[23:59:12] 
+╔══════════════════════════════════════════════════════════╗
+[23:59:12] ║                   P4 Pipeline Complete                  ║
+[23:59:12] ╠══════════════════════════════════════════════════════════╣
+[23:59:12] ║  Buyid (Buwayhid)      :    844 scraped,   831 merged  ║
+[23:59:12] ║  Samanid               :   7737 scraped,  7658 merged  ║
+[23:59:12] ╠══════════════════════════════════════════════════════════╣
+[23:59:12] ║  coins.json: 44,319 → 52,808 (+8,489 new)                  ║
+[23:59:12] ╚══════════════════════════════════════════════════════════╝
+[23:59:12] 
+Final coins.json count: 52,808

@@ -283,6 +283,35 @@ const DYNASTIC_GROUPS: DynastyGroup[] = [
     desc_en: 'East African coastal sultanates: Kilwa, Mombasa, Zanzibar and more. Copper coins reflecting Swahili Islamic civilisation.',
     dynMatch: ['سلطنات شرق أفريقيا', 'East Africa', 'Kilwa', 'Swahili'],
   },
+  // ── Latest scraped dynasties ───────────────────────────────────────────
+  {
+    key: 'ilkhanid', label_ar: 'الإيلخانيون', label_en: 'Ilkhanid Dynasty',
+    icon: '🏹', period: '654–758 AH (1256–1357 CE)',
+    desc_ar: 'المغول الإسلاميون حكام فارس والعراق. اعتنقوا الإسلام وضربوا عملات عربية رفيعة في بغداد وتبريز.',
+    desc_en: 'The Islamised Mongols of Persia and Iraq. Struck Arabic coins of high quality in Baghdad and Tabriz.',
+    dynMatch: ['الإيلخانيون', 'Ilkhanid', 'إيلخاني', 'هولاكو'],
+  },
+  {
+    key: 'samanid', label_ar: 'السامانيون', label_en: 'Samanid Dynasty',
+    icon: '🌺', period: '261–395 AH (875–1005 CE)',
+    desc_ar: 'أول سلالة إيرانية مستقلة بعد الفتح الإسلامي. دراهمهم الفضية هي الأكثر شيوعاً في العصور الوسطى.',
+    desc_en: 'The first independent Iranian dynasty post-Islam. Their silver dirhams are the most commonly found medieval Islamic coins.',
+    dynMatch: ['السامانيون', 'Samanid', 'ساماني'],
+  },
+  {
+    key: 'buyid', label_ar: 'البويهيون', label_en: 'Buyid Dynasty',
+    icon: '⚜️', period: '322–447 AH (934–1055 CE)',
+    desc_ar: 'سلالة شيعية إيرانية حكمت العراق وفارس. أذلّوا الخليفة العباسي وأمسكوا بزمام السلطة الفعلية.',
+    desc_en: 'Shia Iranian dynasty controlling Iraq and Persia. They held the Abbasid caliph as a figurehead while wielding real power.',
+    dynMatch: ['البويهيون', 'Buyid', 'بويهي', 'بويه'],
+  },
+  {
+    key: 'pre_reform', label_ar: 'الإسلام المبكر', label_en: 'Early Islamic (Pre-Reform)',
+    icon: '🌙', period: '15–77 AH (636–697 CE)',
+    desc_ar: 'أقدم العملات الإسلامية قبل إصلاح عبد الملك عام 77هـ. تجمع بين التصاميم البيزنطية والساسانية والنقوش العربية.',
+    desc_en: 'The earliest Islamic coins before the reform of Abd al-Malik in 77 AH. Blend Byzantine and Sasanian designs with Arabic inscriptions.',
+    dynMatch: ['الإسلام المبكر', 'Early Islamic', 'Pre-Reform', 'Arab-Byzantine', 'Arab-Sasanian'],
+  },
 ];
 
 function coinMatchesDynasticGroup(coin: Coin, groupKey: string): boolean {
@@ -599,16 +628,33 @@ export default function CataloguePage({
   const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom !== '' || yearTo !== '' || sortBy !== 'default';
 
   const clearFilters = () => {
-    setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 1500, yearTo: 2026 }); setDynasty(''); setYearFrom(''); setYearTo(''); setSortBy('default');
+    setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 661, yearTo: 2026 });
+    setDynasty(''); setDynastyMode('national'); setDynasticGroup('');
+    setYearFrom(''); setYearTo(''); setSortBy('default');
     setPage(1);
   };
 
-  // Country counts
+  // Country counts — reflect current dynasty/era filters
   const countryCounts = useMemo(() => {
     const map: Record<string, number> = {};
-    COINS.forEach(c => { map[c.co] = (map[c.co] || 0) + 1; });
+    let base = COINS.filter(c => {
+      if (filters.era) {
+        const [a, b] = filters.era.split('-').map(Number);
+        const y = parseInt(c.yce || '0');
+        if (!(y >= a && y <= b)) return false;
+      }
+      if (filters.metal && !c.metal?.toLowerCase().includes(filters.metal.toLowerCase())) return false;
+      if (dynastyMode === 'national' && dynasty && !coinMatchesDynastyPill(c, dynasty)) return false;
+      if (dynastyMode === 'dynastic' && dynasticGroup && !coinMatchesDynasticGroup(c, dynasticGroup)) return false;
+      return true;
+    });
+    base.forEach(c => { map[c.co] = (map[c.co] || 0) + 1; });
     return map;
-  }, []);
+  }, [filters.era, filters.metal, dynasty, dynastyMode, dynasticGroup]);
+
+  const filteredTotal = useMemo(() =>
+    Object.values(countryCounts).reduce((s, n) => s + n, 0),
+  [countryCounts]);
 
   return (
     <div className={darkMode ? 'dark' : ''} style={darkMode ? {filter:'invert(1) hue-rotate(180deg)'} : {}}>
@@ -846,28 +892,94 @@ export default function CataloguePage({
         </div>
       )}
 
-      {/* ── CONTROLS BAR ── */}
-      <div className="bg-parch sticky top-[103px] z-30 border-b border-gold-700/15 shadow-sm">
-        <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-3 flex-wrap">
-          {/* Country filter — FIRST */}
-          <div className="flex items-center gap-1.5">
-            <select
-              value={filters.country}
-              onChange={e => { updateFilter('country', e.target.value); setPage(1); }}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer font-medium"
-            >
-              <option value="all">🌍 {isAr ? 'كل الدول' : 'All Countries'} ({COINS.length})</option>
-              {COUNTRIES.map(({ cc, co, co_ar }) => {
-                const count = countryCounts[co] || 0;
-                if (!count) return null;
+
+      {/* ── LATEST ADDITIONS ── */}
+      {(() => {
+        const LATEST_IDS = ['zeno-23550','zeno-185268','zeno-185392','zeno-86057','zeno-355488','zeno-355487','zeno-355486','zeno-290949','zeno-49509','zeno-376954','zeno-361963','zeno-322892','zeno-303451','zeno-355673','zeno-107703','zeno-308809','zeno-307639','zeno-306737','zeno-306729','zeno-182035'];
+        const latestCoins = LATEST_IDS.map(id => COINS.find(c => c.id === id)).filter((c): c is Coin => !!c).slice(0, 12);
+        if (latestCoins.length === 0) return null;
+        return (
+          <div className="border-b border-gold-700/20" style={{ background: 'rgba(16,10,4,0.7)' }}>
+            <div className="max-w-[1440px] mx-auto px-4 py-2.5 flex items-center gap-3 overflow-x-auto scrollbar-none">
+              <div className="shrink-0 flex items-center gap-1.5">
+                <span className="text-gold-500 text-xs">✨</span>
+                <span className="text-[10px] text-gold-500/70 uppercase tracking-widest font-medium whitespace-nowrap">
+                  {isAr ? 'أحدث الإضافات' : 'Latest Additions'}
+                </span>
+              </div>
+              {latestCoins.map(coin => {
+                const coinName = isAr && coin.nar ? coin.nar : coin.name;
                 return (
-                  <option key={cc} value={co}>
-                    {COUNTRY_FLAGS[cc]} {isAr ? co_ar : co} ({count})
-                  </option>
+                  <button key={coin.id} onClick={() => setSelectedCoin(coin)}
+                    className="flex items-center gap-1.5 shrink-0 px-2 py-1 rounded-lg border border-gold-700/20 hover:border-gold-500/50 transition-colors">
+                    {coin.o
+                      // eslint-disable-next-line @next/next/no-img-element
+                      ? <img src={coin.o} alt={coinName} className="w-6 h-6 rounded-full object-cover shrink-0" style={{ border:'1px solid rgba(139,109,46,0.4)' }} />
+                      : <div className="w-6 h-6 rounded-full bg-gold-900/40 flex items-center justify-center text-[10px] shrink-0">🪙</div>
+                    }
+                    <span className="text-[10px] text-gold-400/80 hover:text-gold-300 whitespace-nowrap max-w-[110px] truncate">{coinName}</span>
+                  </button>
                 );
               })}
-            </select>
+            </div>
           </div>
+        );
+      })()}
+
+      {/* ── CONTROLS BAR ── */}
+      <div className="bg-parch sticky top-[103px] z-30 border-b border-gold-700/15 shadow-sm">
+        <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-2 flex-wrap">
+          {/* Country filter */}
+          <select
+            value={filters.country}
+            onChange={e => { updateFilter('country', e.target.value); setPage(1); }}
+            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer font-medium"
+          >
+            <option value="all">🌍 {isAr ? 'كل الدول' : 'All Countries'} ({filteredTotal.toLocaleString()})</option>
+            {COUNTRIES.map(({ cc, co, co_ar }) => {
+              const count = countryCounts[co] || 0;
+              if (!count) return null;
+              return (
+                <option key={cc} value={co}>
+                  {COUNTRY_FLAGS[cc]} {isAr ? co_ar : co} ({count})
+                </option>
+              );
+            })}
+          </select>
+
+          {/* National era — compact dropdown */}
+          <select
+            value={dynastyMode === 'national' ? dynasty : ''}
+            onChange={e => { setDynastyMode('national'); setDynasticGroup(''); setDynasty(e.target.value); setPage(1); }}
+            className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
+              ${dynastyMode === 'national' && dynasty ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
+          >
+            <option value="">{isAr ? '🗺️ الحقبة الوطنية' : '🗺️ National Era'}</option>
+            {DYNASTY_PILLS.map(pill => (
+              <option key={pill.key} value={pill.key}>
+                {pill.icon} {isAr ? pill.label_ar : pill.label_en}
+              </option>
+            ))}
+          </select>
+
+          {/* Historical dynasty — compact dropdown */}
+          <select
+            value={dynastyMode === 'dynastic' ? dynasticGroup : ''}
+            onChange={e => { setDynastyMode('dynastic'); setDynasty(''); setDynasticGroup(e.target.value); setPage(1); }}
+            className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
+              ${dynastyMode === 'dynastic' && dynasticGroup ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
+          >
+            <option value="">{isAr ? '☪️ الأسرة التاريخية' : '☪️ Dynasty'}</option>
+            {DYNASTIC_GROUPS.map(group => {
+              const count = COINS.filter(c => coinMatchesDynasticGroup(c, group.key)).length;
+              if (count === 0) return null;
+              return (
+                <option key={group.key} value={group.key}>
+                  {group.icon} {isAr ? group.label_ar : group.label_en} ({count.toLocaleString()})
+                </option>
+              );
+            })}
+          </select>
 
           {/* Era */}
           <select

@@ -727,9 +727,11 @@ export const COUNTRY_FLAGS: Record<string, string> = {
   IQ: '🇮🇶', JO: '🇯🇴', LB: '🇱🇧', LY: '🇱🇾', MA: '🇲🇦',
   OM: '🇴🇲', PS: '🇵🇸', SD: '🇸🇩', SY: '🇸🇾', DZ: '🇩🇿',
   TN: '🇹🇳', YE: '🇾🇪', KW: '🇰🇼', MR: '🇲🇷', KM: '🇰🇲',
+  IS: '☪️',
 };
 
 export const COUNTRIES: { cc: string; co: string; co_ar: string }[] = [
+  { cc: 'IS', co: 'Islamic',        co_ar: 'إسلامي' },
   { cc: 'EG', co: 'Egypt',          co_ar: 'مصر' },
   { cc: 'MA', co: 'Morocco',        co_ar: 'المغرب' },
   { cc: 'SA', co: 'Saudi Arabia',   co_ar: 'المملكة العربية السعودية' },
