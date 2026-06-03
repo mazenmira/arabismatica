@@ -637,7 +637,7 @@ export default function CataloguePage({
   // Country counts — reflect current dynasty/era filters
   const countryCounts = useMemo(() => {
     const map: Record<string, number> = {};
-    let base = COINS.filter(c => {
+    const base = COINS.filter(c => {
       if (filters.era) {
         const [a, b] = filters.era.split('-').map(Number);
         const y = parseInt(c.yce || '0');
