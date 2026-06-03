@@ -124,7 +124,6 @@ function PriceGuide({ coinId, locale, cataloguePrices }: {
   const isAr = locale === 'ar';
   const [prices, setPrices] = useState<PriceRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [submitPrice, setSubmitPrice] = useState(false);
   const [tab, setTab] = useState<'Raw' | 'PCGS/NGC'>('Raw');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -133,16 +132,6 @@ function PriceGuide({ coinId, locale, cataloguePrices }: {
     supabase.from('price_submissions').select('*').eq('coin_id', coinId).order('created_at', { ascending: false })
       .then(({ data }) => { if (data) setPrices(data as PriceRow[]); setLoading(false); });
   }, [coinId]);
-
-  const submitObservedPrice = async (grade: string, price: number) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    await supabase.from('price_submissions').insert({
-      coin_id: coinId, user_id: session.user.id,
-      grade, raw: price, currency: 'USD', source: 'community', date: new Date().toISOString(),
-    });
-    setSubmitPrice(false);
-  };
 
   const latestSource = prices[0];
 
@@ -193,7 +182,7 @@ function PriceGuide({ coinId, locale, cataloguePrices }: {
             {isAr ? 'لا توجد بيانات أسعار بعد' : 'No price data for this coin yet'}
           </p>
           {isLoggedIn ? (
-            <button onClick={() => setSubmitPrice(true)}
+            <button
               className="text-[11px] text-gold-600 border border-gold-700/30 rounded-full px-3 py-1 hover:border-gold-500 transition-colors">
               {isAr ? '+ سجّل سعر ملاحَظ' : '+ Submit observed price'}
             </button>

@@ -342,16 +342,6 @@ function coinMatchesDynasticGroup(coin: Coin, groupKey: string): boolean {
 
 
 
-const DYNASTY_HISTORY: Record<string, { ar: string; en: string }> = {
-  ottoman:   { ar: "حكمت الدولة العثمانية مصر والعالم العربي من 1517 حتى 1798م. ضربت عملاتها في دور الضرب بالقسطنطينية ومصر وتتميز بالخط العربي والطغراء.", en: "The Ottoman Empire ruled Egypt and the Arab world from 1517-1798. Coins bear Arabic calligraphy and the tughra monogram." },
-  muhali:    { ar: "أسس محمد علي باشا أسرة حاكمة في مصر (1805-1914) حدّثت نظام العملة وأدخلت المليم والقرش الحديثين.", en: "Muhammad Ali Pasha founded a dynasty (1805-1914) that modernized coinage, introducing the modern millieme and piastre." },
-  sultanate: { ar: "السلطنة المصرية (1914-1922): أُعلنت تحت الحماية البريطانية. حكمها السلطان حسين كامل ثم فؤاد الأول.", en: "The Egyptian Sultanate (1914-1922) was declared under British protectorate, with Sultans Hussein Kamel and Fuad I." },
-  kingdom:   { ar: "المملكة المصرية (1922-1953): أُعلن الاستقلال الرسمي وحكمها الملك فؤاد الأول ثم فاروق الأول.", en: "The Kingdom of Egypt (1922-1953) gained formal independence. Kings Fuad I and Farouk I issued iconic portrait coins." },
-  republic:  { ar: "الجمهورية المصرية (1953 حتى الآن): أصدرت عملات تذكارية تعكس إنجازات مصر من السد العالي إلى المتحف المصري الكبير.", en: "The Egyptian Republic (1953-present) issued commemorative coins marking major milestones." },
-  saudi:     { ar: "المملكة العربية السعودية والحجاز: امتدت عملات المنطقة من ريالات الحجاز العثمانية إلى الهللة السعودية الحديثة.", en: "From Ottoman Hejaz riyals to modern Saudi halalas, this coinage reflects the heartland of Islam." },
-  gulf:      { ar: "دول الخليج العربي: بدأت إصدار عملاتها المستقلة في الستينيات والسبعينيات. تتميز بصور الحكام وثروة النفط.", en: "Gulf states began independent coinage in the 1960s-70s, featuring ruling sheikhs and oil wealth symbols." },
-  maghreb:   { ar: "المغرب العربي: امتدت عملاته من الدراهم المرينية إلى الفرنك الاستعماري والعملات الوطنية الحديثة.", en: "North African coinage spans Marinid dirhams, French colonial francs, and modern national issues." },
-};
 
 const METAL_OPTIONS = [
   'Gold','Silver','Copper','Bronze','Cupro-Nickel',
