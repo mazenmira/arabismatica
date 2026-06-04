@@ -1,7 +1,7 @@
 // v3.1
 'use client';
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -19,10 +19,8 @@ import type { Coin, FilterState } from '@/types/coin';
 import { COUNTRIES, COUNTRY_FLAGS } from '@/lib/coins';
 
 // ── Supabase-powered data loading ─────────────────────────
-import { getCoins, getCoinById, searchCoins } from '@/lib/coinsApi';
+import { getCoins, searchCoins } from '@/lib/coinsApi';
 import type { CoinFilters } from '@/lib/coinsApi';
-
-const PER_PAGE = 60;
 
 // ── Dynasty filter system ────────────────────────────────────────────────
 // Two modes:
@@ -43,6 +41,7 @@ const DYNASTY_YEAR_RANGES: Record<string, { cc: string | '*'; from: number; to: 
   maghreb:    [{ cc: 'MA', from: 1600, to: 2099 }, { cc: 'DZ', from: 1500, to: 2099 }, { cc: 'TN', from: 1700, to: 2099 }],
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function coinMatchesDynastyPill(coin: { cc: string; yce?: string }, pillKey: string): boolean {
   const ranges = DYNASTY_YEAR_RANGES[pillKey];
   if (!ranges) return false;
@@ -313,6 +312,7 @@ const DYNASTIC_GROUPS: DynastyGroup[] = [
   },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function coinMatchesDynasticGroup(coin: Coin, groupKey: string): boolean {
   const group = DYNASTIC_GROUPS.find(g => g.key === groupKey);
   if (!group) return false;
@@ -366,6 +366,7 @@ function getCoinOfDay(coins: Coin[]): Coin {
   return coins[seed % coins.length];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function fuseSearch(coins: Coin[], query: string): Coin[] {
   if (!query.trim()) return coins;
   const q = query.toLowerCase();
