@@ -135,8 +135,7 @@ function applyFilters(
 
   // Full-text search using the stored tsvector column
   if (query && query.trim()) {
-    const tsq = query.trim().split(/\s+/).map(w => `${w}:*`).join(' & ');
-    qb = qb.textSearch('search_vector', tsq, { type: 'websearch' });
+    qb = qb.textSearch('search_vector', query.trim(), { type: 'websearch' });
   }
 
   return qb;
@@ -210,12 +209,10 @@ export async function searchCoins(
   if (!query.trim()) return [];
 
   // Try tsvector full-text first
-  const tsq = query.trim().split(/\s+/).map(w => `${w}:*`).join(' & ');
-
   const { data, error } = await db
     .from('coins')
     .select('id, name, nar, cc, dyn, metal, yce, nref, o, mint, ruler, denomination')
-    .textSearch('search_vector', tsq, { type: 'websearch' })
+    .textSearch('search_vector', query.trim(), { type: 'websearch' })
     .limit(limit);
 
   if (!error && data && data.length > 0) return data as CoinRow[];
@@ -238,16 +235,16 @@ export async function searchCoins(
 export async function getDistinctValues(
   column: 'cc' | 'dyn' | 'metal' | 'type' | 'denomination',
 ): Promise<string[]> {
-  // Supabase doesn't expose DISTINCT natively via the JS client;
-  // use an RPC function or a workaround with a limit + group.
-  // Best done via a Supabase DB function, but we can approximate:
+  // Fetch a small sample and deduplicate in JS.
+  // All filterable columns (cc=21, type=3, denomination=4, metal=~20, dyn=~30)
+  // have low cardinality — 100 rows captures all distinct values.
   const { data, error } = await db
     .from('coins')
     .select(column)
     .not(column, 'is', null)
     .not(column, 'eq', '')
     .order(column)
-    .limit(2000);  // large enough to capture all distinct values for small-cardinality cols
+    .limit(100);
 
   if (error) throw new Error(`getDistinctValues(${column}): ${error.message}`);
   const rows = (data ?? []) as Array<Record<string, unknown>>;

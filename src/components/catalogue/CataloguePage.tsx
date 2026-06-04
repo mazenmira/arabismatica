@@ -18,10 +18,9 @@ import { useWishlist } from '@/hooks/useWishlist';
 import type { Coin, FilterState } from '@/types/coin';
 import { COUNTRIES, COUNTRY_FLAGS } from '@/lib/coins';
 
-// ── Stub: replace with real data import ──────────────────
-// In production: import COINS from '@/data/coins.json'
-import COINS_DATA from '@/data/coins.json';
-const COINS = COINS_DATA as unknown as Coin[];
+// ── Supabase-powered data loading ─────────────────────────
+import { getCoins, getCoinById, searchCoins } from '@/lib/coinsApi';
+import type { CoinFilters } from '@/lib/coinsApi';
 
 const PER_PAGE = 60;
 
@@ -405,9 +404,15 @@ export default function CataloguePage({
 
   const [filters, setFilters] = useState<FilterState>({
     country: 'all', era: '', metal: '', type: '', query: '',
-    yearFrom: 1500, yearTo: 2026,
+    yearFrom: 661, yearTo: 2026,
   });
   const [page, setPage] = useState(1);
+
+  // ── Supabase data state ──────────────────────────────────
+  const [coins,       setCoins]       = useState<Coin[]>([]);
+  const [totalCount,  setTotalCount]  = useState(52808);
+  const [loading,     setLoading]     = useState(false);
+  const PER_PAGE_SUP = 60;
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [dynasty, setDynasty]         = useState('');
@@ -469,6 +474,48 @@ export default function CataloguePage({
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  // ── Supabase fetch — runs when any filter or page changes ────────────────
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    // Build CoinFilters from current state
+    const apiFilters: CoinFilters = {};
+    if (filters.country !== 'all') {
+      // Map co (English name) back to cc
+      const found = COUNTRIES.find(c => c.co === filters.country || c.co_ar === filters.country);
+      if (found) apiFilters.cc = found.cc;
+    }
+    if (filters.metal)  apiFilters.metal = filters.metal;
+    if (filters.type === 'Circulation')   apiFilters.type = 'Circulation';
+    if (filters.type === 'Commemorative') apiFilters.type = 'Commemorative';
+    if (filters.query)  apiFilters.query = filters.query;
+    if (yearFrom) apiFilters.yceFrom = parseInt(yearFrom);
+    if (yearTo)   apiFilters.yceTo   = parseInt(yearTo);
+    if (filters.era) {
+      const [a, b] = filters.era.split('-').map(Number);
+      apiFilters.yceFrom = a;
+      apiFilters.yceTo   = b;
+    }
+    // Dynasty filters — translate to dyn field values
+    if (dynastyMode === 'dynastic' && dynasticGroup) {
+      const group = DYNASTIC_GROUPS.find(g => g.key === dynasticGroup);
+      if (group?.dynMatch?.[0]) apiFilters.dyn = group.dynMatch[0];
+    }
+
+    getCoins(apiFilters, page, PER_PAGE_SUP).then(({ data, count }) => {
+      if (!cancelled) {
+        setCoins(data as unknown as Coin[]);
+        setTotalCount(count);
+        setLoading(false);
+      }
+    }).catch(() => {
+      if (!cancelled) setLoading(false);
+    });
+
+    return () => { cancelled = true; };
+  }, [filters, page, dynasty, dynastyMode, dynasticGroup, yearFrom, yearTo, sortBy]);
+
   const handleToggleCollection = async (id: string) => {
     if (user) { await toggleCollectionDB(id); return; }
     setCollection(prev => {
@@ -487,7 +534,7 @@ export default function CataloguePage({
   // PDF export — builds a print-ready HTML page from filtered results
   const downloadPDF = () => {
     const isArLocal = locale === 'ar';
-    const rows = filtered.slice(0, 500).map(c => {
+    const rows = coins.slice(0, 500).map(c => {
       const name  = isArLocal ? (c.nar || c.name) : c.name;
       const year  = c.yce ? c.yce + (isArLocal ? ' م' : ' CE') : '';
       const mint  = c.mint ? parseInt(c.mint).toLocaleString(isArLocal ? 'ar-EG' : 'en-US') : '—';
@@ -510,7 +557,7 @@ export default function CataloguePage({
       ? ['الدولة','الاسم','الأسرة','السنة','المعدن','المضروب','KM#']
       : ['Country','Name','Dynasty','Year','Metal','Mintage','KM#'];
     const date = new Date().toLocaleDateString(isArLocal ? 'ar-EG' : 'en-AU');
-    const total = filtered.length;
+    const total = totalCount;
 
     const html = `<!DOCTYPE html>
 <html dir="${isArLocal ? 'rtl' : 'ltr'}" lang="${locale}">
@@ -563,21 +610,15 @@ export default function CataloguePage({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const suggestions = useMemo(() => {
-    if (!filters.query || filters.query.length < 2) return [];
-    const q = filters.query.toLowerCase();
-    const seen = new Set<string>();
-    return COINS.reduce<string[]>((acc, c) => {
-      const name = c.name;
-      const nar  = c.nar || '';
-      for (const candidate of [name, nar]) {
-        if (candidate.toLowerCase().includes(q) && !seen.has(candidate)) {
-          seen.add(candidate);
-          acc.push(candidate);
-        }
-      }
-      return acc;
-    }, []).slice(0, 8);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  useEffect(() => {
+    if (!filters.query || filters.query.length < 2) { setSuggestions([]); return; }
+    const timer = setTimeout(() => {
+      searchCoins(filters.query, 8).then(results => {
+        setSuggestions(results.map(c => c.name).filter(Boolean));
+      }).catch(() => setSuggestions([]));
+    }, 200);
+    return () => clearTimeout(timer);
   }, [filters.query]);
 
   const updateFilter = useCallback((key: string, value: string | number) => {
@@ -585,35 +626,11 @@ export default function CataloguePage({
     setPage(1);
   }, []);
 
-  const filtered = useMemo(() => {
-    let result = fuseSearch(COINS, filters.query);
-    if (filters.country !== 'all') result = result.filter(c => c.co === filters.country);
-    if (filters.era) {
-      const [a, b] = filters.era.split('-').map(Number);
-      result = result.filter(c => { const y = parseInt(c.yce || '0'); return y >= a && y <= b; });
-    }
-    if (filters.metal) result = result.filter(c => c.metal?.toLowerCase().includes(filters.metal.toLowerCase()));
-    if (filters.type === 'Circulation') result = result.filter(c => c.type === 'Circulation');
-    if (filters.type === 'Commemorative') result = result.filter(c => c.type === 'Commemorative');
-    if (filters.type === 'has-mint') result = result.filter(c => Boolean(c.mint));
-    if (dynastyMode === 'national' && dynasty) {
-      result = result.filter(c => coinMatchesDynastyPill(c, dynasty));
-    }
-    if (dynastyMode === 'dynastic' && dynasticGroup) {
-      result = result.filter(c => coinMatchesDynasticGroup(c, dynasticGroup));
-    }
-    if (yearFrom) result = result.filter(c => parseInt(c.yce || '0') >= parseInt(yearFrom));
-    if (yearTo)   result = result.filter(c => parseInt(c.yce || '0') <= parseInt(yearTo));
-    if (sortBy === 'oldest') result = [...result].sort((a, b) => parseInt(a.yce||'9999') - parseInt(b.yce||'9999'));
-    if (sortBy === 'newest') result = [...result].sort((a, b) => parseInt(b.yce||'0') - parseInt(a.yce||'0'));
-    if (sortBy === 'rarest') result = [...result].sort((a, b) => parseInt(a.mint||'999999999') - parseInt(b.mint||'999999999'));
-    if (sortBy === 'common') result = [...result].sort((a, b) => parseInt(b.mint||'0') - parseInt(a.mint||'0'));
-    if (sortBy === 'az')     result = [...result].sort((a, b) => a.name.localeCompare(b.name));
-    return result;
-  }, [filters, dynasty, dynastyMode, dynasticGroup, yearFrom, yearTo, sortBy]);
+  // Filtering is now done server-side via Supabase — no client-side memo needed
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  // With Supabase: coins ARE already paged, count comes from server
+  const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE_SUP));
+  const paged = coins; // already paginated by Supabase
 
   const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom !== '' || yearTo !== '' || sortBy !== 'default';
 
@@ -624,32 +641,20 @@ export default function CataloguePage({
     setPage(1);
   };
 
-  // Country counts — reflect current dynasty/era filters
-  const countryCounts = useMemo(() => {
-    const map: Record<string, number> = {};
-    const base = COINS.filter(c => {
-      if (filters.era) {
-        const [a, b] = filters.era.split('-').map(Number);
-        const y = parseInt(c.yce || '0');
-        if (!(y >= a && y <= b)) return false;
-      }
-      if (filters.metal && !c.metal?.toLowerCase().includes(filters.metal.toLowerCase())) return false;
-      if (dynastyMode === 'national' && dynasty && !coinMatchesDynastyPill(c, dynasty)) return false;
-      if (dynastyMode === 'dynastic' && dynasticGroup && !coinMatchesDynasticGroup(c, dynasticGroup)) return false;
-      return true;
-    });
-    base.forEach(c => { map[c.co] = (map[c.co] || 0) + 1; });
-    return map;
-  }, [filters.era, filters.metal, dynasty, dynastyMode, dynasticGroup]);
-
-  const filteredTotal = useMemo(() =>
-    Object.values(countryCounts).reduce((s, n) => s + n, 0),
-  [countryCounts]);
+  // Country counts — static from known totals (fast, no extra queries)
+  const COUNTRY_TOTALS: Record<string, number> = {
+    'Islamic':47303,'Egypt':1186,'Morocco':1120,'Tunisia':858,'Yemen':270,
+    'Oman':255,'Sudan':228,'Libya':202,'Iraq':195,'Algeria':178,
+    'Saudi Arabia':126,'UAE':163,'Jordan':130,'Lebanon':114,'Kuwait':98,
+    'Palestine':14,'Mauritania':20,'Qatar':136,'Qatar & Dubai':5,'Comoros':34,
+  };
+  const countryCounts = COUNTRY_TOTALS;
+  const filteredTotal = totalCount;
 
   return (
     <div className={darkMode ? 'dark' : ''} style={darkMode ? {filter:'invert(1) hue-rotate(180deg)'} : {}}>
       {/* ── HERO ── */}
-      <HeroBanner locale={locale} totalCoins={COINS.length} totalCountries={COUNTRIES.length} />
+      <HeroBanner locale={locale} totalCoins={totalCount} totalCountries={COUNTRIES.length} />
 
       <section className="relative overflow-hidden" style={{ background: 'linear-gradient(155deg, #16100A 0%, #241605 55%, #301B06 100%)' }}>
         <div className="relative max-w-[1440px] mx-auto px-4 py-6 text-center">
@@ -721,7 +726,8 @@ export default function CataloguePage({
 
       {/* COIN OF THE DAY */}
       {(() => {
-        const cotd = getCoinOfDay(COINS);
+        const cotd = coins.length > 0 ? getCoinOfDay(coins) : null;
+        if (!cotd) return null;
         return (
           <div className="bg-gradient-to-r from-ink via-[#1e1206] to-ink border-b border-gold-700/30">
             <div className="max-w-[1440px] mx-auto px-4 py-3">
@@ -798,11 +804,10 @@ export default function CataloguePage({
           >
             <option value="">{isAr ? '☪️ الأسرة التاريخية' : '☪️ Dynasty'}</option>
             {DYNASTIC_GROUPS.map(group => {
-              const count = COINS.filter(c => coinMatchesDynasticGroup(c, group.key)).length;
-              if (count === 0) return null;
+              // counts loaded from Supabase dynamically
               return (
                 <option key={group.key} value={group.key}>
-                  {group.icon} {isAr ? group.label_ar : group.label_en} ({count.toLocaleString()})
+                  {group.icon} {isAr ? group.label_ar : group.label_en}
                 </option>
               );
             })}
@@ -869,9 +874,9 @@ export default function CataloguePage({
           {/* Results count + PDF download */}
           <div className="flex items-center gap-2 mr-auto">
             <span className="text-[11px] text-ink/40">
-              {filtered.length.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {t('search.results')}
+              {totalCount.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {t('search.results')}
             </span>
-            {filtered.length > 0 && (
+            {totalCount > 0 && (
               <button
                 onClick={downloadPDF}
                 title={isAr ? 'تنزيل النتائج كـ PDF' : 'Download results as PDF'}
@@ -926,7 +931,14 @@ export default function CataloguePage({
 
       {/* ── GRID ── */}
       <div className="max-w-[1440px] mx-auto px-4 py-6">
-        {paged.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="flex items-center gap-3 text-gold-600">
+              <div className="w-5 h-5 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
+              <span className="text-[13px] font-amiri">{isAr ? 'جارٍ التحميل...' : 'Loading...'}</span>
+            </div>
+          </div>
+        ) : paged.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 rounded-full bg-parch-dark flex items-center justify-center mx-auto mb-4 text-2xl">🔍</div>
             <h3 className="font-amiri text-xl text-ink/60 mb-2">{t('search.noResults')}</h3>
