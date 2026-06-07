@@ -21,7 +21,7 @@ import { COUNTRIES, COUNTRY_FLAGS } from '@/lib/coins';
 // ── Supabase-powered data loading ─────────────────────────
 import { getCoins, searchCoins, getDistinctValues } from '@/lib/coinsApi';
 import type { CoinFilters } from '@/lib/coinsApi';
-import { DYNASTY_ORDER, dynastyIndex } from '@/lib/dynasties';
+import { dynastyIndex } from '@/lib/dynasties';
 
 // ── Dynasty filter system ────────────────────────────────────────────────
 // Two modes:
