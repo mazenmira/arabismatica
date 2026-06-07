@@ -94,6 +94,12 @@ export interface CoinFilters {
   type?:     string;
   /** Denomination */
   denomination?: string;
+  /** Mint name in Arabic — exact match */
+  mint_ar?: string;
+  /** Ruler name in Arabic — exact match */
+  ruler_ar?: string;
+  /** Hijri year — partial match (LIKE %yah%) */
+  yah?: string;
   /** CE year range */
   yceFrom?:  number;
   yceTo?:    number;
@@ -108,7 +114,7 @@ function applyFilters(
   qb: any,
   filters: CoinFilters,
 ) {
-  const { cc, dyn, metal, type, denomination, yceFrom, yceTo, query } = filters;
+  const { cc, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query } = filters;
 
   if (cc) {
     if (Array.isArray(cc)) {
@@ -118,10 +124,13 @@ function applyFilters(
     }
   }
 
-  if (dyn)          qb = qb.ilike('dyn',   `%${dyn}%`);
-  if (metal)        qb = qb.ilike('metal', `%${metal}%`);
-  if (type)         qb = qb.eq('type',     type);
-  if (denomination) qb = qb.eq('denomination', denomination);
+  if (dyn)          qb = qb.ilike('dyn',         `%${dyn}%`);
+  if (metal)        qb = qb.ilike('metal',        `%${metal}%`);
+  if (type)         qb = qb.eq('type',             type);
+  if (denomination) qb = qb.eq('denomination',     denomination);
+  if (mint_ar)      qb = qb.eq('mint_ar',          mint_ar);
+  if (ruler_ar)     qb = qb.eq('ruler_ar',          ruler_ar);
+  if (yah)          qb = qb.ilike('yah',           `%${yah}%`);
 
   // Year range — yce is stored as text; cast to int, ignore empty strings
   if (yceFrom != null) {
@@ -233,7 +242,7 @@ export async function searchCoins(
  * e.g. getDistinctValues('cc') returns all country codes present in the table.
  */
 export async function getDistinctValues(
-  column: 'cc' | 'dyn' | 'metal' | 'type' | 'denomination',
+  column: 'cc' | 'dyn' | 'metal' | 'type' | 'denomination' | 'mint_ar' | 'ruler_ar',
 ): Promise<string[]> {
   // Fetch a small sample and deduplicate in JS.
   // All filterable columns (cc=21, type=3, denomination=4, metal=~20, dyn=~30)

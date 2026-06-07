@@ -19,8 +19,9 @@ import type { Coin, FilterState } from '@/types/coin';
 import { COUNTRIES, COUNTRY_FLAGS } from '@/lib/coins';
 
 // ── Supabase-powered data loading ─────────────────────────
-import { getCoins, searchCoins } from '@/lib/coinsApi';
+import { getCoins, searchCoins, getDistinctValues } from '@/lib/coinsApi';
 import type { CoinFilters } from '@/lib/coinsApi';
+import { DYNASTY_ORDER, dynastyIndex } from '@/lib/dynasties';
 
 // ── Dynasty filter system ────────────────────────────────────────────────
 // Two modes:
@@ -421,6 +422,17 @@ export default function CataloguePage({
   const [dynasticGroup, setDynasticGroup] = useState('');
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [sortBy, setSortBy] = useState('default');
+
+  // ── Islamic detail filters (active when dynastyMode === 'dynastic') ──────
+  const [filterMintAr,      setFilterMintAr]      = useState('');
+  const [filterRulerAr,     setFilterRulerAr]     = useState('');
+  const [filterHijriYear,   setFilterHijriYear]   = useState('');
+  const [filterDenomination, setFilterDenomination] = useState('');
+
+  // Distinct value lists for the three dropdown filters
+  const [mintOptions,  setMintOptions]  = useState<string[]>([]);
+  const [rulerOptions, setRulerOptions] = useState<string[]>([]);
+  const [denomOptions, setDenomOptions] = useState<string[]>([]);
   const [yearFrom, setYearFrom] = useState('');
   const [yearTo, setYearTo] = useState('');
   const autocompleteRef = useRef<HTMLDivElement>(null);
@@ -466,6 +478,14 @@ export default function CataloguePage({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Load distinct values for Islamic detail filters when dynastic mode is active
+  useEffect(() => {
+    if (dynastyMode !== 'dynastic') return;
+    getDistinctValues('mint_ar').then(setMintOptions).catch(() => {});
+    getDistinctValues('ruler_ar').then(setRulerOptions).catch(() => {});
+    getDistinctValues('denomination').then(setDenomOptions).catch(() => {});
+  }, [dynastyMode]);
+
   // Back-to-top visibility
   useEffect(() => {
     const onScroll = () => setShowBackTop(window.scrollY > 600);
@@ -504,6 +524,14 @@ export default function CataloguePage({
       if (group?.dynMatch?.[0]) apiFilters.dyn = group.dynMatch[0];
     }
 
+    // Islamic detail filters (only active in dynastic mode)
+    if (dynastyMode === 'dynastic') {
+      if (filterMintAr)       apiFilters.mint_ar      = filterMintAr;
+      if (filterRulerAr)      apiFilters.ruler_ar     = filterRulerAr;
+      if (filterHijriYear)    apiFilters.yah          = filterHijriYear;
+      if (filterDenomination) apiFilters.denomination = filterDenomination;
+    }
+
     getCoins(apiFilters, page, PER_PAGE_SUP).then(({ data, count }) => {
       if (!cancelled) {
         setCoins(data as unknown as Coin[]);
@@ -515,7 +543,8 @@ export default function CataloguePage({
     });
 
     return () => { cancelled = true; };
-  }, [filters, page, dynasty, dynastyMode, dynasticGroup, yearFrom, yearTo, sortBy]);
+  }, [filters, page, dynasty, dynastyMode, dynasticGroup, yearFrom, yearTo, sortBy,
+      filterMintAr, filterRulerAr, filterHijriYear, filterDenomination]);
 
   const handleToggleCollection = async (id: string) => {
     if (user) { await toggleCollectionDB(id); return; }
@@ -631,14 +660,20 @@ export default function CataloguePage({
 
   // With Supabase: coins ARE already paged, count comes from server
   const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE_SUP));
-  const paged = coins; // already paginated by Supabase
+  // When sorting by dynasty: re-order the current page client-side using DYNASTY_ORDER.
+  // (Supabase doesn't support custom sort arrays; client sort across one page is sufficient.)
+  const paged = sortBy === 'dynasty'
+    ? [...coins].sort((a, b) => dynastyIndex(a.dyn ?? '') - dynastyIndex(b.dyn ?? ''))
+    : coins;
 
-  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom !== '' || yearTo !== '' || sortBy !== 'default';
+  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom !== '' || yearTo !== '' || sortBy !== 'default'
+    || !!filterMintAr || !!filterRulerAr || !!filterHijriYear || !!filterDenomination;
 
   const clearFilters = () => {
     setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 661, yearTo: 2026 });
     setDynasty(''); setDynastyMode('national'); setDynasticGroup('');
     setYearFrom(''); setYearTo(''); setSortBy('default');
+    setFilterMintAr(''); setFilterRulerAr(''); setFilterHijriYear(''); setFilterDenomination('');
     setPage(1);
   };
 
@@ -804,15 +839,74 @@ export default function CataloguePage({
               ${dynastyMode === 'dynastic' && dynasticGroup ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
           >
             <option value="">{isAr ? '☪️ الأسرة التاريخية' : '☪️ Dynasty'}</option>
-            {DYNASTIC_GROUPS.map(group => {
-              // counts loaded from Supabase dynamically
-              return (
+            {[...DYNASTIC_GROUPS]
+              .sort((a, b) => {
+                // Sort by position of dynMatch[0] in DYNASTY_ORDER; ungrouped entries go last
+                const ai = dynastyIndex(a.dynMatch?.[0] ?? '');
+                const bi = dynastyIndex(b.dynMatch?.[0] ?? '');
+                return ai - bi;
+              })
+              .map(group => (
                 <option key={group.key} value={group.key}>
                   {group.icon} {isAr ? group.label_ar : group.label_en}
                 </option>
-              );
-            })}
+              ))}
           </select>
+
+          {/* ── Islamic detail filters — visible only in dynastic mode ── */}
+          {dynastyMode === 'dynastic' && (
+            <>
+              {/* Denomination */}
+              <select
+                value={filterDenomination}
+                onChange={e => { setFilterDenomination(e.target.value); setPage(1); }}
+                className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
+                  ${filterDenomination ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
+              >
+                <option value="">{isAr ? '⚖️ الفئة' : '⚖️ Denomination'}</option>
+                {denomOptions.map(d => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+
+              {/* Mint */}
+              <select
+                value={filterMintAr}
+                onChange={e => { setFilterMintAr(e.target.value); setPage(1); }}
+                className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
+                  ${filterMintAr ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
+              >
+                <option value="">{isAr ? '🏛️ دار الضرب' : '🏛️ Mint'}</option>
+                {mintOptions.map(m => (
+                  <option key={m} value={m} dir="rtl">{m}</option>
+                ))}
+              </select>
+
+              {/* Ruler */}
+              <select
+                value={filterRulerAr}
+                onChange={e => { setFilterRulerAr(e.target.value); setPage(1); }}
+                className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
+                  ${filterRulerAr ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
+              >
+                <option value="">{isAr ? '👑 الحاكم' : '👑 Ruler'}</option>
+                {rulerOptions.map(r => (
+                  <option key={r} value={r} dir="rtl">{r}</option>
+                ))}
+              </select>
+
+              {/* Hijri year — text input, partial match */}
+              <input
+                type="text"
+                dir="rtl"
+                placeholder={isAr ? 'سنة هجرية' : 'Hijri year'}
+                value={filterHijriYear}
+                onChange={e => { setFilterHijriYear(e.target.value); setPage(1); }}
+                className={`w-[90px] text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 font-cairo
+                  ${filterHijriYear ? 'border-gold-500' : 'border-gold-700/30'}`}
+              />
+            </>
+          )}
 
           {/* Era */}
           <select
@@ -871,6 +965,7 @@ export default function CataloguePage({
             <option value="rarest">{isAr ? 'الأندر أولاً' : 'Rarest first'}</option>
             <option value="common">{isAr ? 'الأكثر شيوعاً' : 'Most common'}</option>
             <option value="az">{isAr ? 'أبجدي' : 'A to Z'}</option>
+            <option value="dynasty">{isAr ? 'حسب الأسرة (تاريخي)' : 'By dynasty (historical)'}</option>
           </select>
           {/* Results count + PDF download */}
           <div className="flex items-center gap-2 mr-auto">
