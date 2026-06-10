@@ -50,6 +50,7 @@ export interface CoinRow {
   prices:          PriceMap | null;
   mintage_data:    MintageEntry[] | null;
   auction:         AuctionRecord | null;
+  coin_type_tag:   string | null;
 }
 
 export interface PriceMap {
@@ -94,6 +95,8 @@ export interface CoinFilters {
   type?:     string;
   /** Denomination */
   denomination?: string;
+  /** Coin type tag — exact match (Arab-Byzantine, Dinar, Fals/Fils, etc.) */
+  coin_type_tag?: string;
   /** Mint name in Arabic — exact match */
   mint_ar?: string;
   /** Ruler name in Arabic — exact match */
@@ -127,8 +130,9 @@ function applyFilters(
   if (dyn)          qb = qb.ilike('dyn',         `%${dyn}%`);
   if (metal)        qb = qb.ilike('metal',        `%${metal}%`);
   if (type)         qb = qb.eq('type',             type);
-  if (denomination) qb = qb.eq('denomination',     denomination);
-  if (mint_ar)      qb = qb.eq('mint_ar',          mint_ar);
+  if (denomination)  qb = qb.eq('denomination',     denomination);
+  if (filters.coin_type_tag) qb = qb.eq('coin_type_tag', filters.coin_type_tag);
+  if (mint_ar)       qb = qb.eq('mint_ar',          mint_ar);
   if (ruler_ar)     qb = qb.eq('ruler_ar',          ruler_ar);
   if (yah)          qb = qb.ilike('yah',           `%${yah}%`);
 
@@ -242,7 +246,7 @@ export async function searchCoins(
  * e.g. getDistinctValues('cc') returns all country codes present in the table.
  */
 export async function getDistinctValues(
-  column: 'cc' | 'dyn' | 'metal' | 'type' | 'denomination' | 'mint_ar' | 'ruler_ar',
+  column: 'cc' | 'dyn' | 'metal' | 'type' | 'denomination' | 'mint_ar' | 'ruler_ar' | 'coin_type_tag',
 ): Promise<string[]> {
   // Fetch a small sample and deduplicate in JS.
   // All filterable columns (cc=21, type=3, denomination=4, metal=~20, dyn=~30)
@@ -281,4 +285,210 @@ export async function getCoinsByCountry(
   pageSize: number = 60,
 ): Promise<{ data: CoinRow[]; count: number }> {
   return getCoins({ cc }, page, pageSize);
+}
+
+// ── Islamic-specific types & functions ────────────────────────────────────────
+
+export interface DynastyStat {
+  dyn:          string;
+  coin_count:   number;
+  ruler_count:  number;
+  from_ah:      string;
+  to_ah:        string;
+  from_ce:      string;
+  to_ce:        string;
+}
+
+export interface MintStat {
+  mint:    string;
+  mint_ar: string;
+  total:   number;
+}
+
+export interface RulerStat {
+  ruler:    string;
+  ruler_ar: string;
+  dyn:      string;
+  from_ah:  string;
+  to_ah:    string;
+  total:    number;
+}
+
+export interface IslamicFilters {
+  dynasties: string[];
+  mints:     string[];
+  rulers:    string[];
+  tags:      string[];
+}
+
+/** Extra filters available for Islamic coin pages */
+export interface IslamicCoinFilters extends CoinFilters {
+  coin_type_tag?: string;
+  yah_from?: number;
+  yah_to?:   number;
+}
+
+// Internal: paginate through all IS rows for a compact column set
+async function fetchAllIsRows<T extends Record<string, unknown>>(
+  select: string,
+): Promise<T[]> {
+  const PAGE = 1000;
+  const result: T[] = [];
+  let from = 0;
+  for (;;) {
+    const { data, error } = await db
+      .from('coins')
+      .select(select)
+      .eq('cc', 'IS')
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(`fetchAllIsRows: ${error.message}`);
+    if (!data || data.length === 0) break;
+    result.push(...(data as unknown as T[]));
+    if (data.length < PAGE) break;
+    from += PAGE;
+  }
+  return result;
+}
+
+/**
+ * Dynasty-level statistics for all IS coins.
+ * Returns one row per dynasty, sorted chronologically by earliest AH year.
+ */
+export async function getDynastyStats(): Promise<DynastyStat[]> {
+  type Row = { dyn: string; ruler: string; yah: string; yce: string };
+  const rows = await fetchAllIsRows<Row>('dyn, ruler, yah, yce');
+
+  const map = new Map<string, {
+    count: number; rulers: Set<string>; yahs: number[]; yces: number[];
+  }>();
+
+  for (const row of rows) {
+    const dyn = row.dyn || '';
+    if (!map.has(dyn)) map.set(dyn, { count: 0, rulers: new Set(), yahs: [], yces: [] });
+    const e = map.get(dyn)!;
+    e.count++;
+    if (row.ruler) e.rulers.add(row.ruler);
+    const yah = parseInt(row.yah || '');
+    const yce = parseInt(row.yce || '');
+    if (!isNaN(yah) && yah > 0) e.yahs.push(yah);
+    if (!isNaN(yce) && yce > 0) e.yces.push(yce);
+  }
+
+  return Array.from(map.entries())
+    .map(([dyn, { count, rulers, yahs, yces }]) => ({
+      dyn,
+      coin_count:  count,
+      ruler_count: rulers.size,
+      from_ah: yahs.length ? String(Math.min(...yahs)) : '',
+      to_ah:   yahs.length ? String(Math.max(...yahs)) : '',
+      from_ce: yces.length ? String(Math.min(...yces)) : '',
+      to_ce:   yces.length ? String(Math.max(...yces)) : '',
+    }))
+    .sort((a, b) => (parseInt(a.from_ah || '9999') - parseInt(b.from_ah || '9999')));
+}
+
+/**
+ * Mint statistics for all IS coins, sorted by coin count descending.
+ */
+export async function getMintStats(): Promise<MintStat[]> {
+  type Row = { mint: string; mint_ar: string };
+  const rows = await fetchAllIsRows<Row>('mint, mint_ar');
+
+  const map = new Map<string, { mint_ar: string; total: number }>();
+  for (const row of rows) {
+    if (!row.mint) continue;
+    if (!map.has(row.mint)) map.set(row.mint, { mint_ar: row.mint_ar || '', total: 0 });
+    map.get(row.mint)!.total++;
+  }
+
+  return Array.from(map.entries())
+    .map(([mint, { mint_ar, total }]) => ({ mint, mint_ar, total }))
+    .sort((a, b) => b.total - a.total);
+}
+
+/**
+ * Ruler statistics for all IS coins, sorted chronologically by earliest AH year.
+ */
+export async function getRulerStats(): Promise<RulerStat[]> {
+  type Row = { ruler: string; ruler_ar: string; dyn: string; yah: string };
+  const rows = await fetchAllIsRows<Row>('ruler, ruler_ar, dyn, yah');
+
+  const map = new Map<string, { ruler_ar: string; dyn: string; yahs: number[]; total: number }>();
+  for (const row of rows) {
+    if (!row.ruler) continue;
+    if (!map.has(row.ruler)) map.set(row.ruler, { ruler_ar: row.ruler_ar || '', dyn: row.dyn || '', yahs: [], total: 0 });
+    const e = map.get(row.ruler)!;
+    e.total++;
+    const yah = parseInt(row.yah || '');
+    if (!isNaN(yah) && yah > 0) e.yahs.push(yah);
+  }
+
+  return Array.from(map.entries())
+    .map(([ruler, { ruler_ar, dyn, yahs, total }]) => ({
+      ruler,
+      ruler_ar,
+      dyn,
+      from_ah: yahs.length ? String(Math.min(...yahs)) : '',
+      to_ah:   yahs.length ? String(Math.max(...yahs)) : '',
+      total,
+    }))
+    .sort((a, b) => (parseInt(a.from_ah || '9999') - parseInt(b.from_ah || '9999')));
+}
+
+/**
+ * Paginated IS coin listing with extended Islamic filters.
+ * Always scoped to cc = 'IS'. Supports all CoinFilters plus
+ * coin_type_tag (exact) and yah_from / yah_to (Hijri year range).
+ */
+export async function getIslamicCoins(
+  filters:  IslamicCoinFilters = {},
+  page:     number             = 1,
+  pageSize: number             = 40,
+): Promise<{ data: CoinRow[]; count: number }> {
+  const from = (page - 1) * pageSize;
+  const to   = from + pageSize - 1;
+
+  // Always force cc = IS; merge caller cc is overridden
+  let qb = db
+    .from('coins')
+    .select('*', { count: 'exact' })
+    .eq('cc', 'IS')
+    .order('id')
+    .range(from, to);
+
+  // Apply standard filters (excluding cc — already set above)
+  const { cc: _cc, ...rest } = filters;
+  void _cc;
+  qb = applyFilters(qb, rest);
+
+  // Islamic-specific range filters on yah (stored as text)
+  if (filters.yah_from != null) {
+    qb = qb.filter('yah', 'gte', String(filters.yah_from));
+    qb = qb.not('yah', 'eq', '');
+  }
+  if (filters.yah_to != null) {
+    qb = qb.filter('yah', 'lte', String(filters.yah_to));
+    qb = qb.not('yah', 'eq', '');
+  }
+
+  const { data, count, error } = await qb;
+  if (error) throw new Error(`getIslamicCoins: ${error.message}`);
+  return { data: (data ?? []) as CoinRow[], count: count ?? 0 };
+}
+
+/**
+ * Returns all distinct filter values for the Islamic coins section.
+ * Used to populate dynasty, mint, ruler, and tag dropdowns.
+ */
+export async function getIslamicFilters(): Promise<IslamicFilters> {
+  const [dynasties, mints, rulers, tags] = await Promise.all([
+    getDistinctValues('dyn').then(vals =>
+      // Filter to IS-relevant dynasties only (exclude national/modern)
+      vals.filter(v => v && !['الجمهورية', 'المملكة', 'Republic', 'Kingdom'].some(k => v.includes(k)))
+    ),
+    getDistinctValues('mint_ar'),
+    getDistinctValues('ruler_ar'),
+    getDistinctValues('coin_type_tag'),
+  ]);
+  return { dynasties, mints, rulers, tags };
 }
