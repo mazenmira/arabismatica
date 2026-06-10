@@ -87,6 +87,8 @@ export interface AuctionRecord {
 export interface CoinFilters {
   /** Country code(s) — 'IS', 'EG', ['SA','EG'], etc. */
   cc?:       string | string[];
+  /** Exclude a single country code — e.g. 'IS' to show only non-Islamic coins */
+  excludeCC?: string;
   /** Dynasty name (Arabic) — exact or partial */
   dyn?:      string;
   /** Metal — exact match (case-insensitive handled by ilike) */
@@ -117,7 +119,7 @@ function applyFilters(
   qb: any,
   filters: CoinFilters,
 ) {
-  const { cc, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query } = filters;
+  const { cc, excludeCC, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query } = filters;
 
   if (cc) {
     if (Array.isArray(cc)) {
@@ -126,6 +128,7 @@ function applyFilters(
       qb = qb.eq('cc', cc);
     }
   }
+  if (excludeCC) qb = qb.neq('cc', excludeCC);
 
   if (dyn)          qb = qb.ilike('dyn',         `%${dyn}%`);
   if (metal)        qb = qb.ilike('metal',        `%${metal}%`);

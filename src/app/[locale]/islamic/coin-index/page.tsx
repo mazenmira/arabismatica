@@ -7,19 +7,20 @@ export async function generateMetadata(
   { params }: { params: { locale: string } }
 ): Promise<Metadata> {
   const locale = params.locale as 'ar' | 'en';
-  const isAr = locale === 'ar';
+  const isAr   = locale === 'ar';
   return {
     title: isAr
-      ? 'فهرس العملات الإسلامية | أرابيسماتيكا'
+      ? 'فهرس العملات الإسلامية | أرابيزماتيكا'
       : 'Islamic Coin Index | Arabismatica',
     description: isAr
       ? 'فهرس مكثف قابل للتصفية بجميع العملات الإسلامية في قاعدة البيانات.'
       : 'Dense filterable index of all Islamic coins in the Arabismatica database.',
+    openGraph: { images: [{ url: `${BASE_URL}/og-image.jpg` }] },
     alternates: {
       canonical: `${BASE_URL}/${locale}/islamic/coin-index`,
       languages: {
-        ar: `${BASE_URL}/ar/islamic/coin-index`,
-        en: `${BASE_URL}/en/islamic/coin-index`,
+        ar:          `${BASE_URL}/ar/islamic/coin-index`,
+        en:          `${BASE_URL}/en/islamic/coin-index`,
         'x-default': `${BASE_URL}/ar/islamic/coin-index`,
       },
     },

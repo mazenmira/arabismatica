@@ -532,6 +532,9 @@ export default function CataloguePage({
       if (filterDenomination) apiFilters.denomination = filterDenomination;
     }
 
+    // Exclude Islamic coins from main Arab catalogue
+    if (!apiFilters.cc) apiFilters.excludeCC = 'IS';
+
     getCoins(apiFilters, page, PER_PAGE_SUP).then(({ data, count }) => {
       if (!cancelled) {
         setCoins(data as unknown as Coin[]);

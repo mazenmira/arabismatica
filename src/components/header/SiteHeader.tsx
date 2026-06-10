@@ -35,11 +35,11 @@ const TOP_NAV_ITEMS_AR = [
     { label: '🇵🇸 فلسطين',                   href: '/ar/country/palestine' },
     { label: '🇰🇲 جزر القمر',                 href: '/ar/country/comoros' },
     { label: '🇶🇦 قطر ودبي',                  href: '/ar/country/qatar-dubai' },
+  ]},
+  { label: '☪️ إسلامي', children: [
     { label: '☪️ العملات الإسلامية',           href: '/ar/islamic' },
-    { label: '  ↳ كتالوج العملات',             href: '/ar/islamic' },
     { label: '  ↳ السلالات',                   href: '/ar/islamic/dynasties' },
     { label: '  ↳ دور الضرب',                  href: '/ar/islamic/mints' },
-    { label: '  ↳ الحكام',                     href: '/ar/islamic/rulers' },
     { label: '  ↳ فهرس العملات',               href: '/ar/islamic/coin-index' },
   ]},
   { label: 'الأدوات', isTools: true, children: [
@@ -78,8 +78,9 @@ const TOP_NAV_ITEMS_EN = [
     { label: '🇵🇸 Palestine',    href: '/en/country/palestine' },
     { label: '🇰🇲 Comoros',      href: '/en/country/comoros' },
     { label: '🇶🇦 Qatar & Dubai', href: '/en/country/qatar-dubai' },
+  ]},
+  { label: '☪️ Islamic', children: [
     { label: '☪️ Islamic Coins',   href: '/en/islamic' },
-    { label: '  ↳ Coin Catalogue', href: '/en/islamic' },
     { label: '  ↳ Dynasties',      href: '/en/islamic/dynasties' },
     { label: '  ↳ Mints',          href: '/en/islamic/mints' },
     { label: '  ↳ Rulers',         href: '/en/islamic/rulers' },

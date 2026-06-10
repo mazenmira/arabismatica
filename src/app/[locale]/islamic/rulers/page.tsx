@@ -7,14 +7,15 @@ export async function generateMetadata(
   { params }: { params: { locale: string } }
 ): Promise<Metadata> {
   const locale = params.locale as 'ar' | 'en';
-  const isAr = locale === 'ar';
+  const isAr   = locale === 'ar';
   return {
     title: isAr
-      ? 'حكام العملات الإسلامية | أرابيسماتيكا'
-      : 'Islamic Coin Rulers | Arabismatica',
+      ? 'حكام العملات الإسلامية — قائمة شاملة | أرابيزماتيكا'
+      : 'Islamic Coin Rulers — Complete List | Arabismatica',
     description: isAr
-      ? 'قائمة بجميع الحكام الذين وردت أسماؤهم على العملات الإسلامية المسجّلة.'
-      : 'All rulers whose names appear on recorded Islamic coins.',
+      ? 'قائمة بجميع الحكام الذين وردت أسماؤهم على العملات الإسلامية المسجّلة مرتبة حسب سلالاتهم.'
+      : 'All rulers whose names appear on recorded Islamic coins, organised by dynasty.',
+    openGraph: { images: [{ url: `${BASE_URL}/og-image.jpg` }] },
     alternates: {
       canonical: `${BASE_URL}/${locale}/islamic/rulers`,
       languages: {

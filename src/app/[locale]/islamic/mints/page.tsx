@@ -7,14 +7,15 @@ export async function generateMetadata(
   { params }: { params: { locale: string } }
 ): Promise<Metadata> {
   const locale = params.locale as 'ar' | 'en';
-  const isAr = locale === 'ar';
+  const isAr   = locale === 'ar';
   return {
     title: isAr
-      ? 'دور الضرب الإسلامية | أرابيسماتيكا'
-      : 'Islamic Coin Mints | Arabismatica',
+      ? 'دور الضرب الإسلامية — 142 دار ضرب | أرابيزماتيكا'
+      : 'Islamic Coin Mints — 142 Mint Cities | Arabismatica',
     description: isAr
-      ? 'جميع دور الضرب الإسلامية المرتبة حسب عدد العملات المسجّلة.'
-      : 'All Islamic mints ranked by number of recorded coins.',
+      ? 'جميع دور الضرب الإسلامية مرتبة حسب عدد العملات المسجّلة مع الأسماء العربية والإنجليزية.'
+      : 'All Islamic mints ranked by number of recorded coins with Arabic and English names.',
+    openGraph: { images: [{ url: `${BASE_URL}/og-image.jpg` }] },
     alternates: {
       canonical: `${BASE_URL}/${locale}/islamic/mints`,
       languages: {

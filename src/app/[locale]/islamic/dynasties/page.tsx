@@ -7,14 +7,15 @@ export async function generateMetadata(
   { params }: { params: { locale: string } }
 ): Promise<Metadata> {
   const locale = params.locale as 'ar' | 'en';
-  const isAr = locale === 'ar';
+  const isAr   = locale === 'ar';
   return {
     title: isAr
-      ? 'السلالات الإسلامية | أرابيسماتيكا'
-      : 'Islamic Coin Dynasties | Arabismatica',
+      ? 'السلالات الإسلامية — دليل شامل | أرابيزماتيكا'
+      : 'Islamic Coin Dynasties — Complete Index | Arabismatica',
     description: isAr
-      ? 'دليل شامل بالسلالات الإسلامية التي أصدرت عملات، مرتبة تاريخياً.'
-      : 'A complete chronological index of Islamic dynasties that issued coinage.',
+      ? 'دليل شامل بجميع السلالات والخلافات الإسلامية مرتبة زمنياً مع عدد العملات والحكام لكل سلالة.'
+      : 'Complete chronological index of all Islamic dynasties and caliphates with coin counts and ruler lists.',
+    openGraph: { images: [{ url: `${BASE_URL}/og-image.jpg` }] },
     alternates: {
       canonical: `${BASE_URL}/${locale}/islamic/dynasties`,
       languages: {
