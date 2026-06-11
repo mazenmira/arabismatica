@@ -18,25 +18,30 @@ interface CatalogueShellProps {
   heroTitle: string;
   heroSubtitle?: string;
   heroCoinCount?: number;
+  heroIcon?: string;
   navItems: ShellNavItem[];
   children: React.ReactNode;
 }
 
 export default function CatalogueShell({
+  catalogueId,
   locale,
   heroSize,
   heroTitle,
   heroSubtitle,
   heroCoinCount,
+  heroIcon,
   navItems,
   children,
 }: CatalogueShellProps) {
+  const icon = heroIcon ?? (catalogueId === 'arab' ? '🌍' : '☪️');
   const isAr = locale === 'ar';
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const altLocale = isAr ? 'en' : 'ar';
   const altPath   = pathname.replace(`/${locale}/`, `/${altLocale}/`);
+  const dePath    = pathname.replace(`/${locale}/`, '/de/');
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--parch, #FAF6EE)' }} dir={isAr ? 'rtl' : 'ltr'}>
@@ -56,11 +61,17 @@ export default function CatalogueShell({
           <div className="flex-1" />
 
           {/* Language toggle */}
-          <Link href={altPath}
-            className="flex items-center gap-1 text-gold-400 hover:text-gold-200 text-[11px] border border-gold-700/40 rounded px-2 py-1 transition-colors">
-            <Globe size={11} />
-            {isAr ? 'EN' : 'ع'}
-          </Link>
+          <div className="flex items-center gap-0.5 border border-gold-700/40 rounded px-1.5 py-0.5">
+            <Globe size={11} className="text-gold-400 me-1" />
+            <Link href={pathname.replace(`/${locale}/`, '/ar/')}
+              className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'ar' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>ع</Link>
+            <span className="text-gold-700 text-[10px]">|</span>
+            <Link href={altLocale === 'en' ? altPath : pathname.replace(`/${locale}/`, '/en/')}
+              className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'en' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>EN</Link>
+            <span className="text-gold-700 text-[10px]">|</span>
+            <Link href={dePath}
+              className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'de' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>DE</Link>
+          </div>
 
           {/* Mobile nav toggle */}
           <button onClick={() => setMobileNavOpen(!mobileNavOpen)}
@@ -116,7 +127,7 @@ export default function CatalogueShell({
 
           {heroSize === 'large' ? (
             <div className="flex items-start gap-4">
-              <span className="text-4xl md:text-5xl">☪️</span>
+              <span className="text-4xl md:text-5xl">{icon}</span>
               <div>
                 <h1 className="font-amiri text-2xl md:text-3xl text-amber-100 mb-1">{heroTitle}</h1>
                 {heroSubtitle && (
@@ -136,7 +147,7 @@ export default function CatalogueShell({
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <span className="text-xl">☪️</span>
+              <span className="text-xl">{icon}</span>
               <h1 className="font-amiri text-lg text-amber-200">{heroTitle}</h1>
             </div>
           )}

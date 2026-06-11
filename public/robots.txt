@@ -1,7 +1,13 @@
 User-agent: *
+Allow: /ar/
+Allow: /en/
+Allow: /de/
 Allow: /
 
 User-agent: Googlebot
+Allow: /ar/
+Allow: /en/
+Allow: /de/
 Allow: /
 
 Sitemap: https://arabismatica.arabcollector.com/sitemap.xml

@@ -14,6 +14,9 @@ const TOP_NAV_ITEMS_AR = [
   { label: 'المقتني العربي', children: [
     { label: 'عن المقتني العربي', href: `${WP}/about-us/` },
   ]},
+  { label: '🌍 الكتالوج العربي', children: [
+    { label: '🌍 كتالوج العملات العربية', href: '/ar/catalogue' },
+  ]},
   { label: 'الدول', children: [
     { label: '🇪🇬 مصر',                       href: '/ar/country/egypt' },
     { label: '🇲🇦 المغرب',                    href: '/ar/country/morocco' },
@@ -56,6 +59,9 @@ const TOP_NAV_ITEMS_AR = [
 const TOP_NAV_ITEMS_EN = [
   { label: 'The Arab Collector', children: [
     { label: 'About The Arab Collector', href: `${WP}/about-us/` },
+  ]},
+  { label: '🌍 Arab Catalogue', children: [
+    { label: '🌍 Arab Coin Catalogue', href: '/en/catalogue' },
   ]},
   { label: 'Countries', children: [
     { label: '🇪🇬 Egypt',        href: '/en/country/egypt' },
@@ -106,8 +112,56 @@ const SOCIALS = [
   { icon: RssIcon,       href: `${WP}/feed/`,                                        label: 'RSS' },
 ];
 
+const TOP_NAV_ITEMS_DE = [
+  { label: 'The Arab Collector', children: [
+    { label: 'Über The Arab Collector', href: `${WP}/about-us/` },
+  ]},
+  { label: '🌍 Arabischer Katalog', children: [
+    { label: '🌍 Arabischer Münzkatalog', href: '/de/catalogue' },
+  ]},
+  { label: 'Länder', children: [
+    { label: '🇪🇬 Ägypten',        href: '/de/country/egypt' },
+    { label: '🇲🇦 Marokko',        href: '/de/country/morocco' },
+    { label: '🇹🇳 Tunesien',       href: '/de/country/tunisia' },
+    { label: '🇸🇦 Saudi-Arabien',  href: '/de/country/saudi-arabia' },
+    { label: '🇾🇪 Jemen',          href: '/de/country/yemen' },
+    { label: '🇴🇲 Oman',           href: '/de/country/oman' },
+    { label: '🇮🇶 Irak',           href: '/de/country/iraq' },
+    { label: '🇩🇿 Algerien',       href: '/de/country/algeria' },
+    { label: '🇸🇾 Syrien',         href: '/de/country/syria' },
+    { label: '🇱🇾 Libyen',         href: '/de/country/libya' },
+    { label: '🇦🇪 VAE',            href: '/de/country/uae' },
+    { label: '🇯🇴 Jordanien',      href: '/de/country/jordan' },
+    { label: '🇱🇧 Libanon',        href: '/de/country/lebanon' },
+    { label: '🇰🇼 Kuwait',         href: '/de/country/kuwait' },
+    { label: '🇶🇦 Katar',          href: '/de/country/qatar' },
+    { label: '🇸🇩 Sudan',          href: '/de/country/sudan' },
+    { label: '🇲🇷 Mauretanien',    href: '/de/country/mauritania' },
+    { label: '🇵🇸 Palästina',      href: '/de/country/palestine' },
+    { label: '🇰🇲 Komoren',        href: '/de/country/comoros' },
+    { label: '🇶🇦 Katar & Dubai',  href: '/de/country/qatar-dubai' },
+  ]},
+  { label: '☪️ Islamisch', children: [
+    { label: '☪️ Islamische Münzen',  href: '/de/islamic' },
+    { label: '  ↳ Dynastien',         href: '/de/islamic/dynasties' },
+    { label: '  ↳ Münzstätten',       href: '/de/islamic/mints' },
+    { label: '  ↳ Herrscher',         href: '/de/islamic/rulers' },
+    { label: '  ↳ Münzindex',         href: '/de/islamic/coin-index' },
+  ]},
+  { label: 'Tools', isTools: true, children: [
+    { label: '📅 Hidschra ↔ Gregorian', href: '#hijri-converter' },
+    { label: '🛠️ Weitere Tools',        href: '#tools-sidebar' },
+    { label: '📚 Wissensportal',        href: `${WP}/knowledge-portal/` },
+    { label: '🎓 Bewertungstools',      href: `${WP}/grading-tools/` },
+    { label: '🔬 Junger Sammler Lab',   href: `${WP}/young-collector-lab/` },
+    { label: '🎓 Arab Collector Akademie', href: `${WP}/ac-academy/` },
+    { label: '📖 Digitale Bibliothek',  href: 'https://library.arabcollector.com/' },
+  ]},
+];
+
 function getDate(locale: string): string {
-  return new Date().toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-AU', {
+  const loc = locale === 'ar' ? 'ar-EG' : locale === 'de' ? 'de-DE' : 'en-AU';
+  return new Date().toLocaleDateString(loc, {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 }
@@ -122,7 +176,7 @@ interface SiteHeaderProps {
 
 export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen, user }: SiteHeaderProps) {
   const isAr = locale === 'ar';
-  const TOP_NAV_ITEMS = isAr ? TOP_NAV_ITEMS_AR : TOP_NAV_ITEMS_EN;
+  const TOP_NAV_ITEMS = locale === 'ar' ? TOP_NAV_ITEMS_AR : locale === 'de' ? TOP_NAV_ITEMS_DE : TOP_NAV_ITEMS_EN;
 
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [activeMenu,   setActiveMenu]   = useState<string | null>(null);
@@ -154,11 +208,13 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
         <div className="max-w-[1440px] mx-auto px-4 h-9 flex items-center gap-3">
 
           {/* Language switcher */}
-          <div className="flex items-center gap-1 border border-gold-700/40 rounded px-2 py-0.5" style={{ minWidth: '72px' }}>
+          <div className="flex items-center gap-1 border border-gold-700/40 rounded px-2 py-0.5">
             <Globe size={12} className="text-gold-400 shrink-0" />
-            <Link href="/ar" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${isAr ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>ع</Link>
+            <Link href="/ar" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'ar' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>ع</Link>
             <span className="text-gold-700">|</span>
-            <Link href="/en" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${!isAr ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>EN</Link>
+            <Link href="/en" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'en' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>EN</Link>
+            <span className="text-gold-700">|</span>
+            <Link href="/de" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'de' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>DE</Link>
           </div>
 
           {/* Date */}

@@ -95,8 +95,10 @@ export default function IslamicPage({ locale }: { locale: string }) {
   const [coins,     setCoins]     = useState<CoinRow[]>([]);
   const [total,     setTotal]     = useState(47303);
   const [loading,   setLoading]   = useState(false);
-  const [filters,   setFilters]   = useState<{ dynasties: string[]; metals: string[] }>({
-    dynasties: [], metals: [],
+  const [mint,           setMint]          = useState('');
+  const [ruler,          setRuler]         = useState('');
+  const [filters,   setFilters]   = useState<{ dynasties: string[]; metals: string[]; mints: string[]; rulers: string[] }>({
+    dynasties: [], metals: [], mints: [], rulers: [],
   });
 
   const queryRef   = useRef<NodeJS.Timeout>();
@@ -104,7 +106,12 @@ export default function IslamicPage({ locale }: { locale: string }) {
   // Load filter options once
   useEffect(() => {
     getIslamicFilters().then(f => {
-      setFilters({ dynasties: f.dynasties, metals: ['Gold', 'Silver', 'Bronze', 'Billon', 'Lead'] });
+      setFilters({
+        dynasties: f.dynasties,
+        metals: ['Gold', 'Silver', 'Bronze', 'Billon', 'Lead'],
+        mints: f.mints.filter(Boolean).slice(0, 120),
+        rulers: f.rulers.filter(Boolean).slice(0, 200),
+      });
     }).catch(() => {});
   }, []);
 
@@ -116,6 +123,8 @@ export default function IslamicPage({ locale }: { locale: string }) {
     if (denomination) f.denomination = denomination;
     if (dynasty)      f.dyn          = dynasty;
     if (metal)        f.metal        = metal;
+    if (mint)         f.mint_ar      = mint;
+    if (ruler)        f.ruler_ar     = ruler;
     if (coinTypeTag)  f.coin_type_tag = coinTypeTag;
     if (yahFrom)      f.yah_from    = parseInt(yahFrom);
     if (yahTo)        f.yah_to      = parseInt(yahTo);
@@ -134,7 +143,7 @@ export default function IslamicPage({ locale }: { locale: string }) {
       setLoading(false);
     }).catch(() => setLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, denomination, dynasty, metal, coinTypeTag, yahFrom, yahTo, sort, page]);
+  }, [query, denomination, dynasty, metal, mint, ruler, coinTypeTag, yahFrom, yahTo, sort, page]);
 
   useEffect(() => {
     clearTimeout(queryRef.current);
@@ -144,10 +153,11 @@ export default function IslamicPage({ locale }: { locale: string }) {
 
   const clearAll = () => {
     setQuery(''); setDenomination(''); setDynasty(''); setMetal('');
+    setMint(''); setRuler('');
     setCoinTypeTag(''); setYahFrom(''); setYahTo(''); setSort('default'); setPage(1);
   };
 
-  const activeCount = [denomination, dynasty, metal, coinTypeTag, yahFrom, yahTo].filter(Boolean).length;
+  const activeCount = [denomination, dynasty, metal, mint, ruler, coinTypeTag, yahFrom, yahTo].filter(Boolean).length;
   const totalPages  = Math.ceil(total / PER_PAGE);
 
   const jsonLd = {
@@ -205,6 +215,20 @@ export default function IslamicPage({ locale }: { locale: string }) {
             {filters.metals.map(m => (
               <option key={m} value={m}>{isAr ? (METALS_AR[m] ?? m) : m}</option>
             ))}
+          </select>
+
+          {/* Mint */}
+          <select value={mint} onChange={e => { setMint(e.target.value); setPage(1); }}
+            className="text-[12px] px-3 py-2 rounded-lg border border-amber-200 bg-white outline-none focus:border-amber-400 max-w-[180px]">
+            <option value="">{isAr ? 'كل دور الضرب' : 'All mints'}</option>
+            {filters.mints.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+
+          {/* Ruler */}
+          <select value={ruler} onChange={e => { setRuler(e.target.value); setPage(1); }}
+            className="text-[12px] px-3 py-2 rounded-lg border border-amber-200 bg-white outline-none focus:border-amber-400 max-w-[180px]">
+            <option value="">{isAr ? 'كل الحكام' : 'All rulers'}</option>
+            {filters.rulers.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
 
           {/* More filters toggle */}
@@ -283,6 +307,18 @@ export default function IslamicPage({ locale }: { locale: string }) {
               <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
                 {isAr ? (METALS_AR[metal] ?? metal) : metal}
                 <button onClick={() => { setMetal(''); setPage(1); }}><X size={10} /></button>
+              </span>
+            )}
+            {mint && (
+              <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
+                {mint}
+                <button onClick={() => { setMint(''); setPage(1); }}><X size={10} /></button>
+              </span>
+            )}
+            {ruler && (
+              <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
+                {ruler}
+                <button onClick={() => { setRuler(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {coinTypeTag && (

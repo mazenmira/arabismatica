@@ -11,20 +11,33 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
-  const locale  = params.locale as 'ar' | 'en';
+  const locale  = params.locale as 'ar' | 'en' | 'de';
   const isAr    = locale === 'ar';
+  const isDe    = locale === 'de';
   const pageUrl = `${BASE_URL}/${locale}`;
 
+  const title = isAr
+    ? 'أرابيزماتيكا — كتالوج العملات العربية والإسلامية'
+    : isDe
+    ? 'Arabismatica — Arabischer & Islamischer Münzkatalog'
+    : 'Arabismatica — Arab & Islamic Coin Catalogue';
+
+  const description = isAr
+    ? 'أشمل كتالوج إلكتروني للعملات العربية والإسلامية. تصفح 52,808 عملة من الدولة الأموية والعباسية والفاطمية والمماليك و20 دولة عربية. تعرف على عملتك مجاناً.'
+    : isDe
+    ? 'Der umfassendste Online-Katalog arabischer und islamischer Münzen. 52.808 Münzen aus der Umayyaden-, Abbasiden-, Fatimiden- und Mamluken-Ära sowie 20 arabische Länder. Kostenlose Münzidentifizierung.'
+    : 'The most comprehensive online catalogue of Arab and Islamic coins. Browse 52,808 coins from Umayyad, Abbasid, Fatimid, Mamluk dynasties and 20 Arab countries. Free coin identification and price guide.';
+
+  const keywords = isAr
+    ? 'عملات عربية، عملات إسلامية، نمسماتيا عربية، دراهم أموية، دنانير عباسية، عملات فاطمية، عملات مملوكية، عملات مصرية، عملات سعودية، كتالوج عملات، تقييم عملات'
+    : isDe
+    ? 'arabische Münzen, islamische Münzen, arabische Numismatik, Umayyaden-Münzen, Abbasiden-Münzen, Fatimiden-Dinar, Mamluken-Münzen, ägyptische Münzen, Münzkatalog, Münzidentifizierung'
+    : 'Arab coins, Islamic coins, Arabic numismatics, Umayyad coins, Abbasid coins, Fatimid gold dinar, Mamluk coins, Egyptian coins, Saudi coins, coin catalogue, coin identification, Arab coin values, Islamic numismatics';
+
   return {
-    title: isAr
-      ? 'أرابيزماتيكا — كتالوج العملات العربية والإسلامية'
-      : 'Arabismatica — Arab & Islamic Coin Catalogue',
-    description: isAr
-      ? 'أشمل كتالوج إلكتروني للعملات العربية والإسلامية. تصفح 52,808 عملة من الدولة الأموية والعباسية والفاطمية والمماليك و20 دولة عربية. تعرف على عملتك مجاناً.'
-      : 'The most comprehensive online catalogue of Arab and Islamic coins. Browse 52,808 coins from Umayyad, Abbasid, Fatimid, Mamluk dynasties and 20 Arab countries. Free coin identification and price guide.',
-    keywords: isAr
-      ? 'عملات عربية، عملات إسلامية، نمسماتيا عربية، دراهم أموية، دنانير عباسية، عملات فاطمية، عملات مملوكية، عملات مصرية، عملات سعودية، كتالوج عملات، تقييم عملات'
-      : 'Arab coins, Islamic coins, Arabic numismatics, Umayyad coins, Abbasid coins, Fatimid gold dinar, Mamluk coins, Egyptian coins, Saudi coins, coin catalogue, coin identification, Arab coin values, Islamic numismatics',
+    title,
+    description,
+    keywords,
     openGraph: {
       type: 'website',
       url: pageUrl,
@@ -40,6 +53,7 @@ export async function generateMetadata({
       languages: {
         'ar':        `${BASE_URL}/ar`,
         'en':        `${BASE_URL}/en`,
+        'de':        `${BASE_URL}/de`,
         'x-default': `${BASE_URL}/ar`,
       },
     },
@@ -69,7 +83,7 @@ export default async function LocaleLayout({
   params: { locale: string };
 }) {
   const { locale } = params;
-  if (!routing.locales.includes(locale as 'ar' | 'en')) {
+  if (!routing.locales.includes(locale as 'ar' | 'en' | 'de')) {
     notFound();
   }
   const messages = await getMessages();
@@ -84,6 +98,7 @@ export default async function LocaleLayout({
         />
         <link rel="alternate" hrefLang="ar"        href={`${BASE_URL}/ar`} />
         <link rel="alternate" hrefLang="en"        href={`${BASE_URL}/en`} />
+        <link rel="alternate" hrefLang="de"        href={`${BASE_URL}/de`} />
         <link rel="alternate" hrefLang="x-default" href={`${BASE_URL}/ar`} />
       </head>
       <body>

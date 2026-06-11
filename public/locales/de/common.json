@@ -1,0 +1,123 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "catalogue": "Katalog",
+    "knowledge": "Wissensportal",
+    "grading": "Bewertungstools",
+    "about": "Über Arab Collector",
+    "publications": "Veröffentlichungen",
+    "articles": "Artikel & Neuigkeiten",
+    "tools": "Toolscenter",
+    "shop": "Shop",
+    "authors": "Redakteure & Autoren",
+    "backToSite": "Zurück zu Arabismatica"
+  },
+  "hero": {
+    "title": "أرابيزماتيكا – Arabismatica",
+    "subtitle": "Der arabische Münzkatalog",
+    "total": "Münzen indexiert",
+    "countries": "arabische Länder",
+    "years": "1500–2026"
+  },
+  "search": {
+    "placeholder": "Suche nach Name, KM#, N#, Metall, Jahr…",
+    "identify": "Münze per Bild identifizieren",
+    "uploadHint": "Lade ein Münzbild hoch, um es per KI zu identifizieren",
+    "results": "Ergebnisse",
+    "noResults": "Keine Ergebnisse gefunden",
+    "noResultsHint": "Versuche, die Suche oder Filter anzupassen"
+  },
+  "filters": {
+    "era": "Epoche",
+    "allEras": "Alle Epochen",
+    "metal": "Metall",
+    "allMetals": "Alle Metalle",
+    "type": "Typ",
+    "circulation": "Umlaufmünze",
+    "commemorative": "Gedenkmünze",
+    "withMintage": "Mit Auflage",
+    "all": "Alle",
+    "country": "Land"
+  },
+  "timeline": {
+    "label": "Zeitstrahl",
+    "from": "Von",
+    "to": "Bis",
+    "drag": "Ziehen, um Münzen nach Jahr zu filtern"
+  },
+  "coin": {
+    "obverse": "Vorderseite",
+    "reverse": "Rückseite",
+    "metal": "Metall",
+    "weight": "Gewicht",
+    "diameter": "Durchmesser",
+    "type": "Typ",
+    "mintage": "Auflage",
+    "pieces": "Stück",
+    "dynasty": "Dynastie / Epoche",
+    "mint": "Münzstätte",
+    "viewOnNumista": "Auf Numista ansehen",
+    "close": "Schließen"
+  },
+  "tools": {
+    "title": "Professionelle Tools",
+    "tab_encyclopedias": "Enzyklopädien & Glossar",
+    "tab_analysis": "Inspektion & Bewertung",
+    "tab_value": "Wert & Verkauf",
+    "glossary": "Numismatisches Glossar",
+    "islamicEnc": "Enzyklopädie islamischer Münzen",
+    "errorsEnc": "Präge­fehler & Fälschungen",
+    "hijriConverter": "Hidschra-Datumskonverter für Münzen",
+    "coinParts": "Teile einer Münze",
+    "coinInspection": "Münzprüfungsanleitung",
+    "gradingGuide": "Münzbewertungsanleitung",
+    "gradingSites": "Münzbewertungsdienste",
+    "metalCalc": "Edelmetallrechner",
+    "arabPrices": "Arabische Münzpreise",
+    "sellGuide": "Wie verkaufe ich meine alten Münzen",
+    "hijriDesc": "Islamische Kalenderdaten auf Münzen präzise in den gregorianischen Kalender umrechnen",
+    "open": "Professionelle Tools öffnen"
+  },
+  "metals": {
+    "Gold": "Gold",
+    "Silver": "Silber",
+    "Copper": "Kupfer",
+    "Bronze": "Bronze",
+    "Cupro-Nickel": "Kupfer-Nickel",
+    "Bimetallic": "Bimetallisch",
+    "Aluminium": "Aluminium",
+    "Billon": "Billon",
+    "Brass": "Messing",
+    "Nickel": "Nickel",
+    "Steel": "Stahl",
+    "Other": "Sonstige"
+  },
+  "eras": {
+    "1500-1800": "1500–1800 Frühes Osmanisches Reich",
+    "1800-1863": "1800–1863",
+    "1863-1914": "1863–1914",
+    "1914-1952": "1914–1952",
+    "1952-1970": "1952–1970",
+    "1971-2000": "1971–2000",
+    "2001-2026": "2001–2026"
+  },
+  "pagination": {
+    "previous": "Zurück",
+    "next": "Weiter",
+    "page": "Seite",
+    "of": "von"
+  },
+  "footer": {
+    "tagline": "Die umfassende Enzyklopädie arabischer Münzen",
+    "source": "Datenquelle: Numista",
+    "backlink": "arabcollector.com"
+  },
+  "identify": {
+    "title": "Münze per Bild identifizieren",
+    "subtitle": "Lade ein Münzbild zur automatischen Identifizierung hoch",
+    "upload": "Bild hochladen",
+    "drop": "Oder Bild hierher ziehen",
+    "processing": "Analysiere…",
+    "disclaimer": "Dies ist eine experimentelle Funktion — Genauigkeit ist nicht garantiert"
+  }
+}
