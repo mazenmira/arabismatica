@@ -102,23 +102,23 @@ export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
         </select>
 
         {/* Mint */}
-        <select value={filters.mint_ar || ''}
-          onChange={e => updateFilter('mint_ar', e.target.value)}
+        <select value={(filters as { mint?: string }).mint || ''}
+          onChange={e => updateFilter('mint', e.target.value)}
           className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none cursor-pointer focus:border-gold-500
-            ${filters.mint_ar ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
+            ${(filters as { mint?: string }).mint ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
           dir={isAr ? 'rtl' : 'ltr'}>
           <option value="">{isAr ? '🏛️ دار الضرب' : '🏛️ Mint'}</option>
-          {opts.mints.map(m => <option key={m} value={m}>{m}</option>)}
+          {opts.mints.map(m => <option key={m.en} value={m.en}>{isAr ? (m.ar || m.en) : m.en}</option>)}
         </select>
 
         {/* Ruler */}
-        <select value={filters.ruler_ar || ''}
-          onChange={e => updateFilter('ruler_ar', e.target.value)}
+        <select value={(filters as { ruler?: string }).ruler || ''}
+          onChange={e => updateFilter('ruler', e.target.value)}
           className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none cursor-pointer focus:border-gold-500
-            ${filters.ruler_ar ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
+            ${(filters as { ruler?: string }).ruler ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
           dir={isAr ? 'rtl' : 'ltr'}>
           <option value="">{isAr ? '👑 الحاكم' : '👑 Ruler'}</option>
-          {opts.rulers.map(r => <option key={r} value={r}>{r}</option>)}
+          {opts.rulers.map(r => <option key={r.en} value={r.en}>{isAr ? (r.ar || r.en) : r.en}</option>)}
         </select>
 
         {/* Hijri range */}

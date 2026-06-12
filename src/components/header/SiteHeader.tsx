@@ -3,10 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, Globe, ChevronDown, Wrench, Settings } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Menu, X, Globe, ChevronDown, Wrench, Settings, Moon, Sun } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, LinkedinIcon, YoutubeIcon, InstagramIcon, RssIcon } from './SocialIcons';
 import ToolsSidebar from '@/components/sidebar/ToolsSidebar';
 import IdentifyModal from '@/components/modals/IdentifyModal';
+import { useAuth } from '@/lib/authContext';
+import { useDarkMode } from '@/lib/darkModeContext';
 
 const WP = 'https://arabcollector.com';
 
@@ -106,15 +109,15 @@ function getDate(locale: string): string {
 
 interface SiteHeaderProps {
   locale: string;
-  onAuthOpen?: () => void;
-  onDashOpen?: () => void;
-  onAdminOpen?: () => void;
-  user?: { id: string; email: string } | null;
 }
 
-export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen, user }: SiteHeaderProps) {
+export default function SiteHeader({ locale }: SiteHeaderProps) {
   const isAr = locale === 'ar';
   const TOP_NAV_ITEMS = locale === 'ar' ? TOP_NAV_ITEMS_AR : locale === 'de' ? TOP_NAV_ITEMS_DE : TOP_NAV_ITEMS_EN;
+
+  const { user, setAuthOpen, setDashOpen, setAdminOpen } = useAuth();
+  const { darkMode, toggleDarkMode } = useDarkMode();
+  const pathname = usePathname();
 
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [activeMenu,   setActiveMenu]   = useState<string | null>(null);
@@ -123,6 +126,12 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
   const [identifyOpen, setIdentifyOpen] = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const switchLocale = (newLocale: string) => {
+    const segments = pathname.split('/');
+    segments[1] = newLocale;
+    return segments.join('/') || `/${newLocale}`;
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -148,11 +157,11 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
           {/* Language switcher */}
           <div className="flex items-center gap-1 border border-gold-700/40 rounded px-2 py-0.5">
             <Globe size={12} className="text-gold-400 shrink-0" />
-            <Link href="/ar" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'ar' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>ع</Link>
+            <Link href={switchLocale('ar')} className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'ar' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>ع</Link>
             <span className="text-gold-700">|</span>
-            <Link href="/en" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'en' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>EN</Link>
+            <Link href={switchLocale('en')} className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'en' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>EN</Link>
             <span className="text-gold-700">|</span>
-            <Link href="/de" className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'de' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>DE</Link>
+            <Link href={switchLocale('de')} className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'de' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>DE</Link>
           </div>
 
           {/* Date */}
@@ -265,9 +274,16 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 {isAr ? 'تحديد بالصورة' : 'Identify'}
               </button>
 
-              {/* Admin Panel — towards end */}
+              {/* Dark mode toggle */}
+              <button onClick={toggleDarkMode}
+                className="hidden md:flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/40 text-gold-500 hover:border-gold-500 hover:text-gold-300 transition-colors"
+                title={darkMode ? (isAr ? 'الوضع الفاتح' : 'Light mode') : (isAr ? 'الوضع الداكن' : 'Dark mode')}>
+                {darkMode ? <Sun size={14} /> : <Moon size={14} />}
+              </button>
+
+              {/* Admin Panel */}
               <button
-                onClick={onAdminOpen}
+                onClick={() => setAdminOpen(true)}
                 className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-500/70 hover:border-gold-600 hover:text-gold-400 transition-colors"
                 title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}
               >
@@ -275,15 +291,15 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 <span className="hidden lg:block">{isAr ? 'الإدارة' : 'Admin'}</span>
               </button>
 
-              {/* Auth button — at the end */}
+              {/* Auth button */}
               {user ? (
-                <button onClick={onDashOpen}
+                <button onClick={() => setDashOpen(true)}
                   className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 hover:bg-gold-500/25 transition-colors">
                   <span>👤</span>
                   <span className="max-w-[80px] truncate">{user.email.split('@')[0]}</span>
                 </button>
               ) : (
-                <button onClick={onAuthOpen}
+                <button onClick={() => setAuthOpen(true)}
                   className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-500/70 hover:border-gold-600 hover:text-gold-400 transition-colors">
                   {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>
@@ -357,17 +373,21 @@ export default function SiteHeader({ locale, onAuthOpen, onDashOpen, onAdminOpen
                 className="flex-1 py-2 text-[12px] rounded-full border border-gold-500/70 text-gold-400 text-center">
                 {isAr ? 'تحديد بالصورة' : 'Identify'}
               </button>
-              <button onClick={() => { onAdminOpen?.(); setMobileOpen(false); }}
+              <button onClick={() => { toggleDarkMode(); setMobileOpen(false); }}
+                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500/70 text-center flex items-center justify-center gap-1">
+                {darkMode ? <Sun size={12} /> : <Moon size={12} />} {darkMode ? (isAr ? 'فاتح' : 'Light') : (isAr ? 'داكن' : 'Dark')}
+              </button>
+              <button onClick={() => { setAdminOpen(true); setMobileOpen(false); }}
                 className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500/70 text-center flex items-center justify-center gap-1">
                 <Settings size={12} /> {isAr ? 'الإدارة' : 'Admin'}
               </button>
               {user ? (
-                <button onClick={() => { onDashOpen?.(); setMobileOpen(false); }}
+                <button onClick={() => { setDashOpen(true); setMobileOpen(false); }}
                   className="flex-1 py-2 text-[12px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 text-center">
                   👤 {user.email.split('@')[0]}
                 </button>
               ) : (
-                <button onClick={() => { onAuthOpen?.(); setMobileOpen(false); }}
+                <button onClick={() => { setAuthOpen(true); setMobileOpen(false); }}
                   className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500/70 text-center">
                   {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>

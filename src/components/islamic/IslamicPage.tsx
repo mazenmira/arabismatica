@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { Search, X, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
+import { Search, X, ChevronDown, ChevronUp, SlidersHorizontal, FileDown } from 'lucide-react';
 import { getIslamicCoins, getIslamicFilters } from '@/lib/coinsApi';
 import type { CoinRow, IslamicCoinFilters } from '@/lib/coinsApi';
 import CoinCard from '@/components/catalogue/CoinCard';
+import CoinModal from '@/components/catalogue/CoinModal';
+import { useDarkMode } from '@/lib/darkModeContext';
+import type { Coin } from '@/types/coin';
 
 const DENOM_OPTIONS = [
   { key: '',             labelEn: 'All Denominations', labelAr: 'كل الأوراق' },
@@ -42,10 +45,9 @@ function SkeletonCard() {
   );
 }
 
-import type { Coin } from '@/types/coin';
-
 export default function IslamicPage({ locale }: { locale: string }) {
   const isAr = locale === 'ar';
+  const { darkMode } = useDarkMode();
 
   // ── Filter state ─────────────────────────────────────────────────────────
   const [query,          setQuery]          = useState('');
@@ -60,16 +62,20 @@ export default function IslamicPage({ locale }: { locale: string }) {
   const [page,           setPage]           = useState(1);
 
   // ── Data state ───────────────────────────────────────────────────────────
-  const [coins,     setCoins]     = useState<CoinRow[]>([]);
-  const [total,     setTotal]     = useState(47303);
-  const [loading,   setLoading]   = useState(false);
-  const [mint,           setMint]          = useState('');
-  const [ruler,          setRuler]         = useState('');
-  const [filters,   setFilters]   = useState<{ dynasties: string[]; metals: string[]; mints: string[]; rulers: string[] }>({
-    dynasties: [], metals: [], mints: [], rulers: [],
-  });
+  const [coins,        setCoins]        = useState<CoinRow[]>([]);
+  const [total,        setTotal]        = useState(47303);
+  const [loading,      setLoading]      = useState(false);
+  const [mint,         setMint]         = useState('');  // English key
+  const [ruler,        setRuler]        = useState('');  // English key
+  const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
+  const [filters,      setFilters]      = useState<{
+    dynasties: string[];
+    metals: string[];
+    mints: { en: string; ar: string | null }[];
+    rulers: { en: string; ar: string | null }[];
+  }>({ dynasties: [], metals: [], mints: [], rulers: [] });
 
-  const queryRef   = useRef<NodeJS.Timeout>();
+  const queryRef = useRef<NodeJS.Timeout>();
 
   // Load filter options once
   useEffect(() => {
@@ -77,8 +83,8 @@ export default function IslamicPage({ locale }: { locale: string }) {
       setFilters({
         dynasties: f.dynasties,
         metals: ['Gold', 'Silver', 'Bronze', 'Billon', 'Lead'],
-        mints: f.mints.filter(Boolean).slice(0, 120),
-        rulers: f.rulers.filter(Boolean).slice(0, 200),
+        mints: f.mints,
+        rulers: f.rulers,
       });
     }).catch(() => {});
   }, []);
@@ -91,8 +97,8 @@ export default function IslamicPage({ locale }: { locale: string }) {
     if (denomination) f.denomination = denomination;
     if (dynasty)      f.dyn          = dynasty;
     if (metal)        f.metal        = metal;
-    if (mint)         f.mint_ar      = mint;
-    if (ruler)        f.ruler_ar     = ruler;
+    if (mint)         f.mint         = mint;
+    if (ruler)        f.ruler        = ruler;
     if (coinTypeTag)  f.coin_type_tag = coinTypeTag;
     if (yahFrom)      f.yah_from    = parseInt(yahFrom);
     if (yahTo)        f.yah_to      = parseInt(yahTo);
@@ -125,6 +131,62 @@ export default function IslamicPage({ locale }: { locale: string }) {
     setCoinTypeTag(''); setYahFrom(''); setYahTo(''); setSort('default'); setPage(1);
   };
 
+  // PDF download
+  const downloadPDF = () => {
+    const rows = coins.slice(0, 500).map(c => {
+      const name  = isAr ? (c.nar || c.name) : c.name;
+      const yah   = c.yah ? c.yah + (isAr ? ' هـ' : ' AH') : '—';
+      const mintLabel = isAr ? (c.mint_ar || c.mint || '—') : (c.mint || '—');
+      return `<tr>
+        <td dir="rtl">${name}</td>
+        <td>${c.dyn || '—'}</td>
+        <td>${yah}</td>
+        <td>${isAr ? (METALS_AR[c.metal] ?? c.metal) : c.metal || '—'}</td>
+        <td>${mintLabel}</td>
+        <td>${isAr ? (c.ruler_ar || c.ruler || '—') : (c.ruler || '—')}</td>
+      </tr>`;
+    }).join('');
+
+    const title   = isAr ? 'نتائج البحث — العملات الإسلامية' : 'Search Results — Islamic Coins';
+    const headers = isAr
+      ? ['الاسم','السلالة','السنة هـ','المعدن','دار الضرب','الحاكم']
+      : ['Name','Dynasty','Year AH','Metal','Mint','Ruler'];
+    const date = new Date().toLocaleDateString(isAr ? 'ar-EG' : 'en-AU');
+
+    const html = `<!DOCTYPE html>
+<html dir="${isAr ? 'rtl' : 'ltr'}" lang="${locale}">
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Amiri', serif; font-size: 11px; color: #1a0e05; background: #fff; padding: 24px; }
+  h1 { font-size: 20px; color: #8B6D2E; margin-bottom: 4px; }
+  .meta { font-size: 10px; color: #888; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #1a0e05; color: #F0E8D4; padding: 6px 8px; text-align: ${isAr ? 'right' : 'left'}; font-size: 10px; }
+  td { padding: 5px 8px; border-bottom: 1px solid #e8dfc8; font-size: 11px; }
+  tr:nth-child(even) { background: #faf6ee; }
+  @media print { body { padding: 12px; } }
+</style>
+</head>
+<body>
+<h1>${title}</h1>
+<div class="meta">${date} · ${total.toLocaleString()} ${isAr ? 'عملة' : 'coins'}${total > 500 ? (isAr ? ' (أول 500 نتيجة)' : ' (first 500 results)') : ''}</div>
+<table>
+  <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const win  = window.open(url, '_blank');
+    if (win) { win.onload = () => { win.print(); setTimeout(() => URL.revokeObjectURL(url), 3000); }; }
+  };
+
   const activeCount = [denomination, dynasty, metal, mint, ruler, coinTypeTag, yahFrom, yahTo].filter(Boolean).length;
   const totalPages  = Math.ceil(total / PER_PAGE);
 
@@ -138,7 +200,11 @@ export default function IslamicPage({ locale }: { locale: string }) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div dir={isAr ? 'rtl' : 'ltr'} className="max-w-[1440px] mx-auto">
+      <div
+        dir={isAr ? 'rtl' : 'ltr'}
+        className="max-w-[1440px] mx-auto"
+        style={darkMode ? { filter: 'invert(1) hue-rotate(180deg)' } : {}}
+      >
 
         {/* ── SEARCH ───────────────────────────────────────────────────── */}
         <div className="border-b border-gold-700/15 bg-white/50 py-3">
@@ -181,34 +247,60 @@ export default function IslamicPage({ locale }: { locale: string }) {
               ))}
             </select>
 
-            {/* Mint */}
+            {/* Mint — bilingual */}
             <select value={mint} onChange={e => { setMint(e.target.value); setPage(1); }}
               className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[160px]">
               <option value="">{isAr ? 'كل دور الضرب' : 'All Mints'}</option>
-              {filters.mints.map(m => <option key={m} value={m}>{m}</option>)}
+              {filters.mints.map(m => (
+                <option key={m.en} value={m.en}>{isAr ? (m.ar || m.en) : m.en}</option>
+              ))}
             </select>
 
-            {/* Ruler */}
+            {/* Ruler — bilingual */}
             <select value={ruler} onChange={e => { setRuler(e.target.value); setPage(1); }}
               className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[160px]">
               <option value="">{isAr ? 'كل الحكام' : 'All Rulers'}</option>
-              {filters.rulers.map(r => <option key={r} value={r}>{r}</option>)}
+              {filters.rulers.map(r => (
+                <option key={r.en} value={r.en}>{isAr ? (r.ar || r.en) : r.en}</option>
+              ))}
             </select>
 
-            {/* More filters toggle */}
+            {/* Year AH range — moved from More filters */}
+            <div className="flex items-center gap-1">
+              <span className="text-[11px] text-ink/50 shrink-0">{isAr ? 'هـ:' : 'AH:'}</span>
+              <input value={yahFrom} onChange={e => { setYahFrom(e.target.value); setPage(1); }}
+                type="number" placeholder={isAr ? 'من' : 'From'}
+                className="w-[60px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+              <span className="text-ink/30 text-[11px]">—</span>
+              <input value={yahTo} onChange={e => { setYahTo(e.target.value); setPage(1); }}
+                type="number" placeholder={isAr ? 'إلى' : 'To'}
+                className="w-[60px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+            </div>
+
+            {/* More filters toggle (coin type pills only now) */}
             <button
               onClick={() => setMoreFilters(!moreFilters)}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
                 ${moreFilters ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
               <SlidersHorizontal size={12} />
-              {isAr ? 'فلاتر إضافية' : 'More filters'}
+              {isAr ? 'النوع' : 'Type'}
               {moreFilters ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
 
-            {/* Results count */}
-            <span className="text-[11px] text-ink/40 ms-auto">
-              {total.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {isAr ? 'عملة' : 'coins'}
-            </span>
+            {/* Results count + PDF */}
+            <div className="flex items-center gap-2 ms-auto">
+              <span className="text-[11px] text-ink/40">
+                {total.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {isAr ? 'عملة' : 'coins'}
+              </span>
+              {total > 0 && (
+                <button onClick={downloadPDF}
+                  title={isAr ? 'تنزيل النتائج كـ PDF' : 'Download results as PDF'}
+                  className="flex items-center gap-1 text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 hover:border-gold-500/60 rounded-full px-2.5 py-1 transition-colors">
+                  <FileDown size={11} />
+                  <span className="hidden sm:block">{isAr ? 'PDF' : 'PDF'}</span>
+                </button>
+              )}
+            </div>
 
             {/* Sort */}
             <select value={sort} onChange={e => { setSort(e.target.value as typeof sort); setPage(1); }}
@@ -229,23 +321,9 @@ export default function IslamicPage({ locale }: { locale: string }) {
           </div>
         </div>
 
-        {/* ── FILTER ROW 2 (expandable) ────────────────────────────────── */}
+        {/* ── FILTER ROW 2 — coin type pills ───────────────────────────── */}
         {moreFilters && (
           <div className="border-b border-gold-700/10 bg-parch-cream/60 px-4 py-3 flex flex-wrap items-center gap-4">
-            {/* Year AH range */}
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-ink/60 font-medium shrink-0">
-                {isAr ? 'هجري:' : 'Year AH:'}
-              </span>
-              <input value={yahFrom} onChange={e => { setYahFrom(e.target.value); setPage(1); }}
-                type="number" placeholder={isAr ? 'من' : 'From'}
-                className="w-20 text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
-              <span className="text-ink/30 text-[11px]">—</span>
-              <input value={yahTo} onChange={e => { setYahTo(e.target.value); setPage(1); }}
-                type="number" placeholder={isAr ? 'إلى' : 'To'}
-                className="w-20 text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
-            </div>
-            {/* Coin type pills */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] text-ink/60 font-medium shrink-0">
                 {isAr ? 'النوع:' : 'Type:'}
@@ -287,13 +365,13 @@ export default function IslamicPage({ locale }: { locale: string }) {
             )}
             {mint && (
               <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
-                {mint}
+                {isAr ? (filters.mints.find(m => m.en === mint)?.ar ?? mint) : mint}
                 <button onClick={() => { setMint(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {ruler && (
               <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
-                {ruler}
+                {isAr ? (filters.rulers.find(r => r.en === ruler)?.ar ?? ruler) : ruler}
                 <button onClick={() => { setRuler(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
@@ -322,7 +400,7 @@ export default function IslamicPage({ locale }: { locale: string }) {
                   coin={coin as unknown as Coin}
                   locale={locale}
                   view="grid"
-                  onClick={() => {}}
+                  onClick={() => setSelectedCoin(coin as unknown as Coin)}
                 />
               ))}
         </div>
@@ -342,7 +420,6 @@ export default function IslamicPage({ locale }: { locale: string }) {
               {isAr ? '→' : '←'}
             </button>
 
-            {/* Page numbers */}
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               const p = page <= 3 ? i + 1 : page - 2 + i;
               if (p < 1 || p > totalPages) return null;
@@ -371,6 +448,11 @@ export default function IslamicPage({ locale }: { locale: string }) {
           </Link>
         </div>
       </div>
+
+      {/* Coin detail modal */}
+      {selectedCoin && (
+        <CoinModal coin={selectedCoin} locale={locale} onClose={() => setSelectedCoin(null)} />
+      )}
     </>
   );
 }

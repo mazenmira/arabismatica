@@ -46,13 +46,7 @@ export default function CatalogueShell({
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--parch, #FAF6EE)' }} dir={isAr ? 'rtl' : 'ltr'}>
-      <SiteHeader
-        locale={locale}
-        user={undefined as unknown as { id: string; email: string }}
-        onAuthOpen={() => {}}
-        onDashOpen={() => {}}
-        onAdminOpen={() => {}}
-      />
+      <SiteHeader locale={locale} />
 
       {/* ── TOP BAR ─────────────────────────────────────────────────────── */}
       <div className="bg-ink text-xs border-b border-gold-700/30 sticky top-[64px] z-40">

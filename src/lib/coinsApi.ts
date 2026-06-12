@@ -103,6 +103,10 @@ export interface CoinFilters {
   mint_ar?: string;
   /** Ruler name in Arabic — exact match */
   ruler_ar?: string;
+  /** Mint name in English — exact match */
+  mint?: string;
+  /** Ruler name in English — exact match */
+  ruler?: string;
   /** Hijri year — partial match (LIKE %yah%) */
   yah?: string;
   /** CE year range */
@@ -122,6 +126,8 @@ function applyFilters(
   filters: CoinFilters,
 ) {
   const { cc, excludeCC, ccIn, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query } = filters;
+  const mint   = (filters as CoinFilters).mint;
+  const ruler  = (filters as CoinFilters).ruler;
 
   if (cc) {
     if (Array.isArray(cc)) {
@@ -140,6 +146,8 @@ function applyFilters(
   if (filters.coin_type_tag) qb = qb.eq('coin_type_tag', filters.coin_type_tag);
   if (mint_ar)       qb = qb.eq('mint_ar',          mint_ar);
   if (ruler_ar)     qb = qb.eq('ruler_ar',          ruler_ar);
+  if (mint)         qb = qb.eq('mint',              mint);
+  if (ruler)        qb = qb.eq('ruler',             ruler);
   if (yah)          qb = qb.ilike('yah',           `%${yah}%`);
 
   // Year range — yce is stored as text; cast to int, ignore empty strings
@@ -322,8 +330,8 @@ export interface RulerStat {
 
 export interface IslamicFilters {
   dynasties: string[];
-  mints:     string[];
-  rulers:    string[];
+  mints:     { en: string; ar: string | null }[];
+  rulers:    { en: string; ar: string | null }[];
   tags:      string[];
 }
 
@@ -487,19 +495,42 @@ export async function getIslamicCoins(
  * Used to populate dynasty, mint, ruler, and tag dropdowns.
  */
 export async function getIslamicFilters(): Promise<IslamicFilters> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function distinctIS(col: string): Promise<string[]> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = await db.from('coins').select(col).eq('cc', 'IS');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const vals: string[] = (data ?? []).map((r: any) => r[col]).filter(Boolean) as string[];
     return Array.from(new Set(vals)).sort();
   }
 
-  const [dynasties, mints, rulers, tags] = await Promise.all([
+  const [dynasties, tags, mintData, rulerData] = await Promise.all([
     distinctIS('dyn'),
-    distinctIS('mint_ar'),
-    distinctIS('ruler_ar'),
     distinctIS('coin_type_tag'),
+    db.from('coins').select('mint,mint_ar').eq('cc', 'IS'),
+    db.from('coins').select('ruler,ruler_ar').eq('cc', 'IS'),
   ]);
+
+  // Build bilingual mint pairs (keyed by English name for uniqueness)
+  const mintMap = new Map<string, string | null>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (mintData.data ?? []).forEach((r: any) => {
+    if (r.mint && !mintMap.has(r.mint)) mintMap.set(r.mint, r.mint_ar || null);
+  });
+  const mints = Array.from(mintMap.entries())
+    .map(([en, ar]) => ({ en, ar }))
+    .sort((a, b) => a.en.localeCompare(b.en))
+    .slice(0, 120);
+
+  // Build bilingual ruler pairs
+  const rulerMap = new Map<string, string | null>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (rulerData.data ?? []).forEach((r: any) => {
+    if (r.ruler && !rulerMap.has(r.ruler)) rulerMap.set(r.ruler, r.ruler_ar || null);
+  });
+  const rulers = Array.from(rulerMap.entries())
+    .map(([en, ar]) => ({ en, ar }))
+    .sort((a, b) => a.en.localeCompare(b.en))
+    .slice(0, 200);
+
   return { dynasties, mints, rulers, tags };
 }

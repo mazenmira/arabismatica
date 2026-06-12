@@ -4,15 +4,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { Grid3X3, List, X, ArrowUp, FileDown, Moon, Sun } from 'lucide-react';
+import { Grid3X3, List, X, ArrowUp, FileDown, Search } from 'lucide-react';
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
-import AdminPanel from './AdminPanel';
-import AuthModal from '@/components/auth/AuthModal';
-import Dashboard from '@/components/dashboard/Dashboard';
-import { supabase } from '@/lib/supabase';
 import { useCollection } from '@/hooks/useCollection';
 import { useWishlist } from '@/hooks/useWishlist';
+import { useAuth } from '@/lib/authContext';
+import { useDarkMode } from '@/lib/darkModeContext';
 import type { Coin, FilterState } from '@/types/coin';
 import { COUNTRIES, COUNTRY_FLAGS } from '@/lib/coins';
 
@@ -73,22 +71,13 @@ function fuseSearch(coins: Coin[], query: string): Coin[] {
 
 interface CataloguePageProps {
   locale: string;
-  user?: { id: string; email: string } | null;
-  authOpen?: boolean;
-  dashOpen?: boolean;
-  adminOpen?: boolean;
-  setAuthOpen?: (v: boolean) => void;
-  setDashOpen?: (v: boolean) => void;
-  setAdminOpen?: (v: boolean) => void;
 }
 
-export default function CataloguePage({
-  locale, user: userProp, authOpen: authOpenProp = false,
-  dashOpen: dashOpenProp = false, adminOpen: adminOpenProp = false,
-  setAuthOpen: setAuthOpenProp, setDashOpen: setDashOpenProp, setAdminOpen: setAdminOpenProp,
-}: CataloguePageProps) {
+export default function CataloguePage({ locale }: CataloguePageProps) {
   const t = useTranslations();
   const isAr = locale === 'ar';
+  const { user, setAuthOpen, setDashOpen, setAdminOpen } = useAuth();
+  const { darkMode } = useDarkMode();
 
   const [filters, setFilters] = useState<FilterState>({
     country: 'all', era: '', metal: '', type: '', query: '',
@@ -120,35 +109,8 @@ export default function CataloguePage({
       return saved ? new Set<string>(JSON.parse(saved) as string[]) : new Set<string>();
     } catch { return new Set<string>(); }
   });
-  const [darkMode, setDarkMode]         = useState(false);
-  const [adminOpenLocal, setAdminOpenLocal] = useState(false);
-  const adminOpen    = adminOpenProp    || adminOpenLocal;
-  const setAdminOpen = setAdminOpenProp ?? setAdminOpenLocal;
-  // Auth state — use props from page.tsx if provided, else manage locally
-  const [authOpenLocal, setAuthOpenLocal] = useState(false);
-  const [dashOpenLocal, setDashOpenLocal] = useState(false);
-  const [userLocal, setUserLocal]         = useState<{ id: string; email: string } | null>(null);
-
-  const authOpen   = authOpenProp || authOpenLocal;
-  const dashOpen   = dashOpenProp || dashOpenLocal;
-  const user       = userProp !== undefined ? userProp : userLocal;
-  const setAuthOpen = setAuthOpenProp ?? setAuthOpenLocal;
-  const setDashOpen = setDashOpenProp ?? setDashOpenLocal;
   const { has: inCollection, toggle: toggleCollectionDB } = useCollection(user?.id ?? null);
   const { has: inWishlist,   toggle: toggleWishlistDB }   = useWishlist(user?.id ?? null);
-
-  // Auth session listener (only when not controlled by parent)
-  useEffect(() => {
-    if (userProp !== undefined) return; // controlled by page.tsx
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) setUserLocal({ id: session.user.id, email: session.user.email ?? '' });
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserLocal(session?.user ? { id: session.user.id, email: session.user.email ?? '' } : null);
-    });
-    return () => subscription.unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Back-to-top visibility
   useEffect(() => {
@@ -341,7 +303,7 @@ export default function CataloguePage({
       {/* ── SEARCH ── */}
       <div className="border-b border-gold-700/15 bg-white/50 px-4 py-3">
         <div className="max-w-[1440px] mx-auto relative" ref={autocompleteRef}>
-          <span className="absolute top-1/2 -translate-y-1/2 start-4 text-gold-500/50 text-base select-none">🔍</span>
+          <Search size={15} className="absolute top-1/2 -translate-y-1/2 start-4 text-gold-500/50 select-none" />
           <input
             ref={searchRef}
             type="text"
@@ -366,7 +328,7 @@ export default function CataloguePage({
                   onClick={() => { updateFilter('query', s); setShowAutocomplete(false); searchRef.current?.blur(); }}
                   className="w-full text-start px-4 py-2.5 text-[13px] text-ink/80 hover:bg-gold-500/10 border-b border-gold-700/10 last:border-0 transition-colors font-cairo flex items-center gap-2"
                   dir={isAr ? 'rtl' : 'ltr'}>
-                  <span className="text-gold-500/50 text-[10px]">🔍</span>
+                  <Search size={10} className="text-gold-500/50 shrink-0" />
                   {s}
                 </button>
               ))}
@@ -481,25 +443,6 @@ export default function CataloguePage({
             </button>
           )}
 
-          {/* Dark mode toggle */}
-          <button onClick={() => setDarkMode(d => !d)}
-            className="flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/30 text-gold-600 hover:text-gold-400 transition-colors"
-            title={darkMode ? (isAr ? 'الوضع الفاتح' : 'Light mode') : (isAr ? 'الوضع الداكن' : 'Dark mode')}>
-            {darkMode ? <Sun size={13} /> : <Moon size={13} />}
-          </button>
-          {/* Admin panel button */}
-          <button onClick={async () => {
-            // Sign out of collector session to avoid Supabase session conflict with admin
-            if (user) {
-              await supabase.auth.signOut();
-              setUserLocal(null);
-            }
-            setAdminOpen(true);
-          }}
-            className="flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/30 text-gold-600 hover:text-gold-400 transition-colors"
-            title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}>
-            <span className="text-[11px]">⚙</span>
-          </button>
           {/* View toggle */}
           <div className="flex items-center border border-gold-700/25 rounded-lg overflow-hidden">
             <button onClick={() => setView('grid')}
@@ -615,26 +558,6 @@ export default function CataloguePage({
           <CoinModal coin={selectedCoin} locale={locale} onClose={() => setSelectedCoin(null)} />
         )}
       </AnimatePresence>
-
-      {authOpen && (
-        <AuthModal locale={locale} onClose={() => setAuthOpen(false)} onSuccess={() => setAuthOpen(false)} />
-      )}
-      {dashOpen && user && (
-        <Dashboard locale={locale} userId={user.id} userEmail={user.email}
-          onClose={() => setDashOpen(false)}
-          onSignOut={async () => { await supabase.auth.signOut(); setDashOpen(false); }} />
-      )}
-      {adminOpen && (
-        <AdminPanel
-          onClose={async () => {
-            // Sign out admin session on close so it doesn't bleed into collector session
-            await supabase.auth.signOut();
-            setAdminOpen(false);
-          }}
-          locale={locale}
-          onCoinAdded={() => {}}
-        />
-      )}
 
       {/* ── BACK TO TOP ── */}
       <AnimatePresence>

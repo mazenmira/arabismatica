@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import CataloguePageWrapper from '@/components/catalogue/CataloguePageWrapper';
+import CataloguePage from '@/components/catalogue/CataloguePage';
 
 const BASE_URL = 'https://arabismatica.arabcollector.com';
 
@@ -41,5 +41,5 @@ export async function generateMetadata(
 }
 
 export default function Page({ params }: { params: { locale: string } }) {
-  return <CataloguePageWrapper locale={params.locale} />;
+  return <CataloguePage locale={params.locale} />;
 }

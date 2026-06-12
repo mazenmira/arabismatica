@@ -1,16 +1,11 @@
-// v4.1 — landing page with auth modals
+// v4.2 — landing page
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import SiteHeader from '@/components/header/SiteHeader';
-import AuthModal from '@/components/auth/AuthModal';
-import AdminPanel from '@/components/catalogue/AdminPanel';
-import Dashboard from '@/components/dashboard/Dashboard';
 import { supabase } from '@/lib/supabase';
-
-const ADMIN_UUID = 'c26b0742-6283-4707-93ec-d617fc809863';
 
 const HERO_IMG = 'https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2026/05/Arabismatica-Hero.jpg';
 
@@ -79,24 +74,10 @@ const STATS = [
 export default function LandingPage({ params: { locale } }: { params: { locale: string } }) {
   const isAr = locale === 'ar';
   const isDe = locale === 'de';
-  const [user, setUser]           = useState<{ id: string; email: string } | null>(null);
-  const [authOpen,  setAuthOpen]  = useState(false);
-  const [dashOpen,  setDashOpen]  = useState(false);
-  const [adminOpen, setAdminOpen] = useState(false);
   const [coinOfDay, setCoinOfDay] = useState<{
     id: string; name: string; nar?: string; yce?: string;
     o?: string; cc?: string; co?: string; co_ar?: string;
   } | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) setUser({ id: session.user.id, email: session.user.email ?? '' });
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUser(session?.user ? { id: session.user.id, email: session.user.email ?? '' } : null);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     const today = new Date();
@@ -112,13 +93,7 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
 
   return (
     <main className="min-h-screen" style={{ background: 'var(--parch)' }} dir={isAr ? 'rtl' : 'ltr'}>
-      <SiteHeader
-        locale={locale}
-        user={user}
-        onAuthOpen={() => setAuthOpen(true)}
-        onDashOpen={() => setDashOpen(true)}
-        onAdminOpen={() => setAdminOpen(true)}
-      />
+      <SiteHeader locale={locale} />
 
       {/* ── HERO ────────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden" style={{ minHeight: '420px' }}>
@@ -282,28 +257,6 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
         </div>
       </div>
 
-      {authOpen && (
-        <AuthModal
-          locale={locale}
-          onClose={() => setAuthOpen(false)}
-          onSuccess={() => setAuthOpen(false)}
-        />
-      )}
-      {dashOpen && user && (
-        <Dashboard
-          locale={locale}
-          userId={user.id}
-          userEmail={user.email}
-          onClose={() => setDashOpen(false)}
-          onSignOut={() => { setUser(null); setDashOpen(false); }}
-        />
-      )}
-      {adminOpen && user?.id === ADMIN_UUID && (
-        <AdminPanel
-          locale={locale}
-          onClose={() => setAdminOpen(false)}
-        />
-      )}
     </main>
   );
 }
