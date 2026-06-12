@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Search, X, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { getIslamicCoins, getIslamicFilters } from '@/lib/coinsApi';
 import type { CoinRow, IslamicCoinFilters } from '@/lib/coinsApi';
+import CoinCard from '@/components/catalogue/CoinCard';
 
 const DENOMINATIONS = [
   { key: '',             labelEn: 'All',          labelAr: 'الكل',           color: 'bg-amber-700' },
@@ -41,40 +42,7 @@ function SkeletonCard() {
   );
 }
 
-function CoinCard({ coin, locale }: { coin: CoinRow; locale: string }) {
-  const isAr = locale === 'ar';
-  const name  = (isAr && coin.nar) ? coin.nar : coin.name;
-  const metal = isAr ? (METALS_AR[coin.metal] ?? coin.metal) : coin.metal;
-  return (
-    <Link href={`/${locale}/catalogue/${coin.id}`}
-      className="group flex flex-col bg-white rounded-xl border border-amber-100 hover:border-amber-300 overflow-hidden transition-all hover:shadow-md">
-      {coin.o ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={coin.o} alt={name}
-          className="w-full h-28 object-contain bg-amber-50 group-hover:scale-105 transition-transform p-1"
-          style={{ borderBottom: '1px solid #F0E8D4' }} />
-      ) : (
-        <div className="w-full h-28 bg-amber-50 flex items-center justify-center text-3xl">🪙</div>
-      )}
-      <div className="p-2.5">
-        <div className="text-[11px] font-amiri text-amber-900 leading-tight line-clamp-2 mb-1">{name}</div>
-        {coin.ruler && <div className="text-[9px] text-amber-600 truncate mb-0.5">{coin.ruler}</div>}
-        <div className="flex items-center gap-1 flex-wrap">
-          {coin.yce  && <span className="text-[9px] text-amber-600">{coin.yce}</span>}
-          {coin.yah  && <span className="text-[9px] text-amber-500">{coin.yah}هـ</span>}
-          {coin.denomination && (
-            <span className="text-[9px] text-amber-700 border border-amber-300 rounded px-1 font-medium">
-              {isAr
-                ? { Dirham: 'درهم', Dinar: 'دينار', 'Fals/Fils': 'فلس', 'Early Dirham': 'درهم مبكر' }[coin.denomination] ?? coin.denomination
-                : coin.denomination}
-            </span>
-          )}
-          {metal && <span className="text-[9px] text-amber-500 border border-amber-200 rounded px-1">{metal}</span>}
-        </div>
-      </div>
-    </Link>
-  );
-}
+import type { Coin } from '@/types/coin';
 
 export default function IslamicPage({ locale }: { locale: string }) {
   const isAr = locale === 'ar';
@@ -200,17 +168,18 @@ export default function IslamicPage({ locale }: { locale: string }) {
         </div>
 
         {/* ── FILTER ROW 1 ─────────────────────────────────────────────── */}
-        <div className="flex items-center gap-2 pb-3 flex-wrap">
+        <div className="bg-parch sticky top-[167px] z-30 border-b border-gold-700/15 shadow-sm">
+          <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-2 flex-wrap">
           {/* Dynasty */}
           <select value={dynasty} onChange={e => { setDynasty(e.target.value); setPage(1); }}
-            className="text-[12px] px-3 py-2 rounded-lg border border-amber-200 bg-white outline-none focus:border-amber-400 max-w-[200px]">
+            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[200px]">
             <option value="">{isAr ? 'كل السلالات' : 'All dynasties'}</option>
             {filters.dynasties.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
 
           {/* Metal */}
           <select value={metal} onChange={e => { setMetal(e.target.value); setPage(1); }}
-            className="text-[12px] px-3 py-2 rounded-lg border border-amber-200 bg-white outline-none focus:border-amber-400">
+            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
             <option value="">{isAr ? 'كل المعادن' : 'All metals'}</option>
             {filters.metals.map(m => (
               <option key={m} value={m}>{isAr ? (METALS_AR[m] ?? m) : m}</option>
@@ -219,14 +188,14 @@ export default function IslamicPage({ locale }: { locale: string }) {
 
           {/* Mint */}
           <select value={mint} onChange={e => { setMint(e.target.value); setPage(1); }}
-            className="text-[12px] px-3 py-2 rounded-lg border border-amber-200 bg-white outline-none focus:border-amber-400 max-w-[180px]">
+            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[180px]">
             <option value="">{isAr ? 'كل دور الضرب' : 'All mints'}</option>
             {filters.mints.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
 
           {/* Ruler */}
           <select value={ruler} onChange={e => { setRuler(e.target.value); setPage(1); }}
-            className="text-[12px] px-3 py-2 rounded-lg border border-amber-200 bg-white outline-none focus:border-amber-400 max-w-[180px]">
+            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[180px]">
             <option value="">{isAr ? 'كل الحكام' : 'All rulers'}</option>
             {filters.rulers.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
@@ -234,21 +203,22 @@ export default function IslamicPage({ locale }: { locale: string }) {
           {/* More filters toggle */}
           <button
             onClick={() => setMoreFilters(!moreFilters)}
-            className={`flex items-center gap-1.5 px-3 py-2 text-[12px] rounded-lg border transition-colors
-              ${moreFilters ? 'border-amber-400 bg-amber-50 text-amber-800' : 'border-amber-200 bg-white text-amber-600 hover:border-amber-400'}`}>
-            <SlidersHorizontal size={13} />
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
+              ${moreFilters ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
+            <SlidersHorizontal size={12} />
             {isAr ? 'فلاتر إضافية' : 'More filters'}
-            {moreFilters ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+            {moreFilters ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
           </button>
 
           {/* Active filter count */}
           {activeCount > 0 && (
             <button onClick={clearAll}
-              className="flex items-center gap-1 text-[11px] text-amber-600 border border-amber-200 rounded-full px-2.5 py-1.5 hover:bg-amber-50">
+              className="flex items-center gap-1 text-[11px] text-gold-600 hover:text-gold-500 border border-gold-700/30 rounded-full px-2.5 py-1 transition-colors">
               <X size={11} />
               {isAr ? `مسح (${activeCount})` : `Clear (${activeCount})`}
             </button>
           )}
+          </div>
         </div>
 
         {/* ── FILTER ROW 2 (expandable) ────────────────────────────────── */}
@@ -355,7 +325,15 @@ export default function IslamicPage({ locale }: { locale: string }) {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
           {loading
             ? Array.from({ length: 24 }).map((_, i) => <SkeletonCard key={i} />)
-            : coins.map(coin => <CoinCard key={coin.id} coin={coin} locale={locale} />)}
+            : coins.map(coin => (
+                <CoinCard
+                  key={coin.id}
+                  coin={coin as unknown as Coin}
+                  locale={locale}
+                  view="grid"
+                  onClick={() => {}}
+                />
+              ))}
         </div>
 
         {!loading && coins.length === 0 && (

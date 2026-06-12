@@ -19,325 +19,11 @@ import type { Coin, FilterState } from '@/types/coin';
 import { COUNTRIES, COUNTRY_FLAGS } from '@/lib/coins';
 
 // ── Supabase-powered data loading ─────────────────────────
-import { getCoins, searchCoins, getDistinctValues } from '@/lib/coinsApi';
+import { getCoins, searchCoins } from '@/lib/coinsApi';
 import type { CoinFilters } from '@/lib/coinsApi';
-import { dynastyIndex } from '@/lib/dynasties';
 
-// ── Dynasty filter system ────────────────────────────────────────────────
-// Two modes:
-//   'national' — year-range pills per country (current behaviour)
-//   'dynastic' — cross-country historical dynasty groups (new)
 
-// ── NATIONAL ERA pills (year-range based) ────────────────────────────────
-const DYNASTY_YEAR_RANGES: Record<string, { cc: string | '*'; from: number; to: number }[]> = {
-  ottoman:    [{ cc: '*',  from: 1299, to: 1918 }],
-  hejaz_najd: [{ cc: 'SA', from: 1916, to: 1931 }],
-  muhali:     [{ cc: 'EG', from: 1805, to: 1882 }],
-  sultanate:  [{ cc: 'EG', from: 1883, to: 1921 }],
-  kingdom:    [{ cc: 'EG', from: 1922, to: 1952 }, { cc: 'IQ', from: 1921, to: 1958 }, { cc: 'LY', from: 1952, to: 1969 }, { cc: 'JO', from: 1920, to: 1999 }, { cc: 'SA', from: 1932, to: 2099 }],
-  republic:   [{ cc: 'EG', from: 1953, to: 2099 }, { cc: 'IQ', from: 1958, to: 2099 }, { cc: 'SY', from: 1946, to: 2099 }, { cc: 'LB', from: 1943, to: 2099 }, { cc: 'YE', from: 1962, to: 2099 }, { cc: 'DZ', from: 1962, to: 2099 }, { cc: 'SD', from: 1956, to: 2099 }, { cc: 'MR', from: 1960, to: 2099 }, { cc: 'TN', from: 1957, to: 2099 }, { cc: 'LY', from: 1969, to: 2099 }],
-  gulf:       [{ cc: 'AE', from: 1960, to: 2099 }, { cc: 'QA', from: 1960, to: 2099 }, { cc: 'KW', from: 1960, to: 2099 }, { cc: 'OM', from: 1960, to: 2099 }, { cc: 'QD', from: 1960, to: 2099 }],
-  french:     [{ cc: 'MA', from: 1912, to: 1956 }, { cc: 'TN', from: 1881, to: 1956 }, { cc: 'DZ', from: 1830, to: 1962 }, { cc: 'LB', from: 1920, to: 1943 }, { cc: 'SY', from: 1920, to: 1946 }],
-  imamate:    [{ cc: 'YE', from: 1800, to: 1962 }, { cc: 'OM', from: 1800, to: 1970 }],
-  maghreb:    [{ cc: 'MA', from: 1600, to: 2099 }, { cc: 'DZ', from: 1500, to: 2099 }, { cc: 'TN', from: 1700, to: 2099 }],
-};
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function coinMatchesDynastyPill(coin: { cc: string; yce?: string }, pillKey: string): boolean {
-  const ranges = DYNASTY_YEAR_RANGES[pillKey];
-  if (!ranges) return false;
-  const year = parseInt(coin.yce || '0');
-  return ranges.some(r =>
-    (r.cc === '*' || r.cc === coin.cc) && year >= r.from && year <= r.to
-  );
-}
-
-const DYNASTY_PILLS: { key: string; label_ar: string; label_en: string; icon: string }[] = [
-  { key: 'ottoman',    label_ar: 'العثمانيون',        label_en: 'Ottoman',          icon: '🌙' },
-  { key: 'hejaz_najd', label_ar: 'الحجاز ونجد',       label_en: 'Hejaz & Najd',     icon: '⚔️' },
-  { key: 'muhali',     label_ar: 'أسرة محمد علي',     label_en: 'Muhammad Ali',     icon: '👑' },
-  { key: 'sultanate',  label_ar: 'السلطنة المصرية',   label_en: 'Sultanate',        icon: '🏛️' },
-  { key: 'kingdom',    label_ar: 'ملكي',              label_en: 'Kingdom',          icon: '👑' },
-  { key: 'republic',   label_ar: 'الجمهورية',         label_en: 'Republic',         icon: '🏛️' },
-  { key: 'gulf',       label_ar: 'دول الخليج',        label_en: 'Gulf States',      icon: '🛢️' },
-  { key: 'french',     label_ar: 'الحماية الفرنسية',  label_en: 'French Colonial',  icon: '🇫🇷' },
-  { key: 'imamate',    label_ar: 'الإمامة',           label_en: 'Imamate',          icon: '📜' },
-  { key: 'maghreb',    label_ar: 'المغرب العربي',     label_en: 'Maghreb',          icon: '🌅' },
-];
-
-// ── DYNASTIC GROUPS (cross-country, matched on dyn field) ─────────────────
-interface DynastyGroup {
-  key:       string;
-  label_ar:  string;
-  label_en:  string;
-  icon:      string;
-  period:    string;       // e.g. "750–1258 CE"
-  desc_ar:   string;
-  desc_en:   string;
-  // dyn field substrings OR year+cc ranges — whichever is more accurate
-  dynMatch?: string[];     // substrings to match in coin.dyn
-  yearRanges?: { cc: string | '*'; from: number; to: number }[];
-}
-
-const DYNASTIC_GROUPS: DynastyGroup[] = [
-  {
-    key: 'umayyad', label_ar: 'الدولة الأموية', label_en: 'Umayyad Caliphate',
-    icon: '☪️', period: '661–750 CE',
-    desc_ar: 'أول خلافة إسلامية كبرى. ضربت عملاتها الفضية الدراهم والذهبية الدنانير في دمشق وسائر الأمصار.',
-    desc_en: 'The first major Islamic caliphate. Struck silver dirhams and gold dinars from Damascus and across the empire.',
-    dynMatch: ['أموي', 'Umayyad', 'الدولة الأموية', 'Umayyad Caliphate'],
-    yearRanges: [{ cc: '*', from: 661, to: 750 }],
-  },
-  {
-    key: 'abbasid', label_ar: 'الخلافة العباسية', label_en: 'Abbasid Caliphate',
-    icon: '🕌', period: '750–1258 CE',
-    desc_ar: 'الخلافة الإسلامية الكبرى الثانية. مركزها بغداد. أنتجت أوفر العملات الإسلامية وأجملها خطاً.',
-    desc_en: 'The second great Islamic caliphate, centred in Baghdad. Produced the most prolific and calligraphically refined Islamic coinage.',
-    dynMatch: ['عباسي', 'عباسية', 'Abbasid', 'الخلافة العباسية', 'Abbasid Caliphate'],
-    yearRanges: [{ cc: '*', from: 750, to: 1258 }],
-  },
-  {
-    key: 'fatimid', label_ar: 'الدولة الفاطمية', label_en: 'Fatimid Caliphate',
-    icon: '⭐', period: '909–1171 CE',
-    desc_ar: 'خلافة شيعية إسماعيلية حكمت مصر وشمال أفريقيا والشام. اشتُهرت بالدنانير الذهبية الرفيعة.',
-    desc_en: 'Ismaili Shia caliphate ruling Egypt, North Africa and the Levant. Renowned for their refined gold dinars.',
-    dynMatch: ['فاطمي', 'فاطمية', 'Fatimid', 'الدولة الفاطمية', 'Fatimid Caliphate'],
-    yearRanges: [{ cc: '*', from: 909, to: 1171 }],
-  },
-  {
-    key: 'ayyubid', label_ar: 'الدولة الأيوبية', label_en: 'Ayyubid Dynasty',
-    icon: '⚔️', period: '1171–1260 CE',
-    desc_ar: 'أسسها صلاح الدين الأيوبي في مصر والشام. عملاتها النحاسية والفضية تتميز بأسماء السلاطين وألقابهم.',
-    desc_en: 'Founded by Saladin in Egypt and Syria. Copper and silver coins feature sultan names and titles.',
-    dynMatch: ['أيوبي', 'أيوبية', 'Ayyubid', 'الدولة الأيوبية', 'Ayyubid Dynasty'],
-    yearRanges: [{ cc: '*', from: 1171, to: 1260 }],
-  },
-  {
-    key: 'mamluk', label_ar: 'دولة المماليك', label_en: 'Mamluk Sultanate',
-    icon: '🏇', period: '1250–1517 CE',
-    desc_ar: 'سلطنة المماليك في مصر والشام. عملاتها النحاسية الفلوس من أكثر العملات الإسلامية الوسيطة تنوعاً.',
-    desc_en: 'The Mamluk sultanate of Egypt and Syria. Their copper fulus are among the most varied medieval Islamic coins.',
-    dynMatch: ['مملوك', 'مملوكي', 'Mamluk', 'دولة المماليك', 'Mamluk Sultanate'],
-    yearRanges: [{ cc: '*', from: 1250, to: 1517 }],
-  },
-  {
-    key: 'ottoman_full', label_ar: 'الدولة العثمانية', label_en: 'Ottoman Empire',
-    icon: '🌙', period: '1299–1924 CE',
-    desc_ar: 'حكمت الدولة العثمانية العالم العربي من القرن السادس عشر حتى مطلع القرن العشرين. عملاتها تتنوع بين القروش والمنقور والذهب.',
-    desc_en: 'The Ottoman Empire ruled the Arab world from the 16th century. Coins range from silver qirsh to gold altin.',
-    dynMatch: ['الدولة العثمانية', 'العثمانية', 'Ottoman'],
-    yearRanges: [{ cc: '*', from: 1299, to: 1924 }],
-  },
-  {
-    key: 'hejaz_najd_dyn', label_ar: 'الحجاز ونجد', label_en: 'Hejaz & Najd',
-    icon: '🕋', period: '1916–1932 CE',
-    desc_ar: 'إمارة الحجاز ونجد قبيل تأسيس المملكة العربية السعودية. ريالاتها الفضية نادرة ومطلوبة.',
-    desc_en: 'Pre-kingdom Hejaz and Najd coinage. Silver riyals are rare and highly sought.',
-    dynMatch: ['الحجاز قبل المملكة', 'الحجاز ونجد', 'Hejaz'],
-    yearRanges: [{ cc: 'SA', from: 1916, to: 1932 }],
-  },
-  {
-    key: 'french_col', label_ar: 'الحماية الفرنسية', label_en: 'French Colonial',
-    icon: '🇫🇷', period: '1830–1962 CE',
-    desc_ar: 'عملات الاستعمار الفرنسي في المغرب وتونس والجزائر ولبنان وسوريا. تتميز بتصاميم باريسية على نقوش عربية.',
-    desc_en: 'French colonial coins from Morocco, Tunisia, Algeria, Lebanon and Syria. Paris designs with Arabic inscriptions.',
-    dynMatch: ['الحماية الفرنسية', 'الانتداب الفرنسي', 'الجزائر الفرنسية', 'French'],
-  },
-  {
-    key: 'kingdoms_ar', label_ar: 'الممالك العربية', label_en: 'Arab Kingdoms',
-    icon: '👑', period: '1920–present',
-    desc_ar: 'عملات الممالك العربية المستقلة: مصر والعراق والأردن وليبيا والمملكة العربية السعودية والمغرب.',
-    desc_en: 'Coins of independent Arab kingdoms: Egypt, Iraq, Jordan, Libya, Saudi Arabia, Morocco.',
-    dynMatch: ['المملكة', 'الإمارة', 'Kingdom', 'Emirate'],
-    yearRanges: [
-      { cc: 'EG', from: 1922, to: 1952 },
-      { cc: 'IQ', from: 1921, to: 1958 },
-      { cc: 'LY', from: 1952, to: 1969 },
-      { cc: 'JO', from: 1920, to: 2099 },
-      { cc: 'SA', from: 1932, to: 2099 },
-      { cc: 'MA', from: 1957, to: 2099 },
-    ],
-  },
-  {
-    key: 'republics_ar', label_ar: 'الجمهوريات العربية', label_en: 'Arab Republics',
-    icon: '🏛️', period: '1952–present',
-    desc_ar: 'عملات الجمهوريات العربية الحديثة: مصر وسوريا والعراق واليمن وليبيا والجزائر وتونس والسودان.',
-    desc_en: 'Modern Arab republic coinage from Egypt, Syria, Iraq, Yemen, Libya, Algeria, Tunisia and Sudan.',
-    dynMatch: ['الجمهورية', 'Republic'],
-  },
-  {
-    key: 'gulf_states', label_ar: 'دول الخليج', label_en: 'Gulf States',
-    icon: '🛢️', period: '1960–present',
-    desc_ar: 'عملات دول الخليج العربي: الإمارات والكويت وقطر وعُمان والبحرين وقطر ودبي.',
-    desc_en: 'Gulf state coinage: UAE, Kuwait, Qatar, Oman, Bahrain and the historic Qatar & Dubai.',
-    dynMatch: ['الإمارات', 'إمارة الكويت', 'دولة قطر', 'عهد السلطان قابوس'],
-    yearRanges: [
-      { cc: 'AE', from: 1960, to: 2099 },
-      { cc: 'KW', from: 1960, to: 2099 },
-      { cc: 'QA', from: 1960, to: 2099 },
-      { cc: 'OM', from: 1960, to: 2099 },
-      { cc: 'QD', from: 1960, to: 2099 },
-    ],
-  },
-  {
-    key: 'imamates', label_ar: 'الإمامات', label_en: 'Imamates',
-    icon: '📜', period: '1800–1970 CE',
-    desc_ar: 'عملات الإمامات الإسلامية: إمامة اليمن الزيدية وإمامة عُمان. من أندر عملات الجزيرة العربية.',
-    desc_en: 'Zaydi Yemeni and Omani imamate coinage. Among the rarest Arabian Peninsula issues.',
-    dynMatch: ['الإمامة', 'إمامة', 'إمام', 'Imamate'],
-    yearRanges: [
-      { cc: 'YE', from: 1800, to: 1962 },
-      { cc: 'OM', from: 1800, to: 1970 },
-    ],
-  },
-  // ── 13 additional Arab dynasties ─────────────────────────────────────────
-  {
-    key: 'umayyad_andalus', label_ar: 'الأمويون في الأندلس', label_en: 'Umayyad of al-Andalus',
-    icon: '🕌', period: '138–422 AH (756–1031 CE)',
-    desc_ar: 'إمارة قرطبة ثم الخلافة الأندلسية. ضربت دنانير وصرفيات بالغة الجمال من قرطبة وسواها.',
-    desc_en: 'The Andalusian Umayyad emirate and caliphate of Córdoba. Struck magnificent gold dinars and silver dirhams.',
-    dynMatch: ['الأمويون في الأندلس', 'Umayyad of al-Andalus', 'Umayyad of Andalus', 'أموي الأندلس'],
-  },
-  {
-    key: 'tulunid', label_ar: 'الدولة الطولونية', label_en: 'Tulunid Dynasty',
-    icon: '🦅', period: '254–292 AH (868–905 CE)',
-    desc_ar: 'أول دولة مستقلة في مصر بعد الفتح الإسلامي. أسسها أحمد بن طولون. دراهمها ودنانيرها نادرة.',
-    desc_en: 'The first autonomous dynasty in Islamic Egypt, founded by Ahmad ibn Tulun. Their coins are rare survivors.',
-    dynMatch: ['الدولة الطولونية', 'Tulunid', 'طولوني', 'ابن طولون'],
-  },
-  {
-    key: 'ikhshidid', label_ar: 'الإخشيديون', label_en: 'Ikhshidid Dynasty',
-    icon: '⚜️', period: '323–358 AH (935–969 CE)',
-    desc_ar: 'حكمت مصر والشام بين الطولونيين والفاطميين. عملاتها الفضية تحمل ألقاب الإخشيد.',
-    desc_en: 'Ruled Egypt and Syria between the Tulunids and Fatimids. Silver coins bear the Ikhshid title.',
-    dynMatch: ['الإخشيديون', 'Ikhshidid', 'إخشيدي', 'الإخشيد'],
-  },
-  {
-    key: 'hamdanid', label_ar: 'الحمدانيون', label_en: 'Hamdanid Dynasty',
-    icon: '⚔️', period: '293–394 AH (905–1004 CE)',
-    desc_ar: 'سلالة عربية شيعية حكمت الموصل وحلب. اشتُهرت بالشعر والجهاد ضد البيزنطيين.',
-    desc_en: 'Arab Shia dynasty ruling Mosul and Aleppo. Famous for poetry and warfare against Byzantium.',
-    dynMatch: ['الحمدانيون', 'Hamdanid', 'حمداني', 'سيف الدولة'],
-  },
-  {
-    key: 'aghlabid', label_ar: 'الأغالبة', label_en: 'Aghlabid Dynasty',
-    icon: '🌴', period: '184–296 AH (800–909 CE)',
-    desc_ar: 'حكمت إفريقية (تونس وليبيا) باسم العباسيين. دراهمها الفضية من نوادر العملات الإسلامية في الغرب.',
-    desc_en: 'Ruled Ifriqiya (Tunisia/Libya) as Abbasid vassals. Their silver dirhams are rare western Islamic issues.',
-    dynMatch: ['الأغالبة', 'Aghlabid', 'أغلبي'],
-  },
-  {
-    key: 'idrisid', label_ar: 'الأدارسة', label_en: 'Idrisid Dynasty',
-    icon: '📿', period: '172–313 AH (789–926 CE)',
-    desc_ar: 'أول دولة إسلامية في المغرب الأقصى. أسسها إدريس الأول الهارب من العباسيين. دراهمها الفضية نادرة جداً.',
-    desc_en: 'The first Islamic dynasty in Morocco, founded by Idris I, a refugee from the Abbasids. Extremely rare silver dirhams.',
-    dynMatch: ['الأدارسة', 'Idrisid', 'إدريسي', 'إدريس'],
-  },
-  {
-    key: 'hafsid', label_ar: 'الحفصيون', label_en: 'Hafsid Dynasty',
-    icon: '🏛️', period: '625–982 AH (1228–1574 CE)',
-    desc_ar: 'خلفاء الموحدين في تونس وطرابلس. عملاتهم الذهبية والفضية نموذج للحضارة المغاربية.',
-    desc_en: 'Almohad successors in Tunisia and Tripolitania. Their gold and silver coins exemplify Maghrebi civilisation.',
-    dynMatch: ['الحفصيون', 'Hafsid', 'حفصي'],
-  },
-  {
-    key: 'merinid', label_ar: 'المرينيون', label_en: 'Merinid Dynasty',
-    icon: '🦁', period: '592–869 AH (1196–1465 CE)',
-    desc_ar: 'سلالة بربرية حكمت المغرب والأندلس. مدرسة فاس نموذجها في الحضارة. عملاتهم الذهبية من أجمل المغاربية.',
-    desc_en: 'Berber dynasty ruling Morocco and al-Andalus. Their gold dinars are among the finest Maghrebi coins.',
-    dynMatch: ['المرينيون', 'Merinid', 'مريني'],
-  },
-  {
-    key: 'almoravid', label_ar: 'المرابطون', label_en: 'Almoravid Dynasty',
-    icon: '☪️', period: '448–541 AH (1056–1147 CE)',
-    desc_ar: 'حركة إصلاحية بربرية وحّدت المغرب والأندلس. دنانيرهم الذهبية لا تزال مرجعاً في النقائش الكوفية.',
-    desc_en: 'Berber reform movement that unified Morocco and al-Andalus. Their gold dinars remain benchmarks of Kufic epigraphy.',
-    dynMatch: ['المرابطون', 'Almoravid', 'مرابط', 'المرابطين'],
-  },
-  {
-    key: 'almohad', label_ar: 'الموحدون', label_en: 'Almohad Dynasty',
-    icon: '🌙', period: '524–668 AH (1130–1269 CE)',
-    desc_ar: 'أعظم إمبراطورية إسلامية في الغرب. عملاتهم المربعة الشكل ابتكار لا مثيل له في التاريخ النقدي.',
-    desc_en: 'The greatest Islamic empire in the west. Their distinctive square coins are unique in numismatic history.',
-    dynMatch: ['الموحدون', 'Almohad', 'موحدي', 'الموحدين'],
-  },
-  {
-    key: 'zangid', label_ar: 'الزنكيون', label_en: 'Zangid Dynasty',
-    icon: '⚔️', period: '521–619 AH (1127–1222 CE)',
-    desc_ar: 'حكمت الموصل وحلب وأجزاء من الشام. نور الدين زنكي وحّد الشام لمواجهة الصليبيين. فلوسهم النحاسية نادرة.',
-    desc_en: 'Ruled Mosul, Aleppo and parts of Syria. Nur al-Din united Syria against the Crusaders. Rare copper fulus.',
-    dynMatch: ['الزنكيون', 'Zangid', 'زنكي', 'نور الدين'],
-  },
-  {
-    key: 'artuqid', label_ar: 'الأرتقيون', label_en: 'Artuqid Dynasty',
-    icon: '🏰', period: '484–811 AH (1101–1409 CE)',
-    desc_ar: 'سلالة تركمانية حكمت ديار بكر والجزيرة الفراتية. عملاتهم النحاسية الكبيرة بالصور البيزنطية فريدة.',
-    desc_en: 'Turkmen dynasty of Diyar Bakr. Their large copper coins featuring Byzantine imagery are uniquely striking.',
-    dynMatch: ['الأرتقيون', 'Artuqid', 'أرتقي', 'أرتق'],
-  },
-  {
-    key: 'east_africa', label_ar: 'سلطنات شرق أفريقيا', label_en: 'East African Sultanates',
-    icon: '🌊', period: '4th–14th C. AH',
-    desc_ar: 'سلطنات الساحل الأفريقي الشرقي: كلوة وممباسة وزنجبار وغيرها. عملاتها النحاسية تعكس حضارة سواحيلية إسلامية.',
-    desc_en: 'East African coastal sultanates: Kilwa, Mombasa, Zanzibar and more. Copper coins reflecting Swahili Islamic civilisation.',
-    dynMatch: ['سلطنات شرق أفريقيا', 'East Africa', 'Kilwa', 'Swahili'],
-  },
-  // ── Latest scraped dynasties ───────────────────────────────────────────
-  {
-    key: 'ilkhanid', label_ar: 'الإيلخانيون', label_en: 'Ilkhanid Dynasty',
-    icon: '🏹', period: '654–758 AH (1256–1357 CE)',
-    desc_ar: 'المغول الإسلاميون حكام فارس والعراق. اعتنقوا الإسلام وضربوا عملات عربية رفيعة في بغداد وتبريز.',
-    desc_en: 'The Islamised Mongols of Persia and Iraq. Struck Arabic coins of high quality in Baghdad and Tabriz.',
-    dynMatch: ['الإيلخانيون', 'Ilkhanid', 'إيلخاني', 'هولاكو'],
-  },
-  {
-    key: 'samanid', label_ar: 'السامانيون', label_en: 'Samanid Dynasty',
-    icon: '🌺', period: '261–395 AH (875–1005 CE)',
-    desc_ar: 'أول سلالة إيرانية مستقلة بعد الفتح الإسلامي. دراهمهم الفضية هي الأكثر شيوعاً في العصور الوسطى.',
-    desc_en: 'The first independent Iranian dynasty post-Islam. Their silver dirhams are the most commonly found medieval Islamic coins.',
-    dynMatch: ['السامانيون', 'Samanid', 'ساماني'],
-  },
-  {
-    key: 'buyid', label_ar: 'البويهيون', label_en: 'Buyid Dynasty',
-    icon: '⚜️', period: '322–447 AH (934–1055 CE)',
-    desc_ar: 'سلالة شيعية إيرانية حكمت العراق وفارس. أذلّوا الخليفة العباسي وأمسكوا بزمام السلطة الفعلية.',
-    desc_en: 'Shia Iranian dynasty controlling Iraq and Persia. They held the Abbasid caliph as a figurehead while wielding real power.',
-    dynMatch: ['البويهيون', 'Buyid', 'بويهي', 'بويه'],
-  },
-  {
-    key: 'pre_reform', label_ar: 'الإسلام المبكر', label_en: 'Early Islamic (Pre-Reform)',
-    icon: '🌙', period: '15–77 AH (636–697 CE)',
-    desc_ar: 'أقدم العملات الإسلامية قبل إصلاح عبد الملك عام 77هـ. تجمع بين التصاميم البيزنطية والساسانية والنقوش العربية.',
-    desc_en: 'The earliest Islamic coins before the reform of Abd al-Malik in 77 AH. Blend Byzantine and Sasanian designs with Arabic inscriptions.',
-    dynMatch: ['الإسلام المبكر', 'Early Islamic', 'Pre-Reform', 'Arab-Byzantine', 'Arab-Sasanian'],
-  },
-];
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function coinMatchesDynasticGroup(coin: Coin, groupKey: string): boolean {
-  const group = DYNASTIC_GROUPS.find(g => g.key === groupKey);
-  if (!group) return false;
-
-  // 1. dyn field match — works for both IS coins (Zeno) and national coins
-  if (group.dynMatch && coin.dyn) {
-    if (group.dynMatch.some(m => coin.dyn.includes(m))) return true;
-  }
-
-  // 2. For IS (Islamic/Zeno) coins, also match on coin name if dyn is missing
-  if (coin.cc === 'IS' && group.dynMatch && coin.name) {
-    if (group.dynMatch.some(m => coin.name.toLowerCase().includes(m.toLowerCase()))) return true;
-  }
-
-  // 3. Year+cc ranges — for national coins where dyn field may be inconsistent
-  //    Skip for IS coins — they're already handled by dyn matching above
-  if (group.yearRanges && coin.cc !== 'IS') {
-    const year = parseInt(coin.yce || '0');
-    if (year > 0 && group.yearRanges.some(r =>
-      (r.cc === '*' || r.cc === coin.cc) && year >= r.from && year <= r.to
-    )) return true;
-  }
-  return false;
-}
 
 
 
@@ -348,16 +34,24 @@ const METAL_OPTIONS = [
   'Bimetallic','Aluminium','Billon','Brass','Nickel','Steel',
 ];
 
-const ERA_OPTIONS = [
-  { value: '661-750',   label_ar: '٦٦١–٧٥٠ (الأموي)',   label_en: '661–750 (Umayyad)' },
-  { value: '750-1258',  label_ar: '٧٥٠–١٢٥٨ (العباسي)', label_en: '750–1258 (Abbasid)' },
-  { value: '1258-1517', label_ar: '١٢٥٨–١٥١٧ (وسيط)',   label_en: '1258–1517 (Medieval)' },
-  { value: '1299-1918', label_ar: '١٢٩٩–١٩١٨ (عثماني)', label_en: '1299–1918 (Ottoman)' },
-  { value: '1500-1800', label_ar: '١٥٠٠–١٨٠٠',          label_en: '1500–1800' },
-  { value: '1800-1914', label_ar: '١٨٠٠–١٩١٤',          label_en: '1800–1914' },
-  { value: '1914-1952', label_ar: '١٩١٤–١٩٥٢',          label_en: '1914–1952' },
-  { value: '1952-2000', label_ar: '١٩٥٢–٢٠٠٠',          label_en: '1952–2000' },
-  { value: '2001-2026', label_ar: '٢٠٠١–٢٠٢٦',          label_en: '2001–2026' },
+interface EraOption {
+  value: string;
+  label_ar: string;
+  label_en: string;
+  label_de: string;
+  yceFrom: number;
+  yceTo: number;
+  ccOnly?: string[];
+}
+const ERA_OPTIONS: EraOption[] = [
+  { value: 'ottoman',         label_ar: '🌙 العهد العثماني',       label_en: '🌙 Ottoman Era',          label_de: '🌙 Osmanische Zeit',       yceFrom: 1299, yceTo: 1918 },
+  { value: 'muhammad_ali',    label_ar: '👑 أسرة محمد علي',        label_en: '👑 Muhammad Ali Dynasty',  label_de: '👑 Muhammad-Ali-Dynastie', yceFrom: 1805, yceTo: 1882, ccOnly: ['EG'] },
+  { value: 'hejaz_najd',      label_ar: '⚔️ الحجاز ونجد',          label_en: '⚔️ Hejaz & Najd',          label_de: '⚔️ Hedschas & Nadschd',    yceFrom: 1916, yceTo: 1931, ccOnly: ['SA'] },
+  { value: 'french_colonial', label_ar: '🇫🇷 الحماية الفرنسية',    label_en: '🇫🇷 French Colonial',       label_de: '🇫🇷 Französisches Mandat',  yceFrom: 1830, yceTo: 1962, ccOnly: ['MA','TN','DZ','LB','SY'] },
+  { value: 'arab_kingdoms',   label_ar: '👑 الممالك العربية',       label_en: '👑 Arab Kingdoms',          label_de: '👑 Arabische Königreiche',  yceFrom: 1920, yceTo: 1969, ccOnly: ['EG','IQ','LY','JO','SA','MA'] },
+  { value: 'republic_era',    label_ar: '🏛️ عهد الجمهوريات',       label_en: '🏛️ Republic Era',           label_de: '🏛️ Republikanische Zeit',   yceFrom: 1952, yceTo: 2026 },
+  { value: 'gulf_states',     label_ar: '🛢️ دول الخليج',           label_en: '🛢️ Gulf States',            label_de: '🛢️ Golfstaaten',            yceFrom: 1960, yceTo: 2026, ccOnly: ['AE','KW','QA','OM','QD'] },
+  { value: 'imamate',         label_ar: '📜 الإمامة',              label_en: '📜 Imamate',                label_de: '📜 Imamat',                 yceFrom: 1800, yceTo: 1970, ccOnly: ['YE','OM'] },
 ];
 
 
@@ -417,22 +111,8 @@ export default function CataloguePage({
   const PER_PAGE_SUP = 60;
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
-  const [dynasty, setDynasty]         = useState('');
-  const [dynastyMode,   setDynastyMode]   = useState<'national' | 'dynastic'>('national');
-  const [dynasticGroup, setDynasticGroup] = useState('');
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [sortBy, setSortBy] = useState('default');
-
-  // ── Islamic detail filters (active when dynastyMode === 'dynastic') ──────
-  const [filterMintAr,      setFilterMintAr]      = useState('');
-  const [filterRulerAr,     setFilterRulerAr]     = useState('');
-  const [filterHijriYear,   setFilterHijriYear]   = useState('');
-  const [filterDenomination, setFilterDenomination] = useState('');
-
-  // Distinct value lists for the three dropdown filters
-  const [mintOptions,  setMintOptions]  = useState<string[]>([]);
-  const [rulerOptions, setRulerOptions] = useState<string[]>([]);
-  const [denomOptions, setDenomOptions] = useState<string[]>([]);
   const [yearFrom, setYearFrom] = useState('');
   const [yearTo, setYearTo] = useState('');
   const autocompleteRef = useRef<HTMLDivElement>(null);
@@ -478,14 +158,6 @@ export default function CataloguePage({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Load distinct values for Islamic detail filters when dynastic mode is active
-  useEffect(() => {
-    if (dynastyMode !== 'dynastic') return;
-    getDistinctValues('mint_ar').then(setMintOptions).catch(() => {});
-    getDistinctValues('ruler_ar').then(setRulerOptions).catch(() => {});
-    getDistinctValues('denomination').then(setDenomOptions).catch(() => {});
-  }, [dynastyMode]);
-
   // Back-to-top visibility
   useEffect(() => {
     const onScroll = () => setShowBackTop(window.scrollY > 600);
@@ -514,26 +186,16 @@ export default function CataloguePage({
     if (yearFrom) apiFilters.yceFrom = parseInt(yearFrom);
     if (yearTo)   apiFilters.yceTo   = parseInt(yearTo);
     if (filters.era) {
-      const [a, b] = filters.era.split('-').map(Number);
-      apiFilters.yceFrom = a;
-      apiFilters.yceTo   = b;
-    }
-    // Dynasty filters — translate to dyn field values
-    if (dynastyMode === 'dynastic' && dynasticGroup) {
-      const group = DYNASTIC_GROUPS.find(g => g.key === dynasticGroup);
-      if (group?.dynMatch?.[0]) apiFilters.dyn = group.dynMatch[0];
-    }
-
-    // Islamic detail filters (only active in dynastic mode)
-    if (dynastyMode === 'dynastic') {
-      if (filterMintAr)       apiFilters.mint_ar      = filterMintAr;
-      if (filterRulerAr)      apiFilters.ruler_ar     = filterRulerAr;
-      if (filterHijriYear)    apiFilters.yah          = filterHijriYear;
-      if (filterDenomination) apiFilters.denomination = filterDenomination;
+      const era = ERA_OPTIONS.find(e => e.value === filters.era);
+      if (era) {
+        apiFilters.yceFrom = era.yceFrom;
+        apiFilters.yceTo   = era.yceTo;
+        if (era.ccOnly && !apiFilters.cc) apiFilters.ccIn = era.ccOnly;
+      }
     }
 
     // Exclude Islamic coins from main Arab catalogue
-    if (!apiFilters.cc) apiFilters.excludeCC = 'IS';
+    if (!apiFilters.cc && !apiFilters.ccIn) apiFilters.excludeCC = 'IS';
 
     getCoins(apiFilters, page, PER_PAGE_SUP).then(({ data, count }) => {
       if (!cancelled) {
@@ -546,8 +208,7 @@ export default function CataloguePage({
     });
 
     return () => { cancelled = true; };
-  }, [filters, page, dynasty, dynastyMode, dynasticGroup, yearFrom, yearTo, sortBy,
-      filterMintAr, filterRulerAr, filterHijriYear, filterDenomination]);
+  }, [filters, page, yearFrom, yearTo, sortBy]);
 
   const handleToggleCollection = async (id: string) => {
     if (user) { await toggleCollectionDB(id); return; }
@@ -663,20 +324,13 @@ export default function CataloguePage({
 
   // With Supabase: coins ARE already paged, count comes from server
   const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE_SUP));
-  // When sorting by dynasty: re-order the current page client-side using DYNASTY_ORDER.
-  // (Supabase doesn't support custom sort arrays; client sort across one page is sufficient.)
-  const paged = sortBy === 'dynasty'
-    ? [...coins].sort((a, b) => dynastyIndex(a.dyn ?? '') - dynastyIndex(b.dyn ?? ''))
-    : coins;
+  const paged = coins;
 
-  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom !== '' || yearTo !== '' || sortBy !== 'default'
-    || !!filterMintAr || !!filterRulerAr || !!filterHijriYear || !!filterDenomination;
+  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom !== '' || yearTo !== '' || sortBy !== 'default';
 
   const clearFilters = () => {
     setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 661, yearTo: 2026 });
-    setDynasty(''); setDynastyMode('national'); setDynasticGroup('');
     setYearFrom(''); setYearTo(''); setSortBy('default');
-    setFilterMintAr(''); setFilterRulerAr(''); setFilterHijriYear(''); setFilterDenomination('');
     setPage(1);
   };
 
@@ -799,7 +453,7 @@ export default function CataloguePage({
 
 
       {/* ── CONTROLS BAR ── */}
-      <div className="bg-parch sticky top-[103px] z-30 border-b border-gold-700/15 shadow-sm">
+      <div className="bg-parch sticky top-[167px] z-30 border-b border-gold-700/15 shadow-sm">
         <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-2 flex-wrap">
           {/* Country filter */}
           <select
@@ -819,106 +473,14 @@ export default function CataloguePage({
             })}
           </select>
 
-          {/* National era — compact dropdown */}
-          <select
-            value={dynastyMode === 'national' ? dynasty : ''}
-            onChange={e => { setDynastyMode('national'); setDynasticGroup(''); setDynasty(e.target.value); setPage(1); }}
-            className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
-              ${dynastyMode === 'national' && dynasty ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
-          >
-            <option value="">{isAr ? '🗺️ الحقبة الوطنية' : '🗺️ National Era'}</option>
-            {DYNASTY_PILLS.map(pill => (
-              <option key={pill.key} value={pill.key}>
-                {pill.icon} {isAr ? pill.label_ar : pill.label_en}
-              </option>
-            ))}
-          </select>
-
-          {/* Historical dynasty — compact dropdown */}
-          <select
-            value={dynastyMode === 'dynastic' ? dynasticGroup : ''}
-            onChange={e => { setDynastyMode('dynastic'); setDynasty(''); setDynasticGroup(e.target.value); setPage(1); }}
-            className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
-              ${dynastyMode === 'dynastic' && dynasticGroup ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
-          >
-            <option value="">{isAr ? '☪️ الأسرة التاريخية' : '☪️ Dynasty'}</option>
-            {[...DYNASTIC_GROUPS]
-              .sort((a, b) => {
-                // Sort by position of dynMatch[0] in DYNASTY_ORDER; ungrouped entries go last
-                const ai = dynastyIndex(a.dynMatch?.[0] ?? '');
-                const bi = dynastyIndex(b.dynMatch?.[0] ?? '');
-                return ai - bi;
-              })
-              .map(group => (
-                <option key={group.key} value={group.key}>
-                  {group.icon} {isAr ? group.label_ar : group.label_en}
-                </option>
-              ))}
-          </select>
-
-          {/* ── Islamic detail filters — visible only in dynastic mode ── */}
-          {dynastyMode === 'dynastic' && (
-            <>
-              {/* Denomination */}
-              <select
-                value={filterDenomination}
-                onChange={e => { setFilterDenomination(e.target.value); setPage(1); }}
-                className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
-                  ${filterDenomination ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
-              >
-                <option value="">{isAr ? '⚖️ الفئة' : '⚖️ Denomination'}</option>
-                {denomOptions.map(d => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-
-              {/* Mint */}
-              <select
-                value={filterMintAr}
-                onChange={e => { setFilterMintAr(e.target.value); setPage(1); }}
-                className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
-                  ${filterMintAr ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
-              >
-                <option value="">{isAr ? '🏛️ دار الضرب' : '🏛️ Mint'}</option>
-                {mintOptions.map(m => (
-                  <option key={m} value={m} dir="rtl">{m}</option>
-                ))}
-              </select>
-
-              {/* Ruler */}
-              <select
-                value={filterRulerAr}
-                onChange={e => { setFilterRulerAr(e.target.value); setPage(1); }}
-                className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer
-                  ${filterRulerAr ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
-              >
-                <option value="">{isAr ? '👑 الحاكم' : '👑 Ruler'}</option>
-                {rulerOptions.map(r => (
-                  <option key={r} value={r} dir="rtl">{r}</option>
-                ))}
-              </select>
-
-              {/* Hijri year — text input, partial match */}
-              <input
-                type="text"
-                dir="rtl"
-                placeholder={isAr ? 'سنة هجرية' : 'Hijri year'}
-                value={filterHijriYear}
-                onChange={e => { setFilterHijriYear(e.target.value); setPage(1); }}
-                className={`w-[90px] text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none focus:border-gold-500 font-cairo
-                  ${filterHijriYear ? 'border-gold-500' : 'border-gold-700/30'}`}
-              />
-            </>
-          )}
-
-          {/* Era */}
+          {/* Era (national era options) */}
           <select
             value={filters.era}
             onChange={e => updateFilter('era', e.target.value)}
             className="text-[11px] px-3 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
             <option value="">{t('filters.allEras')}</option>
             {ERA_OPTIONS.map(e => (
-              <option key={e.value} value={e.value}>{isAr ? e.label_ar : e.label_en}</option>
+              <option key={e.value} value={e.value}>{locale === 'ar' ? e.label_ar : locale === 'de' ? e.label_de : e.label_en}</option>
             ))}
           </select>
 
@@ -968,7 +530,6 @@ export default function CataloguePage({
             <option value="rarest">{isAr ? 'الأندر أولاً' : 'Rarest first'}</option>
             <option value="common">{isAr ? 'الأكثر شيوعاً' : 'Most common'}</option>
             <option value="az">{isAr ? 'أبجدي' : 'A to Z'}</option>
-            <option value="dynasty">{isAr ? 'حسب الأسرة (تاريخي)' : 'By dynasty (historical)'}</option>
           </select>
           {/* Results count + PDF download */}
           <div className="flex items-center gap-2 mr-auto">

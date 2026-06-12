@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Globe } from 'lucide-react';
+import SiteHeader from '@/components/header/SiteHeader';
 
 export interface ShellNavItem {
   labelAr: string;
@@ -45,9 +46,16 @@ export default function CatalogueShell({
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--parch, #FAF6EE)' }} dir={isAr ? 'rtl' : 'ltr'}>
+      <SiteHeader
+        locale={locale}
+        user={undefined as unknown as { id: string; email: string }}
+        onAuthOpen={() => {}}
+        onDashOpen={() => {}}
+        onAdminOpen={() => {}}
+      />
 
       {/* ── TOP BAR ─────────────────────────────────────────────────────── */}
-      <div className="bg-ink text-xs border-b border-gold-700/30 sticky top-0 z-50">
+      <div className="bg-ink text-xs border-b border-gold-700/30 sticky top-[64px] z-40">
         <div className="max-w-[1440px] mx-auto px-4 h-10 flex items-center gap-3">
           {/* Back to main site */}
           <Link href={`/${locale}`}
@@ -146,9 +154,18 @@ export default function CatalogueShell({
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <span className="text-xl">{icon}</span>
               <h1 className="font-amiri text-lg text-amber-200">{heroTitle}</h1>
+              {catalogueId === 'arab' && (
+                <div className="flex items-center gap-3 ms-auto text-[11px] text-amber-300/60">
+                  <span>5,505 {isAr ? 'عملة' : 'coins'}</span>
+                  <span className="text-gold-700">·</span>
+                  <span>20 {isAr ? 'دولة' : 'countries'}</span>
+                  <span className="text-gold-700">·</span>
+                  <span>1500–2026</span>
+                </div>
+              )}
             </div>
           )}
         </div>

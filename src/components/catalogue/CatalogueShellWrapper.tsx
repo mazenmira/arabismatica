@@ -20,8 +20,7 @@ export default function CatalogueShellWrapper({
   const isDe     = locale === 'de';
   const pathname = usePathname();
   const base     = `/${locale}/catalogue`;
-  const isRoot   = pathname === base || pathname === `${base}/`;
-  const heroSize = isRoot ? 'large' : 'compact';
+  const heroSize = 'compact';
 
   const heroTitle = isAr
     ? 'العملات العربية الحديثة'
@@ -46,8 +45,6 @@ export default function CatalogueShellWrapper({
       locale={locale}
       heroSize={heroSize}
       heroTitle={heroTitle}
-      heroSubtitle={isRoot ? heroSubtitle : undefined}
-      heroCoinCount={isRoot ? 5505 : undefined}
       navItems={navItems}
     >
       {children}

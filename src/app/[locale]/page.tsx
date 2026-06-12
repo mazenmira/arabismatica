@@ -1,11 +1,16 @@
-// v4.0 — pure landing page
+// v4.1 — landing page with auth modals
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import SiteHeader from '@/components/header/SiteHeader';
+import AuthModal from '@/components/auth/AuthModal';
+import AdminPanel from '@/components/catalogue/AdminPanel';
+import Dashboard from '@/components/dashboard/Dashboard';
 import { supabase } from '@/lib/supabase';
+
+const ADMIN_UUID = 'c26b0742-6283-4707-93ec-d617fc809863';
 
 const HERO_IMG = 'https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2026/05/Arabismatica-Hero.jpg';
 
@@ -115,8 +120,11 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
           <p className="text-gold-400 text-[11px] tracking-[0.2em] uppercase mb-3 font-medium">
             {t('كتالوج العملات العربية والإسلامية', 'Arab & Islamic Coin Catalogue', 'Arabischer & Islamischer Münzkatalog')}
           </p>
-          <h1 className="font-amiri text-4xl md:text-6xl text-amber-100 mb-4 leading-tight">
-            أرابيزماتيكا
+          <h1 className="font-amiri text-5xl md:text-6xl text-white leading-tight mb-2">
+            Arabismatica
+            <span className="block text-3xl md:text-4xl text-amber-300/80 font-amiri mt-1">
+              أرابيزماتيكا
+            </span>
           </h1>
           <p className="text-amber-300/80 text-[14px] md:text-[16px] max-w-lg mb-8">
             {t(
@@ -234,10 +242,28 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
         </div>
       </div>
 
-      {/* suppress unused state warnings */}
-      {authOpen && null}
-      {dashOpen && null}
-      {adminOpen && null}
+      {authOpen && (
+        <AuthModal
+          locale={locale}
+          onClose={() => setAuthOpen(false)}
+          onSuccess={() => setAuthOpen(false)}
+        />
+      )}
+      {dashOpen && user && (
+        <Dashboard
+          locale={locale}
+          userId={user.id}
+          userEmail={user.email}
+          onClose={() => setDashOpen(false)}
+          onSignOut={() => { setUser(null); setDashOpen(false); }}
+        />
+      )}
+      {adminOpen && user?.id === ADMIN_UUID && (
+        <AdminPanel
+          locale={locale}
+          onClose={() => setAdminOpen(false)}
+        />
+      )}
     </main>
   );
 }

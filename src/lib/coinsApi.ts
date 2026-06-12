@@ -108,6 +108,8 @@ export interface CoinFilters {
   /** CE year range */
   yceFrom?:  number;
   yceTo?:    number;
+  /** Filter to a set of country codes — for era filters that span multiple countries */
+  ccIn?:     string[];
   /** Free-text search across name, nar, km, nref, ruler, mint */
   query?:    string;
 }
@@ -119,7 +121,7 @@ function applyFilters(
   qb: any,
   filters: CoinFilters,
 ) {
-  const { cc, excludeCC, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query } = filters;
+  const { cc, excludeCC, ccIn, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query } = filters;
 
   if (cc) {
     if (Array.isArray(cc)) {
@@ -128,6 +130,7 @@ function applyFilters(
       qb = qb.eq('cc', cc);
     }
   }
+  if (ccIn) qb = qb.in('cc', ccIn);
   if (excludeCC) qb = qb.neq('cc', excludeCC);
 
   if (dyn)          qb = qb.ilike('dyn',         `%${dyn}%`);
@@ -484,14 +487,19 @@ export async function getIslamicCoins(
  * Used to populate dynasty, mint, ruler, and tag dropdowns.
  */
 export async function getIslamicFilters(): Promise<IslamicFilters> {
+  async function distinctIS(col: string): Promise<string[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await db.from('coins').select(col).eq('cc', 'IS');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vals: string[] = (data ?? []).map((r: any) => r[col]).filter(Boolean) as string[];
+    return Array.from(new Set(vals)).sort();
+  }
+
   const [dynasties, mints, rulers, tags] = await Promise.all([
-    getDistinctValues('dyn').then(vals =>
-      // Filter to IS-relevant dynasties only (exclude national/modern)
-      vals.filter(v => v && !['الجمهورية', 'المملكة', 'Republic', 'Kingdom'].some(k => v.includes(k)))
-    ),
-    getDistinctValues('mint_ar'),
-    getDistinctValues('ruler_ar'),
-    getDistinctValues('coin_type_tag'),
+    distinctIS('dyn'),
+    distinctIS('mint_ar'),
+    distinctIS('ruler_ar'),
+    distinctIS('coin_type_tag'),
   ]);
   return { dynasties, mints, rulers, tags };
 }
