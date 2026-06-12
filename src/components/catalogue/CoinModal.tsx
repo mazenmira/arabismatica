@@ -628,6 +628,17 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
                   <ExternalLink size={12} />{externalLabel}
                 </a>
               )}
+              {(() => {
+                const acsearchQuery = encodeURIComponent(coin.name?.split(',').slice(0, 2).join(' ') ?? '');
+                const acsearchUrl = `https://www.acsearch.info/search.html?query=${acsearchQuery}`;
+                return (
+                  <a href={acsearchUrl} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-[12px] text-gold-600 border border-gold-700/30 rounded-full px-4 py-2 hover:border-gold-500 transition-colors">
+                    <ExternalLink size={12} />
+                    {isAr ? 'أسعار المزادات' : locale === 'de' ? 'Auktionspreise' : 'Auction prices'}
+                  </a>
+                );
+              })()}
               <Link href={`/${locale}/catalogue/${coin.id}`}
                 className="inline-flex items-center gap-2 text-[12px] text-gold-600 border border-gold-700/30 rounded-full px-4 py-2 hover:border-gold-500 hover:text-gold-500 transition-colors">
                 <ExternalLink size={12} />🔗 {isAr ? 'صفحة العملة' : 'Coin page'}

@@ -217,6 +217,68 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                 })()}
               </div>
 
+              {/* ── Description ── */}
+              {coin.zeno_description && (
+                <div className="mb-6 rounded-xl border border-amber-100 overflow-hidden">
+                  <div className="bg-amber-50 px-4 py-2 border-b border-amber-100">
+                    <span className="text-[10px] text-amber-600/60 uppercase tracking-widest font-medium">
+                      {isAr ? 'وصف العملة' : locale === 'de' ? 'Münzbeschreibung' : 'Coin Description'}
+                    </span>
+                  </div>
+                  <div className="px-4 py-4">
+                    {coin.obverse_legend && (
+                      <div className="mb-1.5">
+                        <span className="text-[10px] font-semibold text-amber-700 me-1">
+                          {isAr ? 'الوجه:' : 'Obverse:'}
+                        </span>
+                        <span className="text-[11px] text-amber-900/70 font-amiri">
+                          {coin.obverse_legend}
+                        </span>
+                      </div>
+                    )}
+                    {coin.reverse_legend && (
+                      <div className="mb-2">
+                        <span className="text-[10px] font-semibold text-amber-700 me-1">
+                          {isAr ? 'الظهر:' : 'Reverse:'}
+                        </span>
+                        <span className="text-[11px] text-amber-900/70 font-amiri">
+                          {coin.reverse_legend}
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-[12px] text-amber-900/60 leading-relaxed font-amiri italic mb-3">
+                      {coin.zeno_description}
+                    </p>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {coin.references && (
+                        <span className="text-[10px] text-amber-700/50">
+                          <span className="font-semibold text-amber-700">
+                            {isAr ? 'مراجع: ' : 'Ref: '}
+                          </span>
+                          {coin.references}
+                        </span>
+                      )}
+                      {coin.condition && (
+                        <span className="text-[10px] text-amber-700/50">
+                          <span className="font-semibold text-amber-700">
+                            {isAr ? 'الحالة: ' : 'Grade: '}
+                          </span>
+                          {coin.condition}
+                        </span>
+                      )}
+                      {coin.die_axis && (
+                        <span className="text-[10px] text-amber-700/50">
+                          <span className="font-semibold text-amber-700">
+                            {isAr ? 'محور الضرب: ' : 'Die axis: '}
+                          </span>
+                          {coin.die_axis}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* ── Mintage table ── */}
               {mintageData.length > 0 && (
                 <div className="mb-6">
