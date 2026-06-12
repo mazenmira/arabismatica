@@ -76,7 +76,7 @@ interface CataloguePageProps {
 export default function CataloguePage({ locale }: CataloguePageProps) {
   const t = useTranslations();
   const isAr = locale === 'ar';
-  const { user, setAuthOpen, setDashOpen, setAdminOpen } = useAuth();
+  const { user, setAuthOpen } = useAuth();
   const { darkMode } = useDarkMode();
 
   const [filters, setFilters] = useState<FilterState>({
