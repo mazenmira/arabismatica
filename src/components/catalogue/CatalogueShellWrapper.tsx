@@ -1,6 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import CatalogueShell from '@/components/layout/CatalogueShell';
 import type { ShellNavItem } from '@/components/layout/CatalogueShell';
 
@@ -18,7 +17,6 @@ export default function CatalogueShellWrapper({
 }) {
   const isAr     = locale === 'ar';
   const isDe     = locale === 'de';
-  const pathname = usePathname();
   const base     = `/${locale}/catalogue`;
   const heroSize = 'compact';
 
@@ -27,12 +25,6 @@ export default function CatalogueShellWrapper({
     : isDe
     ? 'Moderne arabische Münzen'
     : 'Modern Arab Coins';
-
-  const heroSubtitle = isAr
-    ? '5,505 عملة من 20 دولة عربية — من العثمانيين حتى اليوم'
-    : isDe
-    ? '5.505 Münzen aus 20 arabischen Ländern — von den Osmanen bis heute'
-    : '5,505 coins from 20 Arab countries — from the Ottomans to today';
 
   const navItems = NAV_ITEMS.map(item => ({
     ...item,
