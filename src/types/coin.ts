@@ -43,6 +43,14 @@ export interface Coin {
   prices?: CoinPrices;
   o: string;
   r: string;
+  zeno_description?: string;
+  upload_date?: string;
+  keywords?: string;
+  obverse_legend?: string;
+  reverse_legend?: string;
+  references?: string;
+  condition?: string;
+  die_axis?: string;
 }
 
 export type Metal =

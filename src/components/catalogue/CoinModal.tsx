@@ -553,6 +553,68 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
               </div>
             ) : null}
 
+            {/* ── Description ── */}
+            {coin.zeno_description && (
+              <div className="border-t border-gold-700/15 pt-4 mb-4">
+                <div className="text-[10px] text-ink/40 uppercase tracking-widest font-medium mb-3">
+                  {isAr ? 'وصف العملة' : locale === 'de' ? 'Münzbeschreibung' : 'Coin Description'}
+                </div>
+
+                {coin.obverse_legend && (
+                  <div className="mb-1.5">
+                    <span className="text-[10px] font-semibold text-gold-600 me-1">
+                      {isAr ? 'الوجه:' : 'Obverse:'}
+                    </span>
+                    <span className="text-[11px] text-ink/70 font-amiri">
+                      {coin.obverse_legend}
+                    </span>
+                  </div>
+                )}
+
+                {coin.reverse_legend && (
+                  <div className="mb-2">
+                    <span className="text-[10px] font-semibold text-gold-600 me-1">
+                      {isAr ? 'الظهر:' : 'Reverse:'}
+                    </span>
+                    <span className="text-[11px] text-ink/70 font-amiri">
+                      {coin.reverse_legend}
+                    </span>
+                  </div>
+                )}
+
+                <p className="text-[12px] text-ink/60 leading-relaxed font-amiri italic mb-2">
+                  {coin.zeno_description}
+                </p>
+
+                <div className="flex items-center gap-3 flex-wrap">
+                  {coin.references && (
+                    <span className="text-[10px] text-ink/40">
+                      <span className="font-semibold text-gold-600/70">
+                        {isAr ? 'مراجع: ' : 'Ref: '}
+                      </span>
+                      {coin.references}
+                    </span>
+                  )}
+                  {coin.condition && (
+                    <span className="text-[10px] text-ink/40">
+                      <span className="font-semibold text-gold-600/70">
+                        {isAr ? 'الحالة: ' : 'Grade: '}
+                      </span>
+                      {coin.condition}
+                    </span>
+                  )}
+                  {coin.die_axis && (
+                    <span className="text-[10px] text-ink/40">
+                      <span className="font-semibold text-gold-600/70">
+                        {isAr ? 'محور الضرب: ' : 'Die axis: '}
+                      </span>
+                      {coin.die_axis}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* ── Price Guide ── */}
             <div className="border-t border-gold-700/15 pt-4">
               <PriceGuide coinId={coin.id} locale={locale} cataloguePrices={coin.prices} />
