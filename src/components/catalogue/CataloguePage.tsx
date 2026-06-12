@@ -4,12 +4,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { Camera, Grid3X3, List, X, CalendarDays, ArrowUp, FileDown, Moon, Sun } from 'lucide-react';
+import { Grid3X3, List, X, ArrowUp, FileDown, Moon, Sun } from 'lucide-react';
 import CoinCard from './CoinCard';
 import CoinModal from './CoinModal';
 import AdminPanel from './AdminPanel';
-import HeroBanner from './HeroBanner';
 import AuthModal from '@/components/auth/AuthModal';
 import Dashboard from '@/components/dashboard/Dashboard';
 import { supabase } from '@/lib/supabase';
@@ -54,12 +52,6 @@ const ERA_OPTIONS: EraOption[] = [
   { value: 'imamate',         label_ar: '📜 الإمامة',              label_en: '📜 Imamate',                label_de: '📜 Imamat',                 yceFrom: 1800, yceTo: 1970, ccOnly: ['YE','OM'] },
 ];
 
-
-function getCoinOfDay(coins: Coin[]): Coin {
-  const today = new Date();
-  const seed  = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-  return coins[seed % coins.length];
-}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function fuseSearch(coins: Coin[], query: string): Coin[] {
@@ -346,109 +338,42 @@ export default function CataloguePage({
 
   return (
     <div className={darkMode ? 'dark' : ''} style={darkMode ? {filter:'invert(1) hue-rotate(180deg)'} : {}}>
-      {/* ── HERO ── */}
-      <HeroBanner locale={locale} totalCoins={totalCount} totalCountries={COUNTRIES.length} />
-
-      <section className="relative overflow-hidden" style={{ background: 'linear-gradient(155deg, #16100A 0%, #241605 55%, #301B06 100%)' }}>
-        <div className="relative max-w-[1440px] mx-auto px-4 py-6 text-center">
-          <motion.div
-            className="flex flex-wrap justify-center gap-6 mb-0"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-          </motion.div>
-
-          {/* Search bar */}
-          <motion.div
-            className="max-w-2xl mx-auto relative"
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <div className="flex items-center bg-parch-cream rounded-2xl border-2 border-gold-700/40 focus-within:border-gold-500 transition-colors shadow-2xl overflow-hidden">
-              <span className="shrink-0 mx-4 text-gold-500/60 text-base">🔍</span>
-              <input
-                ref={searchRef}
-                type="text"
-                dir={isAr ? 'rtl' : 'ltr'}
-                placeholder={t('search.placeholder')}
-                value={filters.query}
-                onChange={e => { updateFilter('query', e.target.value); setShowAutocomplete(true); }}
-                onFocus={() => setShowAutocomplete(true)}
-                className="flex-1 py-3.5 text-[14px] bg-transparent text-ink placeholder:text-ink/30 outline-none font-cairo"
-                autoComplete="off"
-              />
-              {filters.query && (
-                <button onClick={() => updateFilter('query', '')} className="mx-2 text-ink/30 hover:text-ink/60">
-                  <X size={14} />
-                </button>
-              )}
-              <button
-                onClick={() => { /* open identify modal */ }}
-                className="flex items-center gap-1.5 mx-3 px-3 py-2 rounded-xl bg-gold-500 hover:bg-gold-400 text-ink text-[12px] font-semibold transition-colors shrink-0"
-                title={t('search.identify')}>
-                <Camera size={14} />
-                <span className="hidden sm:block">{isAr ? 'تحديد' : 'Identify'}</span>
-              </button>
-            </div>
-          {/* Autocomplete dropdown */}
+      {/* ── SEARCH ── */}
+      <div className="border-b border-gold-700/15 bg-white/50 px-4 py-3">
+        <div className="max-w-[1440px] mx-auto relative" ref={autocompleteRef}>
+          <span className="absolute top-1/2 -translate-y-1/2 start-4 text-gold-500/50 text-base select-none">🔍</span>
+          <input
+            ref={searchRef}
+            type="text"
+            dir={isAr ? 'rtl' : 'ltr'}
+            placeholder={isAr ? 'ابحث بالاسم، KM#، المعدن، السنة...' : 'Search by name, KM#, metal, year...'}
+            value={filters.query}
+            onChange={e => { updateFilter('query', e.target.value); setShowAutocomplete(true); }}
+            onFocus={() => setShowAutocomplete(true)}
+            className="w-full text-[14px] ps-11 pe-10 py-3 rounded-xl border border-gold-700/25 bg-parch-cream outline-none focus:border-gold-500 shadow-sm font-cairo"
+            autoComplete="off"
+          />
+          {filters.query && (
+            <button onClick={() => updateFilter('query', '')}
+              className="absolute top-1/2 -translate-y-1/2 end-4 text-ink/30 hover:text-ink/60">
+              <X size={14} />
+            </button>
+          )}
           {showAutocomplete && suggestions.length > 0 && (
-            <div
-              ref={autocompleteRef}
-              className="max-w-2xl mx-auto mt-1 bg-parch-cream rounded-xl border border-gold-700/30 shadow-2xl overflow-hidden z-50 relative"
-            >
+            <div className="absolute top-full left-0 right-0 mt-1 bg-parch-cream rounded-xl border border-gold-700/30 shadow-2xl overflow-hidden z-50">
               {suggestions.map((s, i) => (
-                <button
-                  key={i}
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => {
-                    updateFilter('query', s);
-                    setShowAutocomplete(false);
-                    searchRef.current?.blur();
-                  }}
-                  className="w-full text-right px-4 py-2.5 text-[13px] text-ink/80 hover:bg-gold-500/10 border-b border-gold-700/10 last:border-0 transition-colors font-cairo flex items-center gap-2"
-                  dir={isAr ? 'rtl' : 'ltr'}
-                >
+                <button key={i} onMouseDown={e => e.preventDefault()}
+                  onClick={() => { updateFilter('query', s); setShowAutocomplete(false); searchRef.current?.blur(); }}
+                  className="w-full text-start px-4 py-2.5 text-[13px] text-ink/80 hover:bg-gold-500/10 border-b border-gold-700/10 last:border-0 transition-colors font-cairo flex items-center gap-2"
+                  dir={isAr ? 'rtl' : 'ltr'}>
                   <span className="text-gold-500/50 text-[10px]">🔍</span>
                   {s}
                 </button>
               ))}
             </div>
           )}
-          </motion.div>
         </div>
-
-        {/* Decorative bottom line */}
-        <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, #8B6D2E, transparent)' }} />
-      </section>
-
-      {/* COIN OF THE DAY */}
-      {(() => {
-        const cotd = coins.length > 0 ? getCoinOfDay(coins) : null;
-        if (!cotd) return null;
-        return (
-          <div className="bg-gradient-to-r from-ink via-[#1e1206] to-ink border-b border-gold-700/30">
-            <div className="max-w-[1440px] mx-auto px-4 py-3">
-              <div className="flex items-center gap-3 flex-wrap">
-                <div className="flex items-center gap-2 shrink-0">
-                  <CalendarDays size={14} className="text-gold-500" />
-                  <span className="text-[10px] text-gold-500/70 uppercase tracking-widest font-medium">
-                    {isAr ? 'عملة اليوم' : 'Coin of the Day'}
-                  </span>
-                </div>
-                {cotd.o && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={cotd.o} alt="" className="w-8 h-8 rounded-full object-cover border border-gold-700/40" />
-                )}
-                <Link href={`/${locale}/catalogue/${cotd.id}`} onClick={(e) => { e.preventDefault(); setSelectedCoin(cotd); }} className="font-amiri text-gold-300 hover:text-gold-100 text-[14px] transition-colors">
-                  {isAr ? (cotd.nar || cotd.name) : cotd.name}
-                </Link>
-                <span className="text-[11px] text-gold-600/50 hidden sm:block">
-                  {cotd.yce ? cotd.yce + ' م' : ''} · {isAr ? cotd.co_ar : cotd.co}
-                </span>
-                <Link href={`/${locale}/catalogue/${cotd.id}`} onClick={(e) => { e.preventDefault(); setSelectedCoin(cotd); }} className="mr-auto text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 rounded-full px-3 py-1 transition-colors shrink-0">
-                  {isAr ? 'عرض التفاصيل ←' : 'View details →'}
-                </Link>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      </div>
 
 
 

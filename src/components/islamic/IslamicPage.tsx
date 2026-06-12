@@ -7,14 +7,14 @@ import { getIslamicCoins, getIslamicFilters } from '@/lib/coinsApi';
 import type { CoinRow, IslamicCoinFilters } from '@/lib/coinsApi';
 import CoinCard from '@/components/catalogue/CoinCard';
 
-const DENOMINATIONS = [
-  { key: '',             labelEn: 'All',          labelAr: 'الكل',           color: 'bg-amber-700' },
-  { key: 'Dirham',       labelEn: 'Dirham',       labelAr: 'درهم',           color: 'bg-blue-700' },
-  { key: 'Dinar',        labelEn: 'Dinar',        labelAr: 'دينار',          color: 'bg-yellow-700' },
-  { key: 'Fals/Fils',    labelEn: 'Fals/Fils',    labelAr: 'فلس',            color: 'bg-green-800' },
-  { key: 'Early Dirham', labelEn: 'Early Dirham', labelAr: 'درهم مبكر',      color: 'bg-purple-800' },
-  { key: 'Fractional',   labelEn: 'Fractional',   labelAr: 'كسر',            color: 'bg-rose-800' },
-  { key: 'Anonymous',    labelEn: 'Anonymous',    labelAr: 'مجهول',          color: 'bg-slate-700' },
+const DENOM_OPTIONS = [
+  { key: '',             labelEn: 'All Denominations', labelAr: 'كل الأوراق' },
+  { key: 'Dirham',       labelEn: 'Dirham',            labelAr: 'درهم' },
+  { key: 'Dinar',        labelEn: 'Dinar',             labelAr: 'دينار' },
+  { key: 'Fals/Fils',    labelEn: 'Fals/Fils',         labelAr: 'فلس' },
+  { key: 'Early Dirham', labelEn: 'Early Dirham',      labelAr: 'درهم مبكر' },
+  { key: 'Fractional',   labelEn: 'Fractional',        labelAr: 'كسر' },
+  { key: 'Anonymous',    labelEn: 'Anonymous',         labelAr: 'مجهول' },
 ];
 
 const COIN_TYPE_PILLS = [
@@ -141,164 +141,170 @@ export default function IslamicPage({ locale }: { locale: string }) {
       <div dir={isAr ? 'rtl' : 'ltr'} className="max-w-[1440px] mx-auto">
 
         {/* ── SEARCH ───────────────────────────────────────────────────── */}
-        <div className="py-4">
+        <div className="border-b border-gold-700/15 bg-white/50 py-3">
           <div className="relative">
-            <Search size={16} className="absolute top-1/2 -translate-y-1/2 start-4 text-amber-400" />
+            <Search size={15} className="absolute top-1/2 -translate-y-1/2 start-4 text-gold-500/50" />
             <input
               value={query}
               onChange={e => { setQuery(e.target.value); setPage(1); }}
-              placeholder={isAr ? 'ابحث بالاسم، الحاكم، دار الضرب...' : 'Search by name, ruler, mint...'}
-              className="w-full text-[14px] ps-11 pe-4 py-3 rounded-xl border border-amber-200 bg-white outline-none focus:border-amber-400 shadow-sm"
+              placeholder={isAr ? 'ابحث بالاسم، دار الضرب، الحاكم، المرجع...' : 'Search by name, mint, ruler, reference...'}
+              className="w-full text-[14px] ps-11 pe-4 py-3 rounded-xl border border-gold-700/25 bg-parch-cream outline-none focus:border-gold-500 shadow-sm font-cairo"
             />
           </div>
-        </div>
-
-        {/* ── DENOMINATION BAR ─────────────────────────────────────────── */}
-        <div className="flex items-center gap-2 pb-3 overflow-x-auto scrollbar-none">
-          {DENOMINATIONS.map(d => (
-            <button key={d.key}
-              onClick={() => { setDenomination(denomination === d.key ? '' : d.key); setPage(1); }}
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium transition-all border
-                ${denomination === d.key
-                  ? `${d.color} text-white border-transparent`
-                  : 'bg-white border-amber-200 text-amber-700 hover:border-amber-400'}`}>
-              <span>{isAr ? d.labelAr : d.labelEn}</span>
-            </button>
-          ))}
         </div>
 
         {/* ── FILTER ROW 1 ─────────────────────────────────────────────── */}
         <div className="bg-parch sticky top-[167px] z-30 border-b border-gold-700/15 shadow-sm">
           <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-2 flex-wrap">
-          {/* Dynasty */}
-          <select value={dynasty} onChange={e => { setDynasty(e.target.value); setPage(1); }}
-            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[200px]">
-            <option value="">{isAr ? 'كل السلالات' : 'All dynasties'}</option>
-            {filters.dynasties.map(d => <option key={d} value={d}>{d}</option>)}
-          </select>
 
-          {/* Metal */}
-          <select value={metal} onChange={e => { setMetal(e.target.value); setPage(1); }}
-            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
-            <option value="">{isAr ? 'كل المعادن' : 'All metals'}</option>
-            {filters.metals.map(m => (
-              <option key={m} value={m}>{isAr ? (METALS_AR[m] ?? m) : m}</option>
-            ))}
-          </select>
+            {/* Dynasty */}
+            <select value={dynasty} onChange={e => { setDynasty(e.target.value); setPage(1); }}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[180px]">
+              <option value="">{isAr ? 'كل السلالات' : 'All Dynasties'}</option>
+              {filters.dynasties.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
 
-          {/* Mint */}
-          <select value={mint} onChange={e => { setMint(e.target.value); setPage(1); }}
-            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[180px]">
-            <option value="">{isAr ? 'كل دور الضرب' : 'All mints'}</option>
-            {filters.mints.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
+            {/* Metal */}
+            <select value={metal} onChange={e => { setMetal(e.target.value); setPage(1); }}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
+              <option value="">{isAr ? 'كل المعادن' : 'All Metals'}</option>
+              {filters.metals.map(m => (
+                <option key={m} value={m}>{isAr ? (METALS_AR[m] ?? m) : m}</option>
+              ))}
+            </select>
 
-          {/* Ruler */}
-          <select value={ruler} onChange={e => { setRuler(e.target.value); setPage(1); }}
-            className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[180px]">
-            <option value="">{isAr ? 'كل الحكام' : 'All rulers'}</option>
-            {filters.rulers.map(r => <option key={r} value={r}>{r}</option>)}
-          </select>
+            {/* Denomination */}
+            <select value={denomination} onChange={e => { setDenomination(e.target.value); setPage(1); }}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[160px]">
+              {DENOM_OPTIONS.map(d => (
+                <option key={d.key} value={d.key}>{isAr ? d.labelAr : d.labelEn}</option>
+              ))}
+            </select>
 
-          {/* More filters toggle */}
-          <button
-            onClick={() => setMoreFilters(!moreFilters)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
-              ${moreFilters ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
-            <SlidersHorizontal size={12} />
-            {isAr ? 'فلاتر إضافية' : 'More filters'}
-            {moreFilters ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-          </button>
+            {/* Mint */}
+            <select value={mint} onChange={e => { setMint(e.target.value); setPage(1); }}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[160px]">
+              <option value="">{isAr ? 'كل دور الضرب' : 'All Mints'}</option>
+              {filters.mints.map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
 
-          {/* Active filter count */}
-          {activeCount > 0 && (
-            <button onClick={clearAll}
-              className="flex items-center gap-1 text-[11px] text-gold-600 hover:text-gold-500 border border-gold-700/30 rounded-full px-2.5 py-1 transition-colors">
-              <X size={11} />
-              {isAr ? `مسح (${activeCount})` : `Clear (${activeCount})`}
+            {/* Ruler */}
+            <select value={ruler} onChange={e => { setRuler(e.target.value); setPage(1); }}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[160px]">
+              <option value="">{isAr ? 'كل الحكام' : 'All Rulers'}</option>
+              {filters.rulers.map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
+
+            {/* More filters toggle */}
+            <button
+              onClick={() => setMoreFilters(!moreFilters)}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
+                ${moreFilters ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
+              <SlidersHorizontal size={12} />
+              {isAr ? 'فلاتر إضافية' : 'More filters'}
+              {moreFilters ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
-          )}
+
+            {/* Results count */}
+            <span className="text-[11px] text-ink/40 ms-auto">
+              {total.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {isAr ? 'عملة' : 'coins'}
+            </span>
+
+            {/* Sort */}
+            <select value={sort} onChange={e => { setSort(e.target.value as typeof sort); setPage(1); }}
+              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
+              <option value="default">{isAr ? 'الافتراضي' : 'Default'}</option>
+              <option value="oldest">{isAr ? 'الأقدم هجرياً' : 'Oldest AH'}</option>
+              <option value="newest">{isAr ? 'الأحدث هجرياً' : 'Newest AH'}</option>
+            </select>
+
+            {/* Clear */}
+            {activeCount > 0 && (
+              <button onClick={clearAll}
+                className="flex items-center gap-1 text-[11px] text-gold-600 hover:text-gold-500 border border-gold-700/30 rounded-full px-2.5 py-1 transition-colors">
+                <X size={11} />
+                {isAr ? `مسح (${activeCount})` : `Clear (${activeCount})`}
+              </button>
+            )}
           </div>
         </div>
 
         {/* ── FILTER ROW 2 (expandable) ────────────────────────────────── */}
         {moreFilters && (
-          <div className="border border-amber-100 rounded-xl bg-amber-50/50 p-4 mb-4 space-y-3">
+          <div className="border-b border-gold-700/10 bg-parch-cream/60 px-4 py-3 flex flex-wrap items-center gap-4">
             {/* Year AH range */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[12px] text-amber-700 font-medium shrink-0">
-                {isAr ? 'السنة الهجرية:' : 'Year AH:'}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-ink/60 font-medium shrink-0">
+                {isAr ? 'هجري:' : 'Year AH:'}
               </span>
               <input value={yahFrom} onChange={e => { setYahFrom(e.target.value); setPage(1); }}
                 type="number" placeholder={isAr ? 'من' : 'From'}
-                className="w-20 text-[12px] px-2 py-1.5 rounded-lg border border-amber-200 bg-white outline-none focus:border-amber-400" />
-              <span className="text-amber-400">–</span>
+                className="w-20 text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+              <span className="text-ink/30 text-[11px]">—</span>
               <input value={yahTo} onChange={e => { setYahTo(e.target.value); setPage(1); }}
                 type="number" placeholder={isAr ? 'إلى' : 'To'}
-                className="w-20 text-[12px] px-2 py-1.5 rounded-lg border border-amber-200 bg-white outline-none focus:border-amber-400" />
+                className="w-20 text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
             </div>
             {/* Coin type pills */}
-            <div>
-              <span className="text-[12px] text-amber-700 font-medium me-2">
-                {isAr ? 'نوع العملة:' : 'Coin type:'}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] text-ink/60 font-medium shrink-0">
+                {isAr ? 'النوع:' : 'Type:'}
               </span>
-              <div className="inline-flex flex-wrap gap-1.5 mt-1">
-                {COIN_TYPE_PILLS.map(p => (
-                  <button key={p.key}
-                    onClick={() => { setCoinTypeTag(coinTypeTag === p.key ? '' : p.key); setPage(1); }}
-                    className={`text-[11px] px-2.5 py-1 rounded-full border transition-all
-                      ${coinTypeTag === p.key
-                        ? 'bg-amber-700 border-amber-600 text-white'
-                        : 'border-amber-300 text-amber-700 hover:border-amber-500'}`}>
-                    {isAr ? p.labelAr : p.labelEn}
-                  </button>
-                ))}
-              </div>
+              {COIN_TYPE_PILLS.map(p => (
+                <button key={p.key}
+                  onClick={() => { setCoinTypeTag(coinTypeTag === p.key ? '' : p.key); setPage(1); }}
+                  className={`text-[11px] px-2.5 py-1 rounded-full border transition-all
+                    ${coinTypeTag === p.key
+                      ? 'bg-gold-500 border-gold-500 text-ink font-semibold'
+                      : 'border-gold-700/25 text-ink/50 hover:border-gold-500/50 hover:text-ink/70'}`}>
+                  {isAr ? p.labelAr : p.labelEn}
+                </button>
+              ))}
             </div>
           </div>
         )}
 
         {/* ── ACTIVE FILTER PILLS ──────────────────────────────────────── */}
         {activeCount > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1.5 py-2">
             {denomination && (
-              <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
-                {isAr ? DENOMINATIONS.find(d => d.key === denomination)?.labelAr : denomination}
+              <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
+                {isAr ? DENOM_OPTIONS.find(d => d.key === denomination)?.labelAr : denomination}
                 <button onClick={() => { setDenomination(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {dynasty && (
-              <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
+              <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
                 {dynasty}
                 <button onClick={() => { setDynasty(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {metal && (
-              <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
+              <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
                 {isAr ? (METALS_AR[metal] ?? metal) : metal}
                 <button onClick={() => { setMetal(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {mint && (
-              <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
+              <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
                 {mint}
                 <button onClick={() => { setMint(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {ruler && (
-              <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
+              <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
                 {ruler}
                 <button onClick={() => { setRuler(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {coinTypeTag && (
-              <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
+              <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
                 {coinTypeTag}
                 <button onClick={() => { setCoinTypeTag(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {(yahFrom || yahTo) && (
-              <span className="flex items-center gap-1 text-[11px] bg-amber-100 text-amber-800 rounded-full px-2.5 py-1 border border-amber-200">
+              <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
                 {yahFrom || '?'}–{yahTo || '?'} هـ
                 <button onClick={() => { setYahFrom(''); setYahTo(''); setPage(1); }}><X size={10} /></button>
               </span>
@@ -306,23 +312,8 @@ export default function IslamicPage({ locale }: { locale: string }) {
           </div>
         )}
 
-        {/* ── RESULTS BAR ──────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-          <span className="text-[12px] text-amber-600/70">
-            {total.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {isAr ? 'عملة' : 'coins'}
-          </span>
-          <div className="flex items-center gap-2">
-            <select value={sort} onChange={e => { setSort(e.target.value as typeof sort); setPage(1); }}
-              className="text-[12px] px-2.5 py-1.5 rounded-lg border border-amber-200 bg-white outline-none focus:border-amber-400">
-              <option value="default">{isAr ? 'الافتراضي' : 'Default'}</option>
-              <option value="oldest">{isAr ? 'الأقدم هجرياً' : 'Oldest AH'}</option>
-              <option value="newest">{isAr ? 'الأحدث هجرياً' : 'Newest AH'}</option>
-            </select>
-          </div>
-        </div>
-
         {/* ── COIN GRID ────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
           {loading
             ? Array.from({ length: 24 }).map((_, i) => <SkeletonCard key={i} />)
             : coins.map(coin => (

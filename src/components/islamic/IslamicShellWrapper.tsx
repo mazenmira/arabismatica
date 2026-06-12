@@ -1,6 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import CatalogueShell from '@/components/layout/CatalogueShell';
 import type { ShellNavItem } from '@/components/layout/CatalogueShell';
 
@@ -19,24 +18,15 @@ export default function IslamicShellWrapper({
   locale: string;
   children: React.ReactNode;
 }) {
-  const isAr     = locale === 'ar';
-  const isDe     = locale === 'de';
-  const pathname = usePathname();
-  const base     = `/${locale}/islamic`;
-  const isRoot   = pathname === base || pathname === `${base}/`;
-  const heroSize = isRoot ? 'large' : 'compact';
+  const isAr = locale === 'ar';
+  const isDe = locale === 'de';
+  const base = `/${locale}/islamic`;
 
   const heroTitle = isAr
     ? 'العملات الإسلامية'
     : isDe
     ? 'Islamische Münzen'
     : 'Islamic Coins';
-
-  const heroSubtitle = isAr
-    ? '47,303 عملة من 18 سلالة وخلافة — من الأموية إلى المماليك'
-    : isDe
-    ? '47.303 Münzen aus 18 Dynastien — von den Umayyaden bis zu den Mamluken'
-    : '47,303 coins from 18 dynasties — from the Umayyads to the Mamluks';
 
   const navItems = NAV_ITEMS.map(item => ({
     ...item,
@@ -47,10 +37,8 @@ export default function IslamicShellWrapper({
     <CatalogueShell
       catalogueId="islamic"
       locale={locale}
-      heroSize={heroSize}
+      heroSize="compact"
       heroTitle={heroTitle}
-      heroSubtitle={isRoot ? heroSubtitle : undefined}
-      heroCoinCount={isRoot ? 47303 : undefined}
       navItems={navItems}
     >
       {children}

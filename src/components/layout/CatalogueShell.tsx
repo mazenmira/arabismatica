@@ -166,6 +166,15 @@ export default function CatalogueShell({
                   <span>1500–2026</span>
                 </div>
               )}
+              {catalogueId === 'islamic' && (
+                <div className="flex items-center gap-3 ms-auto text-[11px] text-amber-300/60">
+                  <span>47,303 {isAr ? 'عملة' : 'coins'}</span>
+                  <span className="text-gold-700">·</span>
+                  <span>18 {isAr ? 'سلالة' : 'dynasties'}</span>
+                  <span className="text-gold-700">·</span>
+                  <span>41–922 {isAr ? 'هـ' : 'AH'}</span>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -70,10 +70,10 @@ const CATALOGUE_CARDS = [
 ];
 
 const STATS = [
-  { numAr: '٥٢٬٨٠٨', numEn: '52,808', numDe: '52.808', labelAr: 'عملة مفهرسة', labelEn: 'coins indexed', labelDe: 'Münzen indexiert' },
-  { numAr: '٢٠',      numEn: '20',     numDe: '20',     labelAr: 'دولة عربية',  labelEn: 'Arab countries', labelDe: 'arabische Länder' },
-  { numAr: '١٨',      numEn: '18',     numDe: '18',     labelAr: 'سلالة إسلامية', labelEn: 'Islamic dynasties', labelDe: 'islamische Dynastien' },
-  { numAr: '١٥٠٠–٢٠٢٦', numEn: '1500–2026', numDe: '1500–2026', labelAr: 'نطاق زمني', labelEn: 'year range', labelDe: 'Zeitraum' },
+  { numAr: '٥٢٬٨٠٨',      numEn: '52,808',       numDe: '52.808',       labelAr: 'عملة مفهرسة',     labelEn: 'coins indexed',          labelDe: 'Münzen indexiert' },
+  { numAr: '٢٠+',          numEn: '20+',          numDe: '20+',          labelAr: 'دولة وإمارة',    labelEn: 'countries & states',     labelDe: 'Länder & Staaten' },
+  { numAr: '١٨',           numEn: '18',           numDe: '18',           labelAr: 'سلالة وخلافة',   labelEn: 'dynasties & caliphates', labelDe: 'Dynastien & Kalifate' },
+  { numAr: '٦٦١م–اليوم',  numEn: '661 CE–today', numDe: '661 n.Chr.–h.', labelAr: 'النطاق الزمني', labelEn: 'time span',               labelDe: 'Zeitraum' },
 ];
 
 export default function LandingPage({ params: { locale } }: { params: { locale: string } }) {
@@ -83,6 +83,10 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
   const [authOpen,  setAuthOpen]  = useState(false);
   const [dashOpen,  setDashOpen]  = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
+  const [coinOfDay, setCoinOfDay] = useState<{
+    id: string; name: string; nar?: string; yce?: string;
+    o?: string; cc?: string; co?: string; co_ar?: string;
+  } | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -92,6 +96,16 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
       setUser(session?.user ? { id: session.user.id, email: session.user.email ?? '' } : null);
     });
     return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const today = new Date();
+    const seed   = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    const offset = seed % 52808;
+    supabase.from('coins').select('id,name,nar,yce,o,cc,co,co_ar').range(offset, offset)
+      .then(({ data }) => { if (data && data.length > 0) setCoinOfDay(data[0] as typeof coinOfDay); });
+    // ignore errors — Coin of the Day is non-critical
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const t = (ar: string, en: string, de: string) => isAr ? ar : isDe ? de : en;
@@ -120,17 +134,14 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
           <p className="text-gold-400 text-[11px] tracking-[0.2em] uppercase mb-3 font-medium">
             {t('كتالوج العملات العربية والإسلامية', 'Arab & Islamic Coin Catalogue', 'Arabischer & Islamischer Münzkatalog')}
           </p>
-          <h1 className="font-amiri text-5xl md:text-6xl text-white leading-tight mb-2">
-            Arabismatica
-            <span className="block text-3xl md:text-4xl text-amber-300/80 font-amiri mt-1">
-              أرابيزماتيكا
-            </span>
+          <h1 className="font-amiri text-4xl md:text-5xl text-white leading-tight mb-2">
+            Arabismatica <span className="text-amber-300/50">|</span> أرابيزماتيكا
           </h1>
           <p className="text-amber-300/80 text-[14px] md:text-[16px] max-w-lg mb-8">
             {t(
-              'أشمل موسوعة رقمية للعملات العربية والإسلامية — من الأموية حتى اليوم',
-              'The most comprehensive digital encyclopaedia of Arab and Islamic coins — from the Umayyads to today',
-              'Die umfassendste digitale Enzyklopädie arabischer und islamischer Münzen — von den Umayyaden bis heute'
+              'الموسوعة الرقمية الأشمل للعملات في العالم العربي والشرق الأوسطي',
+              'The most comprehensive digital encyclopaedia of coins in the Arab and Middle Eastern world',
+              'Die umfassendste digitale Enzyklopädie der Münzen der arabischen und nahöstlichen Welt'
             )}
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
@@ -164,6 +175,35 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
           </div>
         </div>
       </div>
+
+      {/* ── COIN OF THE DAY ─────────────────────────────────────────────── */}
+      {coinOfDay && (
+        <div style={{ background: 'linear-gradient(135deg, #0a0602, #1a0e05)' }} className="border-t border-gold-700/20">
+          <div className="max-w-[1440px] mx-auto px-4 py-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-[10px] text-gold-500/70 uppercase tracking-widest font-medium shrink-0">
+                📅 {isAr ? 'عملة اليوم' : isDe ? 'Münze des Tages' : 'Coin of the Day'}
+              </span>
+              {coinOfDay.o && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={coinOfDay.o} alt="" className="w-8 h-8 rounded-full object-cover border border-gold-700/40 shrink-0" />
+              )}
+              <span className="font-amiri text-gold-300 text-[14px]">
+                {isAr ? (coinOfDay.nar || coinOfDay.name) : coinOfDay.name}
+              </span>
+              {coinOfDay.yce && (
+                <span className="text-[11px] text-gold-600/50 hidden sm:block">
+                  {coinOfDay.yce} · {isAr ? coinOfDay.co_ar : coinOfDay.co}
+                </span>
+              )}
+              <Link href={`/${locale}/catalogue/${coinOfDay.id}`}
+                className="ms-auto text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 rounded-full px-3 py-1 transition-colors shrink-0">
+                {isAr ? 'عرض ←' : isDe ? 'Ansehen →' : 'View →'}
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── CATALOGUE CARDS ─────────────────────────────────────────────── */}
       <div className="max-w-[1440px] mx-auto px-4 py-10">
