@@ -563,8 +563,9 @@ export async function getSasanianCoins(
     .order('id')
     .range(from, to);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { cc: _cc, yce_from: _yf, yce_to: _yt, ...rest } = filters;
-  void _cc;
+  void _cc; void _yf; void _yt;
   qb = applyFilters(qb, rest);
 
   if (filters.yce_from != null) {
