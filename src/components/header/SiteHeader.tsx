@@ -28,6 +28,10 @@ const TOP_NAV_ITEMS_AR = [
     { label: '  ↳ دور الضرب',        href: '/ar/islamic/mints' },
     { label: '  ↳ فهرس العملات',     href: '/ar/islamic/coin-index' },
   ]},
+  { label: '🏺 تاريخية', children: [
+    { label: '🦁 العملات الساسانية',        href: '/ar/sasanian' },
+    { label: '𓂀 العملات البطلمية (قريباً)', href: '' },
+  ]},
   { label: 'الأدوات', isTools: true, children: [
     { label: '📅 محول الهجري ↔ الميلادي', href: '#hijri-converter' },
     { label: '🛠️ باقي الأدوات الداخلية', href: '#tools-sidebar' },
@@ -53,6 +57,10 @@ const TOP_NAV_ITEMS_EN = [
     { label: '  ↳ Dynasties',    href: '/en/islamic/dynasties' },
     { label: '  ↳ Mints',        href: '/en/islamic/mints' },
     { label: '  ↳ Coin Index',   href: '/en/islamic/coin-index' },
+  ]},
+  { label: '🏺 Historical', children: [
+    { label: '🦁 Sasanian Coins',           href: '/en/sasanian' },
+    { label: '𓂀 Ptolemaic Coins (soon)',    href: '' },
   ]},
   { label: 'Tools', isTools: true, children: [
     { label: '📅 Hijri ↔ Gregorian Converter', href: '#hijri-converter' },
@@ -88,6 +96,10 @@ const TOP_NAV_ITEMS_DE = [
     { label: '  ↳ Dynastien',        href: '/de/islamic/dynasties' },
     { label: '  ↳ Münzstätten',      href: '/de/islamic/mints' },
     { label: '  ↳ Münzindex',        href: '/de/islamic/coin-index' },
+  ]},
+  { label: '🏺 Historisch', children: [
+    { label: '🦁 Sassanidische Münzen',       href: '/de/sasanian' },
+    { label: '𓂀 Ptolemäische Münzen (bald)',  href: '' },
   ]},
   { label: 'Tools', isTools: true, children: [
     { label: '📅 Hidschra ↔ Gregorian',    href: '#hijri-converter' },

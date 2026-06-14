@@ -37,17 +37,17 @@ const CATALOGUE_CARDS = [
     bg: 'from-stone-900/90 to-stone-800/90',
   },
   {
-    id: 'roman',
-    titleAr: 'العملات الرومانية',
-    titleEn: 'Roman-Era Coins',
-    titleDe: 'Römische Münzen',
-    subtitleAr: 'قريباً',
-    subtitleEn: 'Coming soon',
-    subtitleDe: 'Demnächst',
-    href: '',
-    status: 'coming_soon' as const,
-    icon: '🏛️',
-    bg: 'from-zinc-800/90 to-zinc-700/90',
+    id: 'sasanian',
+    titleAr: 'العملات الساسانية',
+    titleEn: 'Sasanian Coins',
+    titleDe: 'Sassanidische Münzen',
+    subtitleAr: '7,995 عملة · 224–651م · فارس والعراق',
+    subtitleEn: '7,995 coins · 224–651 CE · Persia & Iraq',
+    subtitleDe: '7.995 Münzen · 224–651 n.Chr.',
+    href: '/sasanian',
+    status: 'active' as const,
+    icon: '🦁',
+    bg: 'from-amber-950/90 to-stone-900/90',
   },
   {
     id: 'ptolemaic',
@@ -65,7 +65,7 @@ const CATALOGUE_CARDS = [
 ];
 
 const STATS = [
-  { numAr: '٥٢٬٨٠٨',      numEn: '52,808',       numDe: '52.808',       labelAr: 'عملة مفهرسة',     labelEn: 'coins indexed',          labelDe: 'Münzen indexiert' },
+  { numAr: '٦٠٬٨٠٣',      numEn: '60,803',       numDe: '60.803',       labelAr: 'عملة مفهرسة',     labelEn: 'coins indexed',          labelDe: 'Münzen indexiert' },
   { numAr: '٢٠+',          numEn: '20+',          numDe: '20+',          labelAr: 'دولة وإمارة',    labelEn: 'countries & states',     labelDe: 'Länder & Staaten' },
   { numAr: '١٨',           numEn: '18',           numDe: '18',           labelAr: 'سلالة وخلافة',   labelEn: 'dynasties & caliphates', labelDe: 'Dynastien & Kalifate' },
   { numAr: '٦٦١م–اليوم',  numEn: '661 CE–today', numDe: '661 n.Chr.–h.', labelAr: 'النطاق الزمني', labelEn: 'time span',               labelDe: 'Zeitraum' },
@@ -82,7 +82,7 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
   useEffect(() => {
     const today = new Date();
     const seed   = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-    const offset = seed % 52808;
+    const offset = seed % 60803;
     supabase.from('coins').select('id,name,nar,yce,o,cc,co,co_ar').range(offset, offset)
       .then(({ data }) => { if (data && data.length > 0) setCoinOfDay(data[0] as typeof coinOfDay); });
     // ignore errors — Coin of the Day is non-critical
@@ -186,7 +186,7 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
           {t('اختر الكتالوج', 'Choose a Catalogue', 'Katalog wählen')}
         </h2>
         <p className="text-[12px] text-amber-700/70 mb-5">
-          {t('أربعة كتالوجات متخصصة — عربي حديث، إسلامي، روماني، بطلمي', 'Four specialised catalogues — modern Arab, Islamic, Roman, Ptolemaic', 'Vier spezialisierte Kataloge — modernes Arabisch, Islamisch, Römisch, Ptolemäisch')}
+          {t('أربعة كتالوجات متخصصة — عربي حديث، إسلامي، ساساني، بطلمي', 'Four specialised catalogues — modern Arab, Islamic, Sasanian, Ptolemaic', 'Vier spezialisierte Kataloge — modernes Arabisch, Islamisch, Sassanidisch, Ptolemäisch')}
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {CATALOGUE_CARDS.map(card => {
@@ -233,9 +233,9 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
             </h2>
             <p className="text-[13px] text-amber-800/80 leading-relaxed max-w-xl">
               {t(
-                'أرابيزماتيكا هي الموسوعة العربية الرقمية الشاملة للعملات المعدنية، تضم أكثر من 52,808 عملة عربية وإسلامية مفهرسة بالتفصيل مع صور وبيانات شاملة.',
-                'Arabismatica is the comprehensive Arabic digital encyclopaedia of coins, featuring over 52,808 Arab and Islamic coins indexed with detailed images and data.',
-                'Arabismatica ist die umfassende arabische digitale Münzenzyklopädie mit über 52.808 arabischen und islamischen Münzen, detailliert indexiert mit Bildern und Daten.'
+                'أرابيزماتيكا هي الموسوعة العربية الرقمية الشاملة للعملات المعدنية، تضم أكثر من 60,803 عملة عربية وإسلامية وساسانية مفهرسة بالتفصيل مع صور وبيانات شاملة.',
+                'Arabismatica is the comprehensive Arabic digital encyclopaedia of coins, featuring over 60,803 Arab, Islamic and Sasanian coins indexed with detailed images and data.',
+                'Arabismatica ist die umfassende arabische digitale Münzenzyklopädie mit über 60.803 arabischen, islamischen und sassanidischen Münzen, detailliert indexiert mit Bildern und Daten.'
               )}
             </p>
             <a href="https://arabcollector.com" target="_blank" rel="noopener"

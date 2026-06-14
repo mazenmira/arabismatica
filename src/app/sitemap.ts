@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/${locale}/islamic/mints`,        lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.90 },
     { url: `${BASE}/${locale}/islamic/rulers`,       lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.90 },
     { url: `${BASE}/${locale}/islamic/coin-index`,   lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 },
+    { url: `${BASE}/${locale}/sasanian`,             lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.90 },
   ]);
 
   const countryPages: MetadataRoute.Sitemap = LOCALES.flatMap(locale =>

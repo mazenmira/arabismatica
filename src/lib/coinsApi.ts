@@ -534,3 +534,81 @@ export async function getIslamicFilters(): Promise<IslamicFilters> {
 
   return { dynasties, mints, rulers, tags };
 }
+
+// ── Sasanian-specific types & functions ───────────────────────────────────────
+
+export interface SasanianCoinFilters extends CoinFilters {
+  yce_from?: number;
+  yce_to?:   number;
+}
+
+export interface SasanianFilters {
+  rulers: { en: string; ar: string | null }[];
+  mints:  { en: string; ar: string | null }[];
+  metals: string[];
+}
+
+export async function getSasanianCoins(
+  filters:  SasanianCoinFilters = {},
+  page:     number              = 1,
+  pageSize: number              = 48,
+): Promise<{ data: CoinRow[]; count: number }> {
+  const from = (page - 1) * pageSize;
+  const to   = from + pageSize - 1;
+
+  let qb = db
+    .from('coins')
+    .select('*', { count: 'exact' })
+    .eq('cc', 'SS')
+    .order('id')
+    .range(from, to);
+
+  const { cc: _cc, yce_from: _yf, yce_to: _yt, ...rest } = filters;
+  void _cc;
+  qb = applyFilters(qb, rest);
+
+  if (filters.yce_from != null) {
+    qb = qb.filter('yce', 'gte', String(filters.yce_from));
+    qb = qb.not('yce', 'eq', '');
+  }
+  if (filters.yce_to != null) {
+    qb = qb.filter('yce', 'lte', String(filters.yce_to));
+    qb = qb.not('yce', 'eq', '');
+  }
+
+  const { data, count, error } = await qb;
+  if (error) throw new Error(`getSasanianCoins: ${error.message}`);
+  return { data: (data ?? []) as CoinRow[], count: count ?? 0 };
+}
+
+export async function getSasanianFilters(): Promise<SasanianFilters> {
+  const [mintData, rulerData, metalData] = await Promise.all([
+    db.from('coins').select('mint,mint_ar').eq('cc', 'SS'),
+    db.from('coins').select('ruler,ruler_ar').eq('cc', 'SS'),
+    db.from('coins').select('metal').eq('cc', 'SS'),
+  ]);
+
+  const mintMap = new Map<string, string | null>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (mintData.data ?? []).forEach((r: any) => {
+    if (r.mint && !mintMap.has(r.mint)) mintMap.set(r.mint, r.mint_ar || null);
+  });
+  const mints = Array.from(mintMap.entries())
+    .map(([en, ar]) => ({ en, ar }))
+    .sort((a, b) => a.en.localeCompare(b.en));
+
+  const rulerMap = new Map<string, string | null>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (rulerData.data ?? []).forEach((r: any) => {
+    if (r.ruler && !rulerMap.has(r.ruler)) rulerMap.set(r.ruler, r.ruler_ar || null);
+  });
+  const rulers = Array.from(rulerMap.entries())
+    .map(([en, ar]) => ({ en, ar }))
+    .sort((a, b) => a.en.localeCompare(b.en));
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const metalSet = new Set<string>((metalData.data ?? []).map((r: any) => r.metal).filter(Boolean));
+  const metals = Array.from(metalSet).sort();
+
+  return { mints, rulers, metals };
+}

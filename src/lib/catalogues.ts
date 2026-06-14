@@ -38,6 +38,30 @@ export const CATALOGUES = [
     }
   },
   {
+    id: 'sasanian',
+    slug: 'sasanian',
+    title: { ar: 'العملات الساسانية', en: 'Sasanian Coins', de: 'Sassanidische Münzen' },
+    subtitle: {
+      ar: '7,995 عملة · 224–651م · فارس والعراق',
+      en: '7,995 coins · 224–651 CE · Persia & Iraq',
+      de: '7.995 Münzen · 224–651 n.Chr. · Persien & Irak',
+    },
+    description: {
+      ar: 'العملات الساسانية — إمبراطورية فارس العظيمة التي حكمت من 224 إلى 651م وخلّفت إرثاً نمسماتياً استثنائياً',
+      en: 'Sasanian coins — the Persian dynasty that ruled 224–651 CE, leaving an exceptional numismatic legacy across Persia and Iraq',
+      de: 'Sassanidische Münzen — die persische Dynastie, die 224–651 n.Chr. regierte und ein außergewöhnliches numismatisches Erbe hinterließ',
+    },
+    coinCount: 7995,
+    ccFilter: { include: ['SS'] },
+    navPath: '/sasanian',
+    status: 'active',
+    icon: '🦁',
+    seoKeywords: {
+      en: ['Sasanian coins', 'Persian coins', 'Sassanid coins', 'ancient Persian numismatics', 'Sasanian Empire coins', 'pre-Islamic coins'],
+      ar: ['عملات ساسانية', 'عملات فارسية', 'نمسماتيا ساسانية', 'عملات فارس القديمة', 'الإمبراطورية الساسانية'],
+    },
+  },
+  {
     id: 'roman',
     slug: 'roman',
     title: { ar: 'العملات الرومانية', en: 'Roman-Era Coins' },
