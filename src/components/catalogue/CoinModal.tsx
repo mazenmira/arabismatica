@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, ZoomIn, Share2, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, ExternalLink, ZoomIn, Share2, ChevronDown, ChevronUp, CalendarDays, Landmark, Tag, User, FlaskConical, Layers, Scale, Ruler, Hash, Bookmark, BarChart2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Coin, MintageEntry, CoinPrices } from '@/types/coin';
 import { supabase } from '@/lib/supabase';
@@ -393,7 +393,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
 
                 {/* Country + dynasty line */}
                 <div className="flex items-center gap-1.5 mb-3 flex-wrap">
-                  <span className="text-lg">{COUNTRY_FLAGS[coin.cc] ?? '☪️'}</span>
+                  <span className="text-lg">{COUNTRY_FLAGS[coin.cc] ?? ''}</span>
                   <span className="text-[12px] text-ink/60">{isAr ? coin.co_ar : coin.co}</span>
                   <span className="text-ink/20">·</span>
                   <span className="text-[12px] text-gold-600 font-medium">{coin.dyn}</span>
@@ -403,7 +403,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-[12px]">
                   {/* Year AH + Mint */}
                   <div className="flex items-start gap-2">
-                    <span className="text-base shrink-0 mt-0.5">📅</span>
+                    <CalendarDays size={14} className="shrink-0 mt-0.5 text-ink/40" />
                     <div>
                       <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">{isAr ? 'السنة' : 'Year'}</div>
                       <div className="font-amiri text-ink font-medium">
@@ -414,7 +414,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
                   </div>
 
                   <div className="flex items-start gap-2">
-                    <span className="text-base shrink-0 mt-0.5">🏛️</span>
+                    <Landmark size={14} className="shrink-0 mt-0.5 text-ink/40" />
                     <div>
                       <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">{isAr ? 'دار الضرب' : 'Mint'}</div>
                       <div className="font-amiri text-ink">{mintCity || '—'}</div>
@@ -424,7 +424,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
                   {/* Denomination badge + Ruler */}
                   {denomination && (
                     <div className="flex items-start gap-2">
-                      <span className="text-base shrink-0 mt-0.5">🏷️</span>
+                      <Tag size={14} className="shrink-0 mt-0.5 text-ink/40" />
                       <div>
                         <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">{isAr ? 'الفئة' : 'Denomination'}</div>
                         <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border
@@ -439,7 +439,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
 
                   {ruler && (
                     <div className="flex items-start gap-2">
-                      <span className="text-base shrink-0 mt-0.5">👤</span>
+                      <User size={14} className="shrink-0 mt-0.5 text-ink/40" />
                       <div>
                         <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">{isAr ? 'الحاكم' : 'Ruler'}</div>
                         <div className="font-amiri text-ink">{ruler}</div>
@@ -449,7 +449,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
 
                   {/* Metal + Type */}
                   <div className="flex items-start gap-2">
-                    <span className="text-base shrink-0 mt-0.5">⚗️</span>
+                    <FlaskConical size={14} className="shrink-0 mt-0.5 text-ink/40" />
                     <div>
                       <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">{isAr ? 'المعدن' : 'Metal'}</div>
                       <div className="text-ink">{metalLabel}</div>
@@ -457,7 +457,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
                   </div>
 
                   <div className="flex items-start gap-2">
-                    <span className="text-base shrink-0 mt-0.5">🔷</span>
+                    <Layers size={14} className="shrink-0 mt-0.5 text-ink/40" />
                     <div>
                       <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">{isAr ? 'النوع' : 'Type'}</div>
                       <span className="text-[11px] px-2 py-0.5 rounded-full border bg-parch-dark/30 border-gold-700/20 text-ink/60">
@@ -469,7 +469,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
                   {/* Weight + Diameter */}
                   {coin.wt != null && (
                     <div className="flex items-start gap-2">
-                      <span className="text-base shrink-0 mt-0.5">⚖️</span>
+                      <Scale size={14} className="shrink-0 mt-0.5 text-ink/40" />
                       <div>
                         <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">{isAr ? 'الوزن' : 'Weight'}</div>
                         <div className="text-ink">{coin.wt} g</div>
@@ -479,7 +479,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
 
                   {coin.dia != null && (
                     <div className="flex items-start gap-2">
-                      <span className="text-base shrink-0 mt-0.5">📏</span>
+                      <Ruler size={14} className="shrink-0 mt-0.5 text-ink/40" />
                       <div>
                         <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">{isAr ? 'القطر' : 'Diameter'}</div>
                         <div className="text-ink">{coin.dia} mm</div>
@@ -490,7 +490,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
                   {/* KM + Ref */}
                   {coin.km && (
                     <div className="flex items-start gap-2">
-                      <span className="text-base shrink-0 mt-0.5">🔢</span>
+                      <Hash size={14} className="shrink-0 mt-0.5 text-ink/40" />
                       <div>
                         <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">KM#</div>
                         <div className="text-ink font-mono">{coin.km}</div>
@@ -499,7 +499,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
                   )}
                   {coin.nref && (
                     <div className="flex items-start gap-2">
-                      <span className="text-base shrink-0 mt-0.5">🔖</span>
+                      <Bookmark size={14} className="shrink-0 mt-0.5 text-ink/40" />
                       <div>
                         <div className="text-[9px] text-ink/35 uppercase tracking-wider mb-0.5">
                           {coin.nref.startsWith('Z#') ? 'Z# Zeno' : 'N# Numista'}
@@ -543,7 +543,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
               <MintageTable data={mintageData} locale={locale} />
             ) : legacyMint && legacyMint !== '' ? (
               <div className="flex items-center gap-3 bg-gold-500/10 border border-gold-500/30 rounded-xl px-4 py-3 mb-4">
-                <span className="text-2xl">📊</span>
+                <BarChart2 size={20} className="text-gold-600 shrink-0" />
                 <div>
                   <div className="text-[9px] text-ink/40 uppercase tracking-wider">{t('mintage')}</div>
                   <div className="text-[18px] font-bold text-ink font-amiri">

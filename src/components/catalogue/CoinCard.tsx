@@ -169,7 +169,7 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
           <VarietyPill coin={c} locale={locale} />
           {totalMintage != null && totalMintage > 0 && (
             <div className="text-[10px] text-gold-500/60">
-              📊 {formatMintage(String(totalMintage), locale)}
+              {formatMintage(String(totalMintage), locale)}
             </div>
           )}
           {onToggleCollection && (
@@ -203,7 +203,7 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
       {/* Metal badge */}
       <div className="flex justify-between items-center px-2.5 pt-2">
         <div className="flex items-center gap-1">
-          <span className="text-[10px]">{COUNTRY_FLAGS[coin.cc] ?? '☪️'}</span>
+          <span className="text-[10px]">{COUNTRY_FLAGS[coin.cc] ?? ''}</span>
           <span className="text-[9px] text-ink/40">{isAr ? coin.co_ar : coin.co}</span>
         </div>
         <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${metalBadgeClass}`}>
@@ -253,7 +253,7 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
 
         {/* Ruler for Islamic coins */}
         {ruler && (
-          <div className="text-[9px] text-gold-600/60 truncate">👤 {ruler}</div>
+          <div className="text-[9px] text-gold-600/60 truncate">{ruler}</div>
         )}
 
         {/* Year */}
@@ -286,7 +286,7 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
         <div className="flex items-center gap-1">
           {totalMintage != null && totalMintage > 0 && (
             <span className="text-[8px] text-ink/40 flex items-center gap-0.5">
-              📊 {formatMintage(String(totalMintage), locale)}
+              {formatMintage(String(totalMintage), locale)}
             </span>
           )}
           <span className={`text-[8px] px-1.5 py-0.5 rounded-full border ${

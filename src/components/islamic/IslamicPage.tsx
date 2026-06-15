@@ -31,6 +31,26 @@ const METALS_AR: Record<string, string> = {
   Lead: 'رصاص', Copper: 'نحاس',
 };
 
+// Static bilingual dynasty list — ordered by coin count descending
+const DYNASTIES = [
+  { value: 'الخلافة العباسية',     labelAr: 'الخلافة العباسية',     labelEn: 'Abbasid Caliphate' },
+  { value: 'السامانيون',            labelAr: 'السامانيون',            labelEn: 'Samanids' },
+  { value: 'المماليك',              labelAr: 'المماليك',              labelEn: 'Mamluks' },
+  { value: 'الإيلخانيون',           labelAr: 'الإيلخانيون',           labelEn: 'Ilkhanids' },
+  { value: 'الدولة الأموية',        labelAr: 'الدولة الأموية',        labelEn: 'Umayyad Caliphate' },
+  { value: 'الأيوبيون',             labelAr: 'الأيوبيون',             labelEn: 'Ayyubids' },
+  { value: 'الإسلام المبكر',        labelAr: 'الإسلام المبكر',        labelEn: 'Early Islam' },
+  { value: 'الأرتقيون',             labelAr: 'الأرتقيون',             labelEn: 'Artuqids' },
+  { value: 'البويهيون',             labelAr: 'البويهيون',             labelEn: 'Buyids' },
+  { value: 'الزنكيون',              labelAr: 'الزنكيون',              labelEn: 'Zengids' },
+  { value: 'الخلافة الفاطمية',      labelAr: 'الخلافة الفاطمية',      labelEn: 'Fatimid Caliphate' },
+  { value: 'الأمويون في الأندلس',   labelAr: 'الأمويون في الأندلس',   labelEn: 'Umayyads of al-Andalus' },
+  { value: 'الموحدون',              labelAr: 'الموحدون',              labelEn: 'Almohads' },
+  { value: 'المرابطون',             labelAr: 'المرابطون',             labelEn: 'Almoravids' },
+  { value: 'الحمدانيون',            labelAr: 'الحمدانيون',            labelEn: 'Hamdanids' },
+  { value: 'سلطنات شرق أفريقيا',    labelAr: 'سلطنات شرق أفريقيا',    labelEn: 'East African Sultanates' },
+];
+
 const PER_PAGE = 48;
 
 function SkeletonCard() {
@@ -227,7 +247,7 @@ export default function IslamicPage({ locale }: { locale: string }) {
             <select value={dynasty} onChange={e => { setDynasty(e.target.value); setPage(1); }}
               className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[180px]">
               <option value="">{isAr ? 'كل السلالات' : 'All Dynasties'}</option>
-              {filters.dynasties.map(d => <option key={d} value={d}>{d}</option>)}
+              {DYNASTIES.map(d => <option key={d.value} value={d.value}>{isAr ? d.labelAr : d.labelEn}</option>)}
             </select>
 
             {/* Metal */}

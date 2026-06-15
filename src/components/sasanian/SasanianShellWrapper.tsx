@@ -4,7 +4,9 @@ import CatalogueShell from '@/components/layout/CatalogueShell';
 import type { ShellNavItem } from '@/components/layout/CatalogueShell';
 
 const NAV_ITEMS: ShellNavItem[] = [
-  { labelAr: 'الكتالوج', labelEn: 'Catalogue', href: '' },
+  { labelAr: 'الكتالوج',  labelEn: 'Catalogue', href: '' },
+  { labelAr: 'الحكام',    labelEn: 'Rulers',     href: '/rulers' },
+  { labelAr: 'دور الضرب', labelEn: 'Mints',      href: '/mints' },
 ];
 
 export default function SasanianShellWrapper({

@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { CalendarDays } from 'lucide-react';
 import SiteHeader from '@/components/header/SiteHeader';
 import { supabase } from '@/lib/supabase';
 
@@ -160,8 +161,9 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
         <div style={{ background: 'linear-gradient(135deg, #0a0602, #1a0e05)' }} className="border-t border-gold-700/20">
           <div className="max-w-[1440px] mx-auto px-4 py-3">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-[10px] text-gold-500/70 uppercase tracking-widest font-medium shrink-0">
-                📅 {isAr ? 'عملة اليوم' : isDe ? 'Münze des Tages' : 'Coin of the Day'}
+              <span className="text-[10px] text-gold-500/70 uppercase tracking-widest font-medium shrink-0 flex items-center gap-1">
+                <CalendarDays size={10} />
+                {isAr ? 'عملة اليوم' : isDe ? 'Münze des Tages' : 'Coin of the Day'}
               </span>
               {coinOfDay.o && (
                 // eslint-disable-next-line @next/next/no-img-element

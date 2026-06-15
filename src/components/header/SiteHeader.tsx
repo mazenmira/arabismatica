@@ -18,28 +18,30 @@ const TOP_NAV_ITEMS_AR = [
     { label: 'زيارة المقتني العربي', href: `${WP}/` },
     { label: 'عن المقتني العربي',   href: `${WP}/about-us/` },
   ]},
-  { label: '🌍 العملات العربية', children: [
-    { label: '🌍 كتالوج العملات العربية', href: '/ar/catalogue' },
-    { label: '🗺️ حسب الدولة',             href: '/ar/catalogue/countries' },
+  { label: 'العملات العربية', children: [
+    { label: 'كتالوج العملات العربية', href: '/ar/catalogue' },
+    { label: 'حسب الدولة',             href: '/ar/catalogue/countries' },
   ]},
-  { label: '☪️ العملات الإسلامية', children: [
-    { label: '☪️ العملات الإسلامية', href: '/ar/islamic' },
-    { label: '  ↳ السلالات',         href: '/ar/islamic/dynasties' },
-    { label: '  ↳ دور الضرب',        href: '/ar/islamic/mints' },
-    { label: '  ↳ فهرس العملات',     href: '/ar/islamic/coin-index' },
+  { label: 'العملات الإسلامية', children: [
+    { label: 'العملات الإسلامية', href: '/ar/islamic' },
+    { label: '  ↳ السلالات',      href: '/ar/islamic/dynasties' },
+    { label: '  ↳ دور الضرب',     href: '/ar/islamic/mints' },
+    { label: '  ↳ فهرس العملات',  href: '/ar/islamic/coin-index' },
   ]},
-  { label: '🏺 تاريخية', children: [
-    { label: '🦁 العملات الساسانية',        href: '/ar/sasanian' },
-    { label: '𓂀 العملات البطلمية (قريباً)', href: '' },
+  { label: 'تاريخية', children: [
+    { label: 'العملات الساسانية',        href: '/ar/sasanian' },
+    { label: '  ↳ الحكام',              href: '/ar/sasanian/rulers' },
+    { label: '  ↳ دور الضرب',           href: '/ar/sasanian/mints' },
+    { label: 'العملات البطلمية (قريباً)', href: '' },
   ]},
   { label: 'الأدوات', isTools: true, children: [
-    { label: '📅 محول الهجري ↔ الميلادي', href: '#hijri-converter' },
-    { label: '🛠️ باقي الأدوات الداخلية', href: '#tools-sidebar' },
-    { label: '📚 بوابة المعرفة',           href: `${WP}/knowledge-portal/` },
-    { label: '🎓 أدوات التقييم',           href: `${WP}/grading-tools/` },
-    { label: '🔬 مختبر المقتني الصغير',    href: `${WP}/young-collector-lab/` },
-    { label: '🎓 أكاديمية المقتني',        href: `${WP}/ac-academy/` },
-    { label: '📖 المكتبة الإلكترونية',    href: 'https://library.arabcollector.com/' },
+    { label: 'محول الهجري ↔ الميلادي', href: '#hijri-converter' },
+    { label: 'باقي الأدوات الداخلية',  href: '#tools-sidebar' },
+    { label: 'بوابة المعرفة',           href: `${WP}/knowledge-portal/` },
+    { label: 'أدوات التقييم',           href: `${WP}/grading-tools/` },
+    { label: 'مختبر المقتني الصغير',    href: `${WP}/young-collector-lab/` },
+    { label: 'أكاديمية المقتني',        href: `${WP}/ac-academy/` },
+    { label: 'المكتبة الإلكترونية',     href: 'https://library.arabcollector.com/' },
   ]},
 ];
 
@@ -48,28 +50,30 @@ const TOP_NAV_ITEMS_EN = [
     { label: 'Visit The Arab Collector', href: `${WP}/` },
     { label: 'About',                    href: `${WP}/about-us/` },
   ]},
-  { label: '🌍 Arab Coins', children: [
-    { label: '🌍 Arab Coin Catalogue', href: '/en/catalogue' },
-    { label: '🗺️ By Country',          href: '/en/catalogue/countries' },
+  { label: 'Arab Coins', children: [
+    { label: 'Arab Coin Catalogue', href: '/en/catalogue' },
+    { label: 'By Country',          href: '/en/catalogue/countries' },
   ]},
-  { label: '☪️ Islamic Coins', children: [
-    { label: '☪️ Islamic Coins', href: '/en/islamic' },
-    { label: '  ↳ Dynasties',    href: '/en/islamic/dynasties' },
-    { label: '  ↳ Mints',        href: '/en/islamic/mints' },
-    { label: '  ↳ Coin Index',   href: '/en/islamic/coin-index' },
+  { label: 'Islamic Coins', children: [
+    { label: 'Islamic Coins', href: '/en/islamic' },
+    { label: '  ↳ Dynasties', href: '/en/islamic/dynasties' },
+    { label: '  ↳ Mints',     href: '/en/islamic/mints' },
+    { label: '  ↳ Coin Index',href: '/en/islamic/coin-index' },
   ]},
-  { label: '🏺 Historical', children: [
-    { label: '🦁 Sasanian Coins',           href: '/en/sasanian' },
-    { label: '𓂀 Ptolemaic Coins (soon)',    href: '' },
+  { label: 'Historical', children: [
+    { label: 'Sasanian Coins',          href: '/en/sasanian' },
+    { label: '  ↳ Rulers',             href: '/en/sasanian/rulers' },
+    { label: '  ↳ Mints',              href: '/en/sasanian/mints' },
+    { label: 'Ptolemaic Coins (soon)',  href: '' },
   ]},
   { label: 'Tools', isTools: true, children: [
-    { label: '📅 Hijri ↔ Gregorian Converter', href: '#hijri-converter' },
-    { label: '🛠️ More Built-in Tools',          href: '#tools-sidebar' },
-    { label: '📚 Knowledge Portal',             href: `${WP}/knowledge-portal/` },
-    { label: '🎓 Grading Tools',               href: `${WP}/grading-tools/` },
-    { label: '🔬 Young Collector Lab',         href: `${WP}/young-collector-lab/` },
-    { label: '🎓 Arab Collector Academy',      href: `${WP}/ac-academy/` },
-    { label: '📖 Digital Library',             href: 'https://library.arabcollector.com/' },
+    { label: 'Hijri ↔ Gregorian Converter', href: '#hijri-converter' },
+    { label: 'More Built-in Tools',          href: '#tools-sidebar' },
+    { label: 'Knowledge Portal',             href: `${WP}/knowledge-portal/` },
+    { label: 'Grading Tools',               href: `${WP}/grading-tools/` },
+    { label: 'Young Collector Lab',         href: `${WP}/young-collector-lab/` },
+    { label: 'Arab Collector Academy',      href: `${WP}/ac-academy/` },
+    { label: 'Digital Library',             href: 'https://library.arabcollector.com/' },
   ]},
 ];
 
@@ -87,28 +91,30 @@ const TOP_NAV_ITEMS_DE = [
     { label: 'The Arab Collector besuchen', href: `${WP}/` },
     { label: 'Über uns',                    href: `${WP}/about-us/` },
   ]},
-  { label: '🌍 Arabische Münzen', children: [
-    { label: '🌍 Arabischer Münzkatalog', href: '/de/catalogue' },
-    { label: '🗺️ Nach Land',              href: '/de/catalogue/countries' },
+  { label: 'Arabische Münzen', children: [
+    { label: 'Arabischer Münzkatalog', href: '/de/catalogue' },
+    { label: 'Nach Land',              href: '/de/catalogue/countries' },
   ]},
-  { label: '☪️ Islamische Münzen', children: [
-    { label: '☪️ Islamische Münzen', href: '/de/islamic' },
-    { label: '  ↳ Dynastien',        href: '/de/islamic/dynasties' },
-    { label: '  ↳ Münzstätten',      href: '/de/islamic/mints' },
-    { label: '  ↳ Münzindex',        href: '/de/islamic/coin-index' },
+  { label: 'Islamische Münzen', children: [
+    { label: 'Islamische Münzen', href: '/de/islamic' },
+    { label: '  ↳ Dynastien',     href: '/de/islamic/dynasties' },
+    { label: '  ↳ Münzstätten',   href: '/de/islamic/mints' },
+    { label: '  ↳ Münzindex',     href: '/de/islamic/coin-index' },
   ]},
-  { label: '🏺 Historisch', children: [
-    { label: '🦁 Sassanidische Münzen',       href: '/de/sasanian' },
-    { label: '𓂀 Ptolemäische Münzen (bald)',  href: '' },
+  { label: 'Historisch', children: [
+    { label: 'Sassanidische Münzen',       href: '/de/sasanian' },
+    { label: '  ↳ Herrscher',              href: '/de/sasanian/rulers' },
+    { label: '  ↳ Münzstätten',            href: '/de/sasanian/mints' },
+    { label: 'Ptolemäische Münzen (bald)', href: '' },
   ]},
   { label: 'Tools', isTools: true, children: [
-    { label: '📅 Hidschra ↔ Gregorian',    href: '#hijri-converter' },
-    { label: '🛠️ Weitere Tools',           href: '#tools-sidebar' },
-    { label: '📚 Wissensportal',           href: `${WP}/knowledge-portal/` },
-    { label: '🎓 Bewertungstools',         href: `${WP}/grading-tools/` },
-    { label: '🔬 Junger Sammler Lab',      href: `${WP}/young-collector-lab/` },
-    { label: '🎓 Arab Collector Akademie', href: `${WP}/ac-academy/` },
-    { label: '📖 Digitale Bibliothek',     href: 'https://library.arabcollector.com/' },
+    { label: 'Hidschra ↔ Gregorian',    href: '#hijri-converter' },
+    { label: 'Weitere Tools',           href: '#tools-sidebar' },
+    { label: 'Wissensportal',           href: `${WP}/knowledge-portal/` },
+    { label: 'Bewertungstools',         href: `${WP}/grading-tools/` },
+    { label: 'Junger Sammler Lab',      href: `${WP}/young-collector-lab/` },
+    { label: 'Arab Collector Akademie', href: `${WP}/ac-academy/` },
+    { label: 'Digitale Bibliothek',     href: 'https://library.arabcollector.com/' },
   ]},
 ];
 

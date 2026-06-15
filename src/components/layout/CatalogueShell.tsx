@@ -35,7 +35,7 @@ export default function CatalogueShell({
   navItems,
   children,
 }: CatalogueShellProps) {
-  const icon = heroIcon ?? (catalogueId === 'arab' ? '🌍' : '☪️');
+  const icon = heroIcon ?? '';
   const isAr = locale === 'ar';
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
