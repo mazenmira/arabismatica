@@ -506,8 +506,8 @@ export async function getIslamicFilters(): Promise<IslamicFilters> {
   const [dynasties, tags, mintData, rulerData] = await Promise.all([
     distinctIS('dyn'),
     distinctIS('coin_type_tag'),
-    db.from('coins').select('mint,mint_ar').eq('cc', 'IS'),
-    db.from('coins').select('ruler,ruler_ar').eq('cc', 'IS'),
+    db.from('coins').select('mint,mint_ar').eq('cc', 'IS').neq('mint', ''),
+    db.from('coins').select('ruler,ruler_ar').eq('cc', 'IS').neq('ruler', ''),
   ]);
 
   // Build bilingual mint pairs (keyed by English name for uniqueness)
@@ -584,8 +584,8 @@ export async function getSasanianCoins(
 
 export async function getSasanianFilters(): Promise<SasanianFilters> {
   const [mintData, rulerData, metalData] = await Promise.all([
-    db.from('coins').select('mint,mint_ar').eq('cc', 'SS'),
-    db.from('coins').select('ruler,ruler_ar').eq('cc', 'SS'),
+    db.from('coins').select('mint,mint_ar').eq('cc', 'SS').neq('mint', ''),
+    db.from('coins').select('ruler,ruler_ar').eq('cc', 'SS').neq('ruler', ''),
     db.from('coins').select('metal').eq('cc', 'SS'),
   ]);
 
