@@ -12,7 +12,7 @@ import type { Coin } from '@/types/coin';
 
 const METALS_AR: Record<string, string> = {
   Gold: 'ذهب', Silver: 'فضة', Bronze: 'برونز', Billon: 'بليون',
-  Lead: 'رصاص', Copper: 'نحاس',
+  Lead: 'رصاص', Copper: 'نحاس', 'Fourrée': 'مطلي',
 };
 
 const PER_PAGE = 48;

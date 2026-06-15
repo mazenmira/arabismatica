@@ -49,7 +49,7 @@ const CATALOGUE_CARDS = [
     tagAr: '224–651م',
     tagEn: '224–651 CE',
     href: '/sasanian',
-    status: 'coming_soon' as const,
+    status: 'active' as const,
     bg: 'from-amber-950/90 to-stone-900/90',
   },
   {
