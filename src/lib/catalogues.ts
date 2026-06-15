@@ -54,8 +54,7 @@ export const CATALOGUES = [
     coinCount: 7995,
     ccFilter: { include: ['SS'] },
     navPath: '/sasanian',
-    status: 'active',
-    icon: '🦁',
+    status: 'coming_soon',
     seoKeywords: {
       en: ['Sasanian coins', 'Persian coins', 'Sassanid coins', 'ancient Persian numismatics', 'Sasanian Empire coins', 'pre-Islamic coins'],
       ar: ['عملات ساسانية', 'عملات فارسية', 'نمسماتيا ساسانية', 'عملات فارس القديمة', 'الإمبراطورية الساسانية'],

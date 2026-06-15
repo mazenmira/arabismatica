@@ -18,9 +18,10 @@ const CATALOGUE_CARDS = [
     subtitleAr: '5,505 عملة · 20 دولة · 1500–2026م',
     subtitleEn: '5,505 coins · 20 countries · 1500–2026 CE',
     subtitleDe: '5.505 Münzen · 20 Länder · 1500–2026 n. Chr.',
+    tagAr: '1500–2026م',
+    tagEn: '1500–2026 CE',
     href: '/catalogue',
     status: 'active' as const,
-    icon: '🌍',
     bg: 'from-amber-900/90 to-amber-800/90',
   },
   {
@@ -31,9 +32,10 @@ const CATALOGUE_CARDS = [
     subtitleAr: '47,303 عملة · 18 سلالة · 41–922هـ',
     subtitleEn: '47,303 coins · 18 dynasties · 41–922 AH',
     subtitleDe: '47.303 Münzen · 18 Dynastien · 41–922 AH',
+    tagAr: '41–922هـ',
+    tagEn: '41–922 AH',
     href: '/islamic',
     status: 'active' as const,
-    icon: '☪️',
     bg: 'from-stone-900/90 to-stone-800/90',
   },
   {
@@ -44,9 +46,10 @@ const CATALOGUE_CARDS = [
     subtitleAr: '7,995 عملة · 224–651م · فارس والعراق',
     subtitleEn: '7,995 coins · 224–651 CE · Persia & Iraq',
     subtitleDe: '7.995 Münzen · 224–651 n.Chr.',
+    tagAr: '224–651م',
+    tagEn: '224–651 CE',
     href: '/sasanian',
-    status: 'active' as const,
-    icon: '🦁',
+    status: 'coming_soon' as const,
     bg: 'from-amber-950/90 to-stone-900/90',
   },
   {
@@ -57,9 +60,10 @@ const CATALOGUE_CARDS = [
     subtitleAr: 'قريباً',
     subtitleEn: 'Coming soon',
     subtitleDe: 'Demnächst',
+    tagAr: 'قريباً',
+    tagEn: 'Soon',
     href: '',
     status: 'coming_soon' as const,
-    icon: '𓂀',
     bg: 'from-zinc-800/90 to-zinc-700/90',
   },
 ];
@@ -206,7 +210,9 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
                   </div>
                 )}
                 <div className="p-5">
-                  <div className="text-3xl mb-3">{card.icon}</div>
+                  <div className="text-[10px] text-gold-500/70 tracking-widest uppercase font-medium mb-3">
+                    {isAr ? (card as { tagAr: string }).tagAr : (card as { tagEn: string }).tagEn}
+                  </div>
                   <div className="font-amiri text-[15px] text-amber-100 leading-snug mb-1.5">{title}</div>
                   <div className="text-[10px] text-amber-400/70 mb-3">{subtitle}</div>
                   {isActive && (
