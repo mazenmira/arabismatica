@@ -1,4 +1,4 @@
-// v4.2 — landing page
+// v4.3 — landing page
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -10,62 +10,80 @@ import { supabase } from '@/lib/supabase';
 
 const HERO_IMG = 'https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2026/05/Arabismatica-Hero.jpg';
 
-const CATALOGUE_CARDS = [
+type CardEntry = {
+  id: string;
+  titleAr: string; titleEn: string; titleDe: string;
+  subtitleAr: string; subtitleEn: string; subtitleDe: string;
+  href: string;
+  status: 'active' | 'coming_soon';
+};
+
+const ARAB_WORLD_CARDS: CardEntry[] = [
   {
     id: 'arab',
-    titleAr: 'العملات العربية الحديثة',
-    titleEn: 'Modern Arab Coins',
-    titleDe: 'Moderne arabische Münzen',
-    subtitleAr: '5,505 عملة · 20 دولة · 1500–2026م',
-    subtitleEn: '5,505 coins · 20 countries · 1500–2026 CE',
-    subtitleDe: '5.505 Münzen · 20 Länder · 1500–2026 n. Chr.',
-    tagAr: '1500–2026م',
-    tagEn: '1500–2026 CE',
-    href: '/catalogue',
-    status: 'active' as const,
-    bg: 'from-amber-900/90 to-amber-800/90',
+    titleAr: 'العملات العربية الحديثة', titleEn: 'Modern Arab Coins', titleDe: 'Moderne arabische Münzen',
+    subtitleAr: '5,505 عملة · 20 دولة · 1500–2026م', subtitleEn: '5,505 coins · 20 countries · 1500–2026 CE', subtitleDe: '5.505 Münzen · 20 Länder · 1500–2026 n. Chr.',
+    href: '/catalogue', status: 'active',
   },
   {
     id: 'islamic',
-    titleAr: 'العملات الإسلامية',
-    titleEn: 'Islamic Coins',
-    titleDe: 'Islamische Münzen',
-    subtitleAr: '47,303 عملة · 18 سلالة · 41–922هـ',
-    subtitleEn: '47,303 coins · 18 dynasties · 41–922 AH',
-    subtitleDe: '47.303 Münzen · 18 Dynastien · 41–922 AH',
-    tagAr: '41–922هـ',
-    tagEn: '41–922 AH',
-    href: '/islamic',
-    status: 'active' as const,
-    bg: 'from-stone-900/90 to-stone-800/90',
+    titleAr: 'العملات الإسلامية', titleEn: 'Islamic Coins', titleDe: 'Islamische Münzen',
+    subtitleAr: '47,303 عملة · 18 سلالة · 41–922هـ', subtitleEn: '47,303 coins · 18 dynasties · 41–922 AH', subtitleDe: '47.303 Münzen · 18 Dynastien · 41–922 AH',
+    href: '/islamic', status: 'active',
   },
+];
+
+const ANCIENT_CARDS: CardEntry[] = [
   {
     id: 'sasanian',
-    titleAr: 'العملات الساسانية',
-    titleEn: 'Sasanian Coins',
-    titleDe: 'Sassanidische Münzen',
-    subtitleAr: '7,995 عملة · 224–651م · فارس والعراق',
-    subtitleEn: '7,995 coins · 224–651 CE · Persia & Iraq',
-    subtitleDe: '7.995 Münzen · 224–651 n.Chr.',
-    tagAr: '224–651م',
-    tagEn: '224–651 CE',
-    href: '/sasanian',
-    status: 'active' as const,
-    bg: 'from-amber-950/90 to-stone-900/90',
+    titleAr: 'العملات الساسانية', titleEn: 'Sasanian Coins', titleDe: 'Sassanidische Münzen',
+    subtitleAr: '7,995 عملة · 224–651م · فارس والعراق', subtitleEn: '7,995 coins · 224–651 CE · Persia & Iraq', subtitleDe: '7.995 Münzen · 224–651 n.Chr.',
+    href: '/sasanian', status: 'active',
+  },
+  {
+    id: 'nabataean',
+    titleAr: 'العملات النبطية', titleEn: 'Nabataean Coins', titleDe: 'Nabatäische Münzen',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
+  },
+  {
+    id: 'byzantine',
+    titleAr: 'العملات البيزنطية العربية', titleEn: 'Byzantine Arab Coins', titleDe: 'Byzantinisch-arabische Münzen',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
   },
   {
     id: 'ptolemaic',
-    titleAr: 'العملات البطلمية',
-    titleEn: 'Ptolemaic Coins',
-    titleDe: 'Ptolemäische Münzen',
-    subtitleAr: 'قريباً',
-    subtitleEn: 'Coming soon',
-    subtitleDe: 'Demnächst',
-    tagAr: 'قريباً',
-    tagEn: 'Soon',
-    href: '',
-    status: 'coming_soon' as const,
-    bg: 'from-zinc-800/90 to-zinc-700/90',
+    titleAr: 'العملات البطلمية', titleEn: 'Ptolemaic Coins', titleDe: 'Ptolemäische Münzen',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
+  },
+  {
+    id: 'crusader',
+    titleAr: 'عملات الحروب الصليبية', titleEn: 'Crusader Coins', titleDe: 'Kreuzfahrermünzen',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
+  },
+  {
+    id: 'achaemenid',
+    titleAr: 'العملات الأخمينية', titleEn: 'Achaemenid Coins', titleDe: 'Achämenidische Münzen',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
+  },
+];
+
+const INDIAN_ISLAMIC_CARDS: CardEntry[] = [
+  {
+    id: 'mughal',
+    titleAr: 'العملات المغولية', titleEn: 'Mughal Coins', titleDe: 'Mogulmünzen',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
+  },
+  {
+    id: 'delhi',
+    titleAr: 'سلطنة دلهي', titleEn: 'Delhi Sultanate', titleDe: 'Delhi-Sultanat',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
   },
 ];
 
@@ -75,6 +93,69 @@ const STATS = [
   { numAr: '١٨',           numEn: '18',           numDe: '18',           labelAr: 'سلالة وخلافة',   labelEn: 'dynasties & caliphates', labelDe: 'Dynastien & Kalifate' },
   { numAr: '٦٦١م–اليوم',  numEn: '661 CE–today', numDe: '661 n.Chr.–h.', labelAr: 'النطاق الزمني', labelEn: 'time span',               labelDe: 'Zeitraum' },
 ];
+
+function CatalogueCard({ card, locale, isAr, isDe }: {
+  card: CardEntry; locale: string; isAr: boolean; isDe: boolean;
+}) {
+  const isActive = card.status === 'active';
+  const title    = isAr ? card.titleAr    : isDe ? card.titleDe    : card.titleEn;
+  const subtitle = isAr ? card.subtitleAr : isDe ? card.subtitleDe : card.subtitleEn;
+  const browseLabel   = isAr ? '← تصفح' : isDe ? 'Ansehen →' : 'Browse →';
+  const comingSoon    = isAr ? 'قريباً'  : isDe ? 'Demnächst' : 'Coming Soon';
+
+  const inner = (
+    <div className={`relative rounded-xl border h-full transition-all duration-200 ${
+      isActive
+        ? 'bg-[#FAF6EE] border-[#B8860B]/40 hover:border-[#B8860B] hover:shadow-[0_4px_20px_rgba(184,134,11,0.18)] hover:-translate-y-0.5 cursor-pointer'
+        : 'border-dashed border-gray-300 cursor-default'
+    }`}
+    style={isActive ? undefined : { background: '#f5f5f5', opacity: 0.75 }}
+    >
+      {!isActive && (
+        <div className="absolute top-2 end-2 text-[9px] px-2 py-0.5 rounded-full bg-gray-200 text-gray-500 font-medium">
+          {comingSoon}
+        </div>
+      )}
+      <div className="p-5">
+        <div className={`font-amiri text-[15px] leading-snug mb-1.5 ${isActive ? 'text-amber-900' : 'text-gray-400'}`}>
+          {title}
+        </div>
+        <div className={`text-[11px] mb-3 ${isActive ? 'text-amber-700/70' : 'text-gray-400'}`}>
+          {subtitle}
+        </div>
+        {isActive && (
+          <div className="inline-flex items-center gap-1 text-[11px] text-[#B8860B] font-medium border border-[#B8860B]/40 rounded-full px-2.5 py-0.5">
+            {browseLabel}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  if (isActive && card.href) {
+    return <Link href={`/${locale}${card.href}`} className="block h-full">{inner}</Link>;
+  }
+  return <div>{inner}</div>;
+}
+
+function CatalogueGroup({ titleAr, titleEn, titleDe, cards, locale, isAr, isDe }: {
+  titleAr: string; titleEn: string; titleDe: string;
+  cards: CardEntry[]; locale: string; isAr: boolean; isDe: boolean;
+}) {
+  const title = isAr ? titleAr : isDe ? titleDe : titleEn;
+  return (
+    <div className="mb-8">
+      <h3 className="font-amiri text-lg text-amber-900 mb-3 border-b border-amber-200/60 pb-1.5">
+        {title}
+      </h3>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        {cards.map(card => (
+          <CatalogueCard key={card.id} card={card} locale={locale} isAr={isAr} isDe={isDe} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function LandingPage({ params: { locale } }: { params: { locale: string } }) {
   const isAr = locale === 'ar';
@@ -112,16 +193,16 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(10,6,2,0.55) 0%, rgba(10,6,2,0.75) 60%, rgba(10,6,2,0.95) 100%)' }} />
         <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-20">
           <p className="text-gold-400 text-[11px] tracking-[0.2em] uppercase mb-3 font-medium">
-            {t('كتالوج العملات العربية والإسلامية', 'Arab & Islamic Coin Catalogue', 'Arabischer & Islamischer Münzkatalog')}
+            {t('الموسوعة الرقمية للعملات', 'THE DIGITAL ENCYCLOPAEDIA OF COINS', 'DIE DIGITALE MÜNZENZYKLOPÄDIE')}
           </p>
           <h1 className="font-amiri text-4xl md:text-5xl text-white leading-tight mb-2">
-            Arabismatica <span className="text-amber-300/50">|</span> أرابيزماتيكا
+            Arabismatica <span className="text-amber-300/50">|</span> <span>أرابيزماتيكا</span>
           </h1>
           <p className="text-amber-300/80 text-[14px] md:text-[16px] max-w-lg mb-8">
             {t(
-              'الموسوعة الرقمية الأشمل للعملات في العالم العربي والشرق الأوسطي',
-              'The most comprehensive digital encyclopaedia of coins in the Arab and Middle Eastern world',
-              'Die umfassendste digitale Enzyklopädie der Münzen der arabischen und nahöstlichen Welt'
+              'استكشف عملات العالم العربي والتاريخ الإسلامي والشرق الأوسط القديم',
+              'Explore coins from across the Arab world, Islamic history, and the ancient Middle East',
+              'Erkunde Münzen aus der arabischen Welt, der islamischen Geschichte und dem alten Nahen Osten'
             )}
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
@@ -186,50 +267,29 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
         </div>
       )}
 
-      {/* ── CATALOGUE CARDS ─────────────────────────────────────────────── */}
+      {/* ── CATALOGUE GROUPS ────────────────────────────────────────────── */}
       <div className="max-w-[1440px] mx-auto px-4 py-10">
         <h2 className="font-amiri text-xl md:text-2xl text-amber-900 mb-1">
           {t('اختر الكتالوج', 'Choose a Catalogue', 'Katalog wählen')}
         </h2>
-        <p className="text-[12px] text-amber-700/70 mb-5">
-          {t('أربعة كتالوجات متخصصة — عربي حديث، إسلامي، ساساني، بطلمي', 'Four specialised catalogues — modern Arab, Islamic, Sasanian, Ptolemaic', 'Vier spezialisierte Kataloge — modernes Arabisch, Islamisch, Sassanidisch, Ptolemäisch')}
+        <p className="text-[12px] text-amber-700/70 mb-6">
+          {t('كتالوجات متخصصة تشمل عملات العالم العربي والشرق الأوسط القديم والإسلام الهندي',
+             'Specialised catalogues covering Arab world, ancient Middle East, and Islamic India',
+             'Spezialisierte Kataloge für arabische Welt, alter Naher Osten und islamisches Indien')}
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {CATALOGUE_CARDS.map(card => {
-            const isActive = card.status === 'active';
-            const href = isActive ? `/${locale}${card.href}` : undefined;
-            const title    = isAr ? card.titleAr    : isDe ? card.titleDe    : card.titleEn;
-            const subtitle = isAr ? card.subtitleAr : isDe ? card.subtitleDe : card.subtitleEn;
-            const inner = (
-              <div className={`relative overflow-hidden rounded-xl border h-full transition-all
-                bg-gradient-to-br ${card.bg}
-                ${isActive
-                  ? 'border-gold-700/50 hover:border-gold-400 hover:shadow-[0_0_24px_rgba(180,140,50,0.25)] hover:-translate-y-0.5 cursor-pointer'
-                  : 'border-white/10 opacity-50 cursor-not-allowed'}`}>
-                {!isActive && (
-                  <div className="absolute top-2 end-2 text-[9px] px-1.5 py-0.5 bg-white/10 rounded text-white/60">
-                    {isAr ? 'قريباً' : isDe ? 'Demnächst' : 'Soon'}
-                  </div>
-                )}
-                <div className="p-5">
-                  <div className="text-[10px] text-gold-500/70 tracking-widest uppercase font-medium mb-3">
-                    {isAr ? (card as { tagAr: string }).tagAr : (card as { tagEn: string }).tagEn}
-                  </div>
-                  <div className="font-amiri text-[15px] text-amber-100 leading-snug mb-1.5">{title}</div>
-                  <div className="text-[10px] text-amber-400/70 mb-3">{subtitle}</div>
-                  {isActive && (
-                    <div className="inline-flex items-center gap-1 text-[11px] text-gold-400 font-medium border border-gold-700/40 rounded-full px-2.5 py-0.5">
-                      {isAr ? '← تصفح' : isDe ? 'Ansehen →' : 'Browse →'}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-            return href
-              ? <Link key={card.id} href={href} className="block h-full">{inner}</Link>
-              : <div key={card.id}>{inner}</div>;
-          })}
-        </div>
+
+        <CatalogueGroup
+          titleAr="العالم العربي" titleEn="Arab World" titleDe="Arabische Welt"
+          cards={ARAB_WORLD_CARDS} locale={locale} isAr={isAr} isDe={isDe}
+        />
+        <CatalogueGroup
+          titleAr="الشرق الأوسط القديم" titleEn="Ancient Middle East" titleDe="Alter Naher Osten"
+          cards={ANCIENT_CARDS} locale={locale} isAr={isAr} isDe={isDe}
+        />
+        <CatalogueGroup
+          titleAr="الإسلام الهندي" titleEn="Islamic India" titleDe="Islamisches Indien"
+          cards={INDIAN_ISLAMIC_CARDS} locale={locale} isAr={isAr} isDe={isDe}
+        />
       </div>
 
       {/* ── ABOUT STRIP ─────────────────────────────────────────────────── */}
@@ -241,9 +301,9 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
             </h2>
             <p className="text-[13px] text-amber-800/80 leading-relaxed max-w-xl">
               {t(
-                'أرابيزماتيكا هي الموسوعة العربية الرقمية الشاملة للعملات المعدنية، تضم أكثر من 60,803 عملة عربية وإسلامية وساسانية مفهرسة بالتفصيل مع صور وبيانات شاملة.',
-                'Arabismatica is the comprehensive Arabic digital encyclopaedia of coins, featuring over 60,803 Arab, Islamic and Sasanian coins indexed with detailed images and data.',
-                'Arabismatica ist die umfassende arabische digitale Münzenzyklopädie mit über 60.803 arabischen, islamischen und sassanidischen Münzen, detailliert indexiert mit Bildern und Daten.'
+                'أرابيزماتيكا هي الموسوعة الرقمية الشاملة للعملات في العالم العربي والشرق الأوسط، تضم أكثر من 60,803 عملة عربية وإسلامية وساسانية مفهرسة بالتفصيل مع صور وبيانات شاملة. مبادرة شبكة المقتني العربي.',
+                'Arabismatica is the comprehensive digital encyclopaedia of coins covering the Arab world and Middle East, featuring over 60,803 Arab, Islamic and Sasanian coins indexed with detailed images and data. An initiative of The Arab Collector Network.',
+                'Arabismatica ist die umfassende digitale Münzenzyklopädie der arabischen Welt und des Nahen Ostens mit über 60.803 arabischen, islamischen und sassanidischen Münzen, detailliert indexiert. Eine Initiative des Arabischen Sammler-Netzwerks.'
               )}
             </p>
             <a href="https://arabcollector.com" target="_blank" rel="noopener"
@@ -260,6 +320,9 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
             </Link>
             <Link href={`/${locale}/islamic/dynasties`} className="hover:text-amber-900 transition-colors">
               {t('← السلالات الإسلامية', '→ Islamic Dynasties', '→ Islamische Dynastien')}
+            </Link>
+            <Link href={`/${locale}/sasanian`} className="hover:text-amber-900 transition-colors">
+              {t('← العملات الساسانية', '→ Sasanian Coins', '→ Sassanidische Münzen')}
             </Link>
           </div>
         </div>

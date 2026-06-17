@@ -18,21 +18,26 @@ const TOP_NAV_ITEMS_AR = [
     { label: 'زيارة المقتني العربي', href: `${WP}/` },
     { label: 'عن المقتني العربي',   href: `${WP}/about-us/` },
   ]},
-  { label: 'العملات العربية', children: [
-    { label: 'كتالوج العملات العربية', href: '/ar/catalogue' },
-    { label: 'حسب الدولة',             href: '/ar/catalogue/countries' },
+  { label: 'العالم العربي', children: [
+    { label: 'العملات العربية الحديثة', href: '/ar/catalogue' },
+    { label: '  ↳ حسب الدولة',          href: '/ar/catalogue/countries' },
+    { label: 'العملات الإسلامية',       href: '/ar/islamic' },
+    { label: '  ↳ السلالات',            href: '/ar/islamic/dynasties' },
+    { label: '  ↳ دور الضرب',           href: '/ar/islamic/mints' },
+    { label: '  ↳ فهرس العملات',        href: '/ar/islamic/coin-index' },
   ]},
-  { label: 'العملات الإسلامية', children: [
-    { label: 'العملات الإسلامية', href: '/ar/islamic' },
-    { label: '  ↳ السلالات',      href: '/ar/islamic/dynasties' },
-    { label: '  ↳ دور الضرب',     href: '/ar/islamic/mints' },
-    { label: '  ↳ فهرس العملات',  href: '/ar/islamic/coin-index' },
+  { label: 'العالم القديم', children: [
+    { label: 'العملات الساسانية',            href: '/ar/sasanian' },
+    { label: '  ↳ الحكام',                  href: '/ar/sasanian/rulers' },
+    { label: '  ↳ دور الضرب',               href: '/ar/sasanian/mints' },
+    { label: 'العملات النبطية (قريباً)',      href: '' },
+    { label: 'العملات البيزنطية (قريباً)',   href: '' },
+    { label: 'العملات البطلمية (قريباً)',    href: '' },
+    { label: 'العملات الأخمينية (قريباً)',   href: '' },
   ]},
-  { label: 'تاريخية', children: [
-    { label: 'العملات الساسانية',        href: '/ar/sasanian' },
-    { label: '  ↳ الحكام',              href: '/ar/sasanian/rulers' },
-    { label: '  ↳ دور الضرب',           href: '/ar/sasanian/mints' },
-    { label: 'العملات البطلمية (قريباً)', href: '' },
+  { label: 'الإسلام الهندي', children: [
+    { label: 'العملات المغولية (قريباً)',    href: '' },
+    { label: 'سلطنة دلهي (قريباً)',          href: '' },
   ]},
   { label: 'الأدوات', isTools: true, children: [
     { label: 'محول الهجري ↔ الميلادي', href: '#hijri-converter' },
@@ -50,21 +55,26 @@ const TOP_NAV_ITEMS_EN = [
     { label: 'Visit The Arab Collector', href: `${WP}/` },
     { label: 'About',                    href: `${WP}/about-us/` },
   ]},
-  { label: 'Arab Coins', children: [
-    { label: 'Arab Coin Catalogue', href: '/en/catalogue' },
-    { label: 'By Country',          href: '/en/catalogue/countries' },
+  { label: 'Arab World', children: [
+    { label: 'Modern Arab Coins',   href: '/en/catalogue' },
+    { label: '  ↳ By Country',      href: '/en/catalogue/countries' },
+    { label: 'Islamic Coins',       href: '/en/islamic' },
+    { label: '  ↳ Dynasties',       href: '/en/islamic/dynasties' },
+    { label: '  ↳ Mints',           href: '/en/islamic/mints' },
+    { label: '  ↳ Coin Index',      href: '/en/islamic/coin-index' },
   ]},
-  { label: 'Islamic Coins', children: [
-    { label: 'Islamic Coins', href: '/en/islamic' },
-    { label: '  ↳ Dynasties', href: '/en/islamic/dynasties' },
-    { label: '  ↳ Mints',     href: '/en/islamic/mints' },
-    { label: '  ↳ Coin Index',href: '/en/islamic/coin-index' },
+  { label: 'Ancient World', children: [
+    { label: 'Sasanian Coins',              href: '/en/sasanian' },
+    { label: '  ↳ Rulers',                 href: '/en/sasanian/rulers' },
+    { label: '  ↳ Mints',                  href: '/en/sasanian/mints' },
+    { label: 'Nabataean Coins (soon)',      href: '' },
+    { label: 'Byzantine Arab Coins (soon)', href: '' },
+    { label: 'Ptolemaic Coins (soon)',      href: '' },
+    { label: 'Achaemenid Coins (soon)',     href: '' },
   ]},
-  { label: 'Historical', children: [
-    { label: 'Sasanian Coins',          href: '/en/sasanian' },
-    { label: '  ↳ Rulers',             href: '/en/sasanian/rulers' },
-    { label: '  ↳ Mints',              href: '/en/sasanian/mints' },
-    { label: 'Ptolemaic Coins (soon)',  href: '' },
+  { label: 'Islamic India', children: [
+    { label: 'Mughal Coins (soon)',    href: '' },
+    { label: 'Delhi Sultanate (soon)', href: '' },
   ]},
   { label: 'Tools', isTools: true, children: [
     { label: 'Hijri ↔ Gregorian Converter', href: '#hijri-converter' },
@@ -91,21 +101,26 @@ const TOP_NAV_ITEMS_DE = [
     { label: 'The Arab Collector besuchen', href: `${WP}/` },
     { label: 'Über uns',                    href: `${WP}/about-us/` },
   ]},
-  { label: 'Arabische Münzen', children: [
-    { label: 'Arabischer Münzkatalog', href: '/de/catalogue' },
-    { label: 'Nach Land',              href: '/de/catalogue/countries' },
+  { label: 'Arabische Welt', children: [
+    { label: 'Moderne arabische Münzen', href: '/de/catalogue' },
+    { label: '  ↳ Nach Land',            href: '/de/catalogue/countries' },
+    { label: 'Islamische Münzen',        href: '/de/islamic' },
+    { label: '  ↳ Dynastien',            href: '/de/islamic/dynasties' },
+    { label: '  ↳ Münzstätten',          href: '/de/islamic/mints' },
+    { label: '  ↳ Münzindex',            href: '/de/islamic/coin-index' },
   ]},
-  { label: 'Islamische Münzen', children: [
-    { label: 'Islamische Münzen', href: '/de/islamic' },
-    { label: '  ↳ Dynastien',     href: '/de/islamic/dynasties' },
-    { label: '  ↳ Münzstätten',   href: '/de/islamic/mints' },
-    { label: '  ↳ Münzindex',     href: '/de/islamic/coin-index' },
+  { label: 'Alte Welt', children: [
+    { label: 'Sassanidische Münzen',             href: '/de/sasanian' },
+    { label: '  ↳ Herrscher',                   href: '/de/sasanian/rulers' },
+    { label: '  ↳ Münzstätten',                 href: '/de/sasanian/mints' },
+    { label: 'Nabatäische Münzen (bald)',        href: '' },
+    { label: 'Byzantinisch-arab. Münzen (bald)', href: '' },
+    { label: 'Ptolemäische Münzen (bald)',       href: '' },
+    { label: 'Achämenidische Münzen (bald)',     href: '' },
   ]},
-  { label: 'Historisch', children: [
-    { label: 'Sassanidische Münzen',       href: '/de/sasanian' },
-    { label: '  ↳ Herrscher',              href: '/de/sasanian/rulers' },
-    { label: '  ↳ Münzstätten',            href: '/de/sasanian/mints' },
-    { label: 'Ptolemäische Münzen (bald)', href: '' },
+  { label: 'Islam. Indien', children: [
+    { label: 'Mogulmünzen (bald)',     href: '' },
+    { label: 'Delhi-Sultanat (bald)',  href: '' },
   ]},
   { label: 'Tools', isTools: true, children: [
     { label: 'Hidschra ↔ Gregorian',    href: '#hijri-converter' },
@@ -265,6 +280,14 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                             </button>
                           );
                         }
+                        if (!child.href) {
+                          return (
+                            <span key={child.label}
+                              className="block px-4 py-2.5 text-[12px] border-b border-gold-900/30 last:border-0 text-white/30 cursor-default select-none">
+                              {child.label}
+                            </span>
+                          );
+                        }
                         const isExternal = child.href.startsWith('http');
                         return (
                           <a key={child.label} href={child.href}
@@ -364,6 +387,14 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                             className="w-full text-start block px-8 py-2.5 text-[12px] text-gold-400 hover:text-white border-b border-gold-900/10 last:border-0">
                             {child.label}
                           </button>
+                        );
+                      }
+                      if (!child.href) {
+                        return (
+                          <span key={child.label}
+                            className="block px-8 py-2.5 text-[12px] text-white/30 border-b border-gold-900/10 last:border-0 cursor-default">
+                            {child.label}
+                          </span>
                         );
                       }
                       const isExternal = child.href.startsWith('http');
