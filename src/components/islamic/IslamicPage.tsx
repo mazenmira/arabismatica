@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Search, X, ChevronDown, ChevronUp, SlidersHorizontal, FileDown } from 'lucide-react';
 import { getIslamicCoins, getIslamicFilters } from '@/lib/coinsApi';
 import type { CoinRow, IslamicCoinFilters } from '@/lib/coinsApi';
+import { supabase } from '@/lib/supabase';
 import CoinCard from '@/components/catalogue/CoinCard';
 import CoinModal from '@/components/catalogue/CoinModal';
 import { useDarkMode } from '@/lib/darkModeContext';
@@ -51,6 +52,28 @@ const DYNASTIES = [
   { value: 'سلطنات شرق أفريقيا',    labelAr: 'سلطنات شرق أفريقيا',    labelEn: 'East African Sultanates' },
 ];
 
+// Top-8 mints quick-select pills
+const TOP_MINTS = [
+  { en: 'Damascus',         ar: 'دمشق' },
+  { en: 'Aleppo',           ar: 'حلب' },
+  { en: 'Baghdad',          ar: 'بغداد' },
+  { en: 'al-Basra',         ar: 'البصرة' },
+  { en: 'al-Kufa',          ar: 'الكوفة' },
+  { en: 'Nishapur',         ar: 'نيسابور' },
+  { en: 'Samarqand',        ar: 'سمرقند' },
+  { en: 'al-Qahira',        ar: 'القاهرة' },
+];
+
+// Top-6 rulers quick-select pills
+const TOP_RULERS = [
+  { en: 'Harun al-Rashid',  ar: 'هارون الرشيد' },
+  { en: 'Abd al-Malik ibn Marwan', ar: 'عبد الملك بن مروان' },
+  { en: 'al-Mansur',        ar: 'المنصور' },
+  { en: 'Baybars',          ar: 'بيبرس' },
+  { en: "Qala'un",          ar: 'قلاوون' },
+  { en: "Salah al-Din",     ar: 'صلاح الدين' },
+];
+
 const PER_PAGE = 48;
 
 function SkeletonCard() {
@@ -61,6 +84,122 @@ function SkeletonCard() {
         <div className="h-3 bg-amber-100 rounded w-3/4" />
         <div className="h-2.5 bg-amber-100 rounded w-1/2" />
       </div>
+    </div>
+  );
+}
+
+// ── Searchable autocomplete component ──────────────────────────────────────
+interface AutoOption { en: string; ar: string | null }
+
+function SearchableSelect({
+  value, onSelect, cc, field, placeholderEn, placeholderAr, isAr,
+}: {
+  value: string;
+  onSelect: (v: string) => void;
+  cc: string;
+  field: 'mint' | 'ruler';
+  placeholderEn: string;
+  placeholderAr: string;
+  isAr: boolean;
+}) {
+  const [inputVal, setInputVal] = useState('');
+  const [options,  setOptions]  = useState<AutoOption[]>([]);
+  const [open,     setOpen]     = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timerRef     = useRef<NodeJS.Timeout>();
+
+  // When value is cleared externally, reset input
+  useEffect(() => {
+    if (!value) setInputVal('');
+  }, [value]);
+
+  // Debounced Supabase query
+  useEffect(() => {
+    clearTimeout(timerRef.current);
+    if (inputVal.length < 2) { setOptions([]); setOpen(false); return; }
+    timerRef.current = setTimeout(async () => {
+      const enField  = field;
+      const arField  = field === 'mint' ? 'mint_ar' : 'ruler_ar';
+      const { data } = await supabase
+        .from('coins')
+        .select(`${enField}, ${arField}`)
+        .eq('cc', cc)
+        .ilike(enField, `%${inputVal}%`)
+        .neq(enField, '')
+        .limit(100);
+      // Deduplicate by en value
+      const seen = new Set<string>();
+      const opts: AutoOption[] = [];
+      for (const row of (data ?? [])) {
+        const enVal = (row as Record<string, string>)[enField];
+        const arVal = (row as Record<string, string>)[arField] ?? null;
+        if (enVal && !seen.has(enVal)) { seen.add(enVal); opts.push({ en: enVal, ar: arVal }); }
+      }
+      setOptions(opts.slice(0, 20));
+      setOpen(opts.length > 0);
+    }, 300);
+    return () => clearTimeout(timerRef.current);
+  }, [inputVal, cc, field]);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleSelect = (opt: AutoOption) => {
+    onSelect(opt.en);
+    setInputVal(isAr ? (opt.ar || opt.en) : opt.en);
+    setOpen(false);
+  };
+
+  const handleClear = () => {
+    onSelect('');
+    setInputVal('');
+    setOptions([]);
+    setOpen(false);
+  };
+
+  const displayVal = value
+    ? (isAr ? (options.find(o => o.en === value)?.ar || value) : value)
+    : undefined;
+
+  return (
+    <div ref={containerRef} className="relative">
+      <div className="flex items-center gap-0.5 rounded-lg border border-gold-700/30 bg-parch-cream overflow-hidden focus-within:border-gold-500">
+        <input
+          value={value ? (displayVal ?? (isAr ? value : value)) : inputVal}
+          readOnly={!!value}
+          onChange={e => { if (!value) { setInputVal(e.target.value); } }}
+          onFocus={() => { if (!value && inputVal.length >= 2) setOpen(true); }}
+          placeholder={isAr ? placeholderAr : placeholderEn}
+          className="text-[11px] px-2.5 py-1.5 bg-transparent text-ink/70 outline-none w-[140px] font-cairo placeholder:text-ink/40 cursor-text"
+        />
+        {value ? (
+          <button onClick={handleClear} className="pe-2 text-ink/40 hover:text-ink/70 shrink-0">
+            <X size={11} />
+          </button>
+        ) : (
+          <ChevronDown size={11} className="pe-2 text-ink/30 shrink-0 pointer-events-none" />
+        )}
+      </div>
+      {open && options.length > 0 && (
+        <div className="absolute top-full start-0 mt-1 w-56 bg-parch-cream border border-gold-700/25 rounded-lg shadow-lg z-50 max-h-52 overflow-y-auto">
+          {options.map(opt => (
+            <button
+              key={opt.en}
+              onMouseDown={e => { e.preventDefault(); handleSelect(opt); }}
+              className="w-full text-start px-3 py-1.5 text-[11px] hover:bg-gold-500/10 text-ink/70 flex justify-between gap-2"
+            >
+              <span className="truncate">{isAr ? (opt.ar || opt.en) : opt.en}</span>
+              {opt.ar && !isAr && <span className="text-ink/30 shrink-0 font-cairo">{opt.ar}</span>}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -85,8 +224,8 @@ export default function IslamicPage({ locale }: { locale: string }) {
   const [coins,        setCoins]        = useState<CoinRow[]>([]);
   const [total,        setTotal]        = useState(47303);
   const [loading,      setLoading]      = useState(false);
-  const [mint,         setMint]         = useState('');  // English key
-  const [ruler,        setRuler]        = useState('');  // English key
+  const [mint,         setMint]         = useState('');
+  const [ruler,        setRuler]        = useState('');
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [filters,      setFilters]      = useState<{
     dynasties: string[];
@@ -95,9 +234,12 @@ export default function IslamicPage({ locale }: { locale: string }) {
     rulers: { en: string; ar: string | null }[];
   }>({ dynasties: [], metals: [], mints: [], rulers: [] });
 
+  // Labels for active filter pills (from autocomplete selection)
+  const [mintArLabel,  setMintArLabel]  = useState('');
+  const [rulerArLabel, setRulerArLabel] = useState('');
+
   const queryRef = useRef<NodeJS.Timeout>();
 
-  // Load filter options once
   useEffect(() => {
     getIslamicFilters().then(f => {
       setFilters({
@@ -109,7 +251,6 @@ export default function IslamicPage({ locale }: { locale: string }) {
     }).catch(() => {});
   }, []);
 
-  // Fetch coins when any filter or page changes (debounced query)
   const doFetch = useCallback(() => {
     setLoading(true);
     const f: IslamicCoinFilters = {};
@@ -147,8 +288,20 @@ export default function IslamicPage({ locale }: { locale: string }) {
 
   const clearAll = () => {
     setQuery(''); setDenomination(''); setDynasty(''); setMetal('');
-    setMint(''); setRuler('');
+    setMint(''); setMintArLabel(''); setRuler(''); setRulerArLabel('');
     setCoinTypeTag(''); setYahFrom(''); setYahTo(''); setSort('default'); setPage(1);
+  };
+
+  const selectMint = (val: string, arLabel?: string) => {
+    setMint(val);
+    setMintArLabel(arLabel || '');
+    setPage(1);
+  };
+
+  const selectRuler = (val: string, arLabel?: string) => {
+    setRuler(val);
+    setRulerArLabel(arLabel || '');
+    setPage(1);
   };
 
   // PDF download
@@ -243,7 +396,7 @@ export default function IslamicPage({ locale }: { locale: string }) {
         <div className="bg-parch sticky top-[167px] z-30 border-b border-gold-700/15 shadow-sm">
           <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-2 flex-wrap">
 
-            {/* Dynasty */}
+            {/* Dynasty — static list */}
             <select value={dynasty} onChange={e => { setDynasty(e.target.value); setPage(1); }}
               className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[180px]">
               <option value="">{isAr ? 'كل السلالات' : 'All Dynasties'}</option>
@@ -267,25 +420,29 @@ export default function IslamicPage({ locale }: { locale: string }) {
               ))}
             </select>
 
-            {/* Mint — bilingual */}
-            <select value={mint} onChange={e => { setMint(e.target.value); setPage(1); }}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[160px]">
-              <option value="">{isAr ? 'كل دور الضرب' : 'All Mints'}</option>
-              {filters.mints.map(m => (
-                <option key={m.en} value={m.en}>{isAr ? (m.ar || m.en) : m.en}</option>
-              ))}
-            </select>
+            {/* Mint — searchable autocomplete */}
+            <SearchableSelect
+              value={mint}
+              onSelect={val => selectMint(val)}
+              cc="IS"
+              field="mint"
+              placeholderEn="Search mints…"
+              placeholderAr="ابحث في دور الضرب…"
+              isAr={isAr}
+            />
 
-            {/* Ruler — bilingual */}
-            <select value={ruler} onChange={e => { setRuler(e.target.value); setPage(1); }}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[160px]">
-              <option value="">{isAr ? 'كل الحكام' : 'All Rulers'}</option>
-              {filters.rulers.map(r => (
-                <option key={r.en} value={r.en}>{isAr ? (r.ar || r.en) : r.en}</option>
-              ))}
-            </select>
+            {/* Ruler — searchable autocomplete */}
+            <SearchableSelect
+              value={ruler}
+              onSelect={val => selectRuler(val)}
+              cc="IS"
+              field="ruler"
+              placeholderEn="Search rulers…"
+              placeholderAr="ابحث في الحكام…"
+              isAr={isAr}
+            />
 
-            {/* Year AH range — moved from More filters */}
+            {/* Year AH range */}
             <div className="flex items-center gap-1">
               <span className="text-[11px] text-ink/50 shrink-0">{isAr ? 'هـ:' : 'AH:'}</span>
               <input value={yahFrom} onChange={e => { setYahFrom(e.target.value); setPage(1); }}
@@ -297,7 +454,7 @@ export default function IslamicPage({ locale }: { locale: string }) {
                 className="w-[60px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
             </div>
 
-            {/* More filters toggle (coin type pills only now) */}
+            {/* More filters toggle */}
             <button
               onClick={() => setMoreFilters(!moreFilters)}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
@@ -341,9 +498,10 @@ export default function IslamicPage({ locale }: { locale: string }) {
           </div>
         </div>
 
-        {/* ── FILTER ROW 2 — coin type pills ───────────────────────────── */}
+        {/* ── FILTER ROW 2 — coin type pills + top mint/ruler pills ────── */}
         {moreFilters && (
-          <div className="border-b border-gold-700/10 bg-parch-cream/60 px-4 py-3 flex flex-wrap items-center gap-4">
+          <div className="border-b border-gold-700/10 bg-parch-cream/60 px-4 py-3 flex flex-col gap-3">
+            {/* Coin type */}
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] text-ink/60 font-medium shrink-0">
                 {isAr ? 'النوع:' : 'Type:'}
@@ -356,6 +514,40 @@ export default function IslamicPage({ locale }: { locale: string }) {
                       ? 'bg-gold-500 border-gold-500 text-ink font-semibold'
                       : 'border-gold-700/25 text-ink/50 hover:border-gold-500/50 hover:text-ink/70'}`}>
                   {isAr ? p.labelAr : p.labelEn}
+                </button>
+              ))}
+            </div>
+
+            {/* Top mints */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] text-ink/60 font-medium shrink-0">
+                {isAr ? 'دور الضرب:' : 'Top mints:'}
+              </span>
+              {TOP_MINTS.map(m => (
+                <button key={m.en}
+                  onClick={() => { selectMint(mint === m.en ? '' : m.en, m.ar); }}
+                  className={`text-[11px] px-2.5 py-1 rounded-full border transition-all font-cairo
+                    ${mint === m.en
+                      ? 'bg-gold-500 border-gold-500 text-ink font-semibold'
+                      : 'border-gold-700/25 text-ink/50 hover:border-gold-500/50 hover:text-ink/70'}`}>
+                  {isAr ? m.ar : m.en}
+                </button>
+              ))}
+            </div>
+
+            {/* Top rulers */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] text-ink/60 font-medium shrink-0">
+                {isAr ? 'الحكام:' : 'Top rulers:'}
+              </span>
+              {TOP_RULERS.map(r => (
+                <button key={r.en}
+                  onClick={() => { selectRuler(ruler === r.en ? '' : r.en, r.ar); }}
+                  className={`text-[11px] px-2.5 py-1 rounded-full border transition-all font-cairo
+                    ${ruler === r.en
+                      ? 'bg-gold-500 border-gold-500 text-ink font-semibold'
+                      : 'border-gold-700/25 text-ink/50 hover:border-gold-500/50 hover:text-ink/70'}`}>
+                  {isAr ? r.ar : r.en}
                 </button>
               ))}
             </div>
@@ -385,14 +577,14 @@ export default function IslamicPage({ locale }: { locale: string }) {
             )}
             {mint && (
               <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
-                {isAr ? (filters.mints.find(m => m.en === mint)?.ar ?? mint) : mint}
-                <button onClick={() => { setMint(''); setPage(1); }}><X size={10} /></button>
+                {isAr ? (mintArLabel || mint) : mint}
+                <button onClick={() => { setMint(''); setMintArLabel(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {ruler && (
               <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
-                {isAr ? (filters.rulers.find(r => r.en === ruler)?.ar ?? ruler) : ruler}
-                <button onClick={() => { setRuler(''); setPage(1); }}><X size={10} /></button>
+                {isAr ? (rulerArLabel || ruler) : ruler}
+                <button onClick={() => { setRuler(''); setRulerArLabel(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {coinTypeTag && (
@@ -469,7 +661,6 @@ export default function IslamicPage({ locale }: { locale: string }) {
         </div>
       </div>
 
-      {/* Coin detail modal */}
       {selectedCoin && (
         <CoinModal coin={selectedCoin} locale={locale} onClose={() => setSelectedCoin(null)} />
       )}

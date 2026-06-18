@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Search, X, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { getSasanianCoins, getSasanianFilters } from '@/lib/coinsApi';
 import type { CoinRow, SasanianCoinFilters } from '@/lib/coinsApi';
+import { supabase } from '@/lib/supabase';
 import CoinCard from '@/components/catalogue/CoinCard';
 import CoinModal from '@/components/catalogue/CoinModal';
 import { useDarkMode } from '@/lib/darkModeContext';
@@ -16,6 +17,107 @@ const METALS_AR: Record<string, string> = {
 };
 
 const PER_PAGE = 48;
+
+// ── Searchable autocomplete ────────────────────────────────────────────────
+interface AutoOption { en: string; ar: string | null }
+
+function SearchableSelect({
+  value, onSelect, cc, field, placeholderEn, placeholderAr, isAr,
+}: {
+  value: string;
+  onSelect: (v: string) => void;
+  cc: string;
+  field: 'mint' | 'ruler';
+  placeholderEn: string;
+  placeholderAr: string;
+  isAr: boolean;
+}) {
+  const [inputVal, setInputVal] = useState('');
+  const [options,  setOptions]  = useState<AutoOption[]>([]);
+  const [open,     setOpen]     = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timerRef     = useRef<NodeJS.Timeout>();
+
+  useEffect(() => { if (!value) setInputVal(''); }, [value]);
+
+  useEffect(() => {
+    clearTimeout(timerRef.current);
+    if (inputVal.length < 2) { setOptions([]); setOpen(false); return; }
+    timerRef.current = setTimeout(async () => {
+      const enField = field;
+      const arField = field === 'mint' ? 'mint_ar' : 'ruler_ar';
+      const { data } = await supabase
+        .from('coins')
+        .select(`${enField}, ${arField}`)
+        .eq('cc', cc)
+        .ilike(enField, `%${inputVal}%`)
+        .neq(enField, '')
+        .limit(100);
+      const seen = new Set<string>();
+      const opts: AutoOption[] = [];
+      for (const row of (data ?? [])) {
+        const enVal = (row as Record<string, string>)[enField];
+        const arVal = (row as Record<string, string>)[arField] ?? null;
+        if (enVal && !seen.has(enVal)) { seen.add(enVal); opts.push({ en: enVal, ar: arVal }); }
+      }
+      setOptions(opts.slice(0, 20));
+      setOpen(opts.length > 0);
+    }, 300);
+    return () => clearTimeout(timerRef.current);
+  }, [inputVal, cc, field]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleSelect = (opt: AutoOption) => {
+    onSelect(opt.en);
+    setInputVal(isAr ? (opt.ar || opt.en) : opt.en);
+    setOpen(false);
+  };
+
+  const handleClear = () => { onSelect(''); setInputVal(''); setOptions([]); setOpen(false); };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <div className="flex items-center gap-0.5 rounded-lg border border-gold-700/30 bg-parch-cream overflow-hidden focus-within:border-gold-500">
+        <input
+          value={value
+            ? (isAr ? (options.find(o => o.en === value)?.ar || value) : value)
+            : inputVal}
+          readOnly={!!value}
+          onChange={e => { if (!value) setInputVal(e.target.value); }}
+          onFocus={() => { if (!value && inputVal.length >= 2) setOpen(true); }}
+          placeholder={isAr ? placeholderAr : placeholderEn}
+          className="text-[11px] px-2.5 py-1.5 bg-transparent text-ink/70 outline-none w-[140px] font-cairo placeholder:text-ink/40 cursor-text"
+        />
+        {value ? (
+          <button onClick={handleClear} className="pe-2 text-ink/40 hover:text-ink/70 shrink-0"><X size={11} /></button>
+        ) : (
+          <ChevronDown size={11} className="pe-2 text-ink/30 shrink-0 pointer-events-none" />
+        )}
+      </div>
+      {open && options.length > 0 && (
+        <div className="absolute top-full start-0 mt-1 w-56 bg-parch-cream border border-gold-700/25 rounded-lg shadow-lg z-50 max-h-52 overflow-y-auto">
+          {options.map(opt => (
+            <button
+              key={opt.en}
+              onMouseDown={e => { e.preventDefault(); handleSelect(opt); }}
+              className="w-full text-start px-3 py-1.5 text-[11px] hover:bg-gold-500/10 text-ink/70 flex justify-between gap-2"
+            >
+              <span className="truncate">{isAr ? (opt.ar || opt.en) : opt.en}</span>
+              {opt.ar && !isAr && <span className="text-ink/30 shrink-0 font-cairo">{opt.ar}</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function SkeletonCard() {
   return (
@@ -123,23 +225,27 @@ export default function SasanianPage({ locale }: { locale: string }) {
         <div className="bg-parch sticky top-[167px] z-30 border-b border-gold-700/15 shadow-sm">
           <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-2 flex-wrap">
 
-            {/* Ruler */}
-            <select value={ruler} onChange={e => { setRuler(e.target.value); setPage(1); }}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[180px]">
-              <option value="">{isAr ? 'كل الحكام' : 'All Rulers'}</option>
-              {filters.rulers.map(r => (
-                <option key={r.en} value={r.en}>{isAr ? (r.ar || r.en) : r.en}</option>
-              ))}
-            </select>
+            {/* Ruler — searchable autocomplete */}
+            <SearchableSelect
+              value={ruler}
+              onSelect={val => { setRuler(val); setPage(1); }}
+              cc="SS"
+              field="ruler"
+              placeholderEn="Search rulers…"
+              placeholderAr="ابحث في الحكام…"
+              isAr={isAr}
+            />
 
-            {/* Mint */}
-            <select value={mint} onChange={e => { setMint(e.target.value); setPage(1); }}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer max-w-[160px]">
-              <option value="">{isAr ? 'كل دور الضرب' : 'All Mints'}</option>
-              {filters.mints.map(m => (
-                <option key={m.en} value={m.en}>{isAr ? (m.ar || m.en) : m.en}</option>
-              ))}
-            </select>
+            {/* Mint — searchable autocomplete */}
+            <SearchableSelect
+              value={mint}
+              onSelect={val => { setMint(val); setPage(1); }}
+              cc="SS"
+              field="mint"
+              placeholderEn="Search mints…"
+              placeholderAr="ابحث في دور الضرب…"
+              isAr={isAr}
+            />
 
             {/* Metal */}
             <select value={metal} onChange={e => { setMetal(e.target.value); setPage(1); }}
@@ -199,13 +305,13 @@ export default function SasanianPage({ locale }: { locale: string }) {
           <div className="flex flex-wrap gap-1.5 py-2 px-4">
             {ruler && (
               <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
-                {isAr ? (filters.rulers.find(r => r.en === ruler)?.ar ?? ruler) : ruler}
+                {ruler}
                 <button onClick={() => { setRuler(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
             {mint && (
               <span className="flex items-center gap-1 text-[11px] bg-gold-500/15 text-ink/70 rounded-full px-2.5 py-1 border border-gold-700/25">
-                {isAr ? (filters.mints.find(m => m.en === mint)?.ar ?? mint) : mint}
+                {mint}
                 <button onClick={() => { setMint(''); setPage(1); }}><X size={10} /></button>
               </span>
             )}
