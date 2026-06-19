@@ -18,7 +18,7 @@ export default function MintsPage({ locale }: MintsPageProps) {
 
   useEffect(() => {
     getMintStats()
-      .then(setRows)
+      .then(rows => setRows(rows.filter(r => r.mint_ar && r.mint_ar.trim())))
       .finally(() => setLoading(false));
   }, []);
 

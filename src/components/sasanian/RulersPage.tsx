@@ -13,7 +13,7 @@ export default function RulersPage({ locale }: { locale: string }) {
 
   useEffect(() => {
     getSasanianFilters().then(f => {
-      setRulers(f.rulers.filter(r => r.en && r.en.trim()));
+      setRulers(f.rulers.filter(r => r.en && r.en.trim() && r.ar));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);

@@ -13,7 +13,7 @@ export default function MintsPage({ locale }: { locale: string }) {
 
   useEffect(() => {
     getSasanianFilters().then(f => {
-      setMints(f.mints.filter(m => m.en && m.en.trim()));
+      setMints(f.mints.filter(m => m.en && m.en.trim() && m.ar));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
