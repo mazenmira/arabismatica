@@ -1,92 +1,155 @@
 'use client';
 
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import { getSasanianFilters } from '@/lib/coinsApi';
 
 interface Ruler { en: string; ar: string | null; count: number }
 
+const PER_PAGE = 40;
+
 export default function RulersPage({ locale }: { locale: string }) {
   const isAr = locale === 'ar';
-  const [rulers, setRulers] = useState<Ruler[]>([]);
+  const [rulers,  setRulers]  = useState<Ruler[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query,   setQuery]   = useState('');
+  const [page,    setPage]    = useState(1);
 
   useEffect(() => {
     getSasanianFilters().then(f => {
-      setRulers(f.rulers.filter(r => r.en && r.en.trim() && r.ar && r.count > 5));
+      setRulers(f.rulers.filter(r => r.en && r.en.trim() && r.ar && r.count > 0));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
 
+  const filtered = useMemo(() => {
+    if (!query.trim()) return rulers;
+    const q = query.toLowerCase();
+    return rulers.filter(r =>
+      r.en.toLowerCase().includes(q) || (r.ar && r.ar.includes(query))
+    );
+  }, [rulers, query]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
   return (
-    <div dir={isAr ? 'rtl' : 'ltr'} className="max-w-[1440px] mx-auto py-6 px-4">
-      <h2 className="font-amiri text-xl text-amber-900 mb-1">
-        {isAr ? 'حكام الإمبراطورية الساسانية' : 'Rulers of the Sasanian Empire'}
-      </h2>
-      <p className="text-[12px] text-amber-700/60 mb-6">
-        {isAr ? '224–651م · انقر على اسم الحاكم لعرض عملاته' : '224–651 CE · Click a ruler to browse their coins'}
-      </p>
+    <div className="max-w-5xl mx-auto px-4 py-8" dir={isAr ? 'rtl' : 'ltr'}>
+      <div className="mb-8">
+        <div className="flex items-center gap-2 text-[11px] text-gold-600/60 mb-3">
+          <Link href={`/${locale}`} className="hover:text-gold-500 transition-colors">
+            {isAr ? 'الرئيسية' : 'Home'}
+          </Link>
+          <span>/</span>
+          <span>{isAr ? 'العملات الساسانية' : 'Sasanian Coins'}</span>
+          <span>/</span>
+          <span className="text-gold-500">{isAr ? 'الحكام' : 'Rulers'}</span>
+        </div>
+        <h1 className="font-amiri text-3xl text-gold-300 mb-2">
+          {isAr ? 'حكام الإمبراطورية الساسانية' : 'Rulers of the Sasanian Empire'}
+        </h1>
+        <p className="text-[13px] text-ink/50">
+          {isAr ? '224–651م · انقر على اسم الحاكم لعرض عملاته' : '224–651 CE · Click a ruler to browse their coins'}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-3 mb-5">
+        <input
+          type="text"
+          value={query}
+          onChange={e => { setQuery(e.target.value); setPage(1); }}
+          placeholder={isAr ? 'ابحث عن حاكم…' : 'Search rulers…'}
+          dir={isAr ? 'rtl' : 'ltr'}
+          className="text-[12px] px-3 py-2 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/80 outline-none focus:border-gold-500 font-cairo w-full max-w-xs"
+        />
+      </div>
 
       {loading ? (
-        <div className="space-y-2">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="h-10 bg-amber-100 rounded-lg animate-pulse" />
-          ))}
+        <div className="flex items-center gap-2 text-gold-600 py-12">
+          <div className="w-4 h-4 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
+          <span className="text-[13px]">{isAr ? 'جارٍ التحميل…' : 'Loading…'}</span>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-amber-200/60 shadow-sm">
-          <table className="w-full text-[13px]">
-            <thead>
-              <tr className="bg-amber-950/90 text-amber-200">
-                <th className="px-4 py-3 text-start font-medium text-[11px] uppercase tracking-wider w-10">#</th>
-                <th className="px-4 py-3 text-start font-medium text-[11px] uppercase tracking-wider">
-                  {isAr ? 'الاسم' : 'Name'}
-                </th>
-                <th className="px-4 py-3 text-start font-medium text-[11px] uppercase tracking-wider font-amiri">
-                  {isAr ? 'الاسم بالعربية' : 'Arabic Name'}
-                </th>
-                <th className="px-4 py-3 text-end font-medium text-[11px] uppercase tracking-wider">
-                  {isAr ? 'العملات' : 'Coins'}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-amber-100">
-              {rulers.map((ruler, i) => (
-                <tr key={ruler.en}
-                  className="hover:bg-amber-50 transition-colors group">
-                  <td className="px-4 py-2.5 text-amber-400/60 text-[11px]">{i + 1}</td>
-                  <td className="px-4 py-2.5">
-                    <Link
-                      href={`/${locale}/sasanian?ruler=${encodeURIComponent(ruler.en)}`}
-                      className="text-amber-900 hover:text-amber-600 font-medium group-hover:underline"
-                    >
-                      {ruler.en}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-2.5 font-amiri text-amber-800">
-                    {ruler.ar || '—'}
-                  </td>
-                  <td className="px-4 py-2.5 text-end">
-                    <Link
-                      href={`/${locale}/sasanian?ruler=${encodeURIComponent(ruler.en)}`}
-                      className="inline-flex items-center gap-1 text-[11px] text-amber-600 hover:text-amber-800 border border-amber-200 hover:border-amber-400 rounded-full px-2.5 py-0.5 transition-colors"
-                    >
-                      {isAr ? 'عرض →' : 'View →'}
-                    </Link>
-                  </td>
+        <>
+          <div className="overflow-x-auto rounded-xl border border-gold-700/20">
+            <table className="w-full text-[12px]">
+              <thead>
+                <tr className="bg-ink text-gold-300">
+                  <th className="px-3 py-3 text-center w-10">#</th>
+                  <th className={`px-4 py-3 ${isAr ? 'text-right' : 'text-left'}`}>
+                    {isAr ? 'الحاكم (إنجليزي)' : 'Ruler (EN)'}
+                  </th>
+                  <th className={`px-4 py-3 ${isAr ? 'text-right' : 'text-left'}`}>
+                    {isAr ? 'الحاكم (عربي)' : 'Ruler (AR)'}
+                  </th>
+                  <th className="px-3 py-3 text-center">{isAr ? 'العملات' : 'Coins'}</th>
+                  <th className="px-3 py-3 text-center w-16"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {paged.map((ruler, i) => (
+                  <tr key={ruler.en}
+                    className="border-t border-gold-700/10 hover:bg-gold-500/5 transition-colors">
+                    <td className="px-3 py-2.5 text-center text-ink/30 text-[11px]">
+                      {(page - 1) * PER_PAGE + i + 1}
+                    </td>
+                    <td className="px-4 py-2.5 text-ink/80">{ruler.en}</td>
+                    <td className="px-4 py-2.5 font-amiri text-[14px] text-ink/90" dir="rtl">
+                      {ruler.ar || '—'}
+                    </td>
+                    <td className="px-3 py-2.5 text-center font-medium text-ink/80">
+                      {ruler.count.toLocaleString(isAr ? 'ar-EG' : 'en-US')}
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <Link
+                        href={`/${locale}/sasanian?ruler=${encodeURIComponent(ruler.en)}`}
+                        className="text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 hover:border-gold-500/60 rounded-full px-2.5 py-1 transition-colors whitespace-nowrap"
+                      >
+                        {isAr ? 'عرض ←' : 'View →'}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+                {paged.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-10 text-center text-ink/40 text-[13px]">
+                      {isAr ? 'لا نتائج' : 'No results'}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-      <div className="mt-6 pt-4 border-t border-amber-100">
-        <Link href={`/${locale}/sasanian`}
-          className="text-[13px] text-amber-700 hover:text-amber-900 transition-colors">
-          {isAr ? '← العودة إلى الكتالوج' : '← Back to Catalogue'}
-        </Link>
-      </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-5 flex-wrap">
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                className="px-3 py-1.5 rounded-lg border border-gold-700/30 text-[11px] text-ink/60 hover:border-gold-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                {isAr ? '‹ السابق' : '‹ Prev'}
+              </button>
+              {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                const p = totalPages <= 7 ? i + 1 : page <= 4 ? i + 1 : page + i - 3;
+                if (p < 1 || p > totalPages) return null;
+                return (
+                  <button key={p} onClick={() => setPage(p)}
+                    className={`px-3 py-1.5 rounded-lg text-[11px] min-w-[32px] transition-colors
+                      ${p === page ? 'bg-gold-500 text-ink font-semibold border border-gold-500' : 'border border-gold-700/25 text-ink/50 hover:border-gold-500/50'}`}>
+                    {p}
+                  </button>
+                );
+              })}
+              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                className="px-3 py-1.5 rounded-lg border border-gold-700/30 text-[11px] text-ink/60 hover:border-gold-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                {isAr ? 'التالي ›' : 'Next ›'}
+              </button>
+            </div>
+          )}
+
+          <p className="mt-3 text-[11px] text-ink/30 text-center">
+            {filtered.length.toLocaleString()} {isAr ? 'حاكم' : 'rulers'}
+          </p>
+        </>
+      )}
     </div>
   );
 }

@@ -20,6 +20,10 @@ export function DarkModeProvider({ children }: { children: React.ReactNode }) {
     if (saved === 'true') setDarkMode(true);
   }, []);
 
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+  }, [darkMode]);
+
   const toggleDarkMode = () => {
     setDarkMode(prev => {
       const next = !prev;

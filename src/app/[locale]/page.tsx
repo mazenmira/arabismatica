@@ -224,7 +224,7 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
 
       {/* ── CATALOGUE INDEX ─────────────────────────────────────────────── */}
       <div className="max-w-[1440px] mx-auto px-4 py-10">
-        <h2 className="font-amiri text-[11px] tracking-[0.15em] uppercase text-amber-600/70 mb-7">
+        <h2 className="font-amiri text-[11px] tracking-[0.15em] uppercase text-amber-700 mb-7">
           {t('الكتالوجات', 'Catalogues', 'Kataloge')}
         </h2>
 
@@ -281,34 +281,6 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
         </div>
       )}
 
-      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-      <footer className="border-t border-amber-200/40 bg-amber-900">
-        <div className="max-w-[1440px] mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
-            <div>
-              <div className="font-amiri text-lg text-amber-100 mb-1">Arabismatica · أرابيزماتيكا</div>
-              <div className="text-[11px] text-amber-300/70">
-                {t('مبادرة شبكة المقتني العربي', 'An initiative of The Arab Collector Network', 'Eine Initiative des Arabischen Sammler-Netzwerks')}
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-amber-400/80">
-              <Link href={`/${locale}/catalogue`} className="hover:text-amber-200 transition-colors">
-                {t('العملات العربية', 'Arab Coins', 'Arabische Münzen')}
-              </Link>
-              <Link href={`/${locale}/islamic`} className="hover:text-amber-200 transition-colors">
-                {t('العملات الإسلامية', 'Islamic Coins', 'Islamische Münzen')}
-              </Link>
-              <Link href={`/${locale}/sasanian`} className="hover:text-amber-200 transition-colors">
-                {t('العملات الساسانية', 'Sasanian Coins', 'Sassanidische Münzen')}
-              </Link>
-              <a href="https://arabcollector.com" target="_blank" rel="noopener"
-                className="hover:text-amber-200 transition-colors">
-                arabcollector.com →
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

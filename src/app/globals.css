@@ -35,6 +35,16 @@ html { scroll-behavior: smooth; }
 .text-gold { color: var(--gold); }
 .bg-gold { background-color: var(--gold); }
 
+/* Global dark mode — applied via html.dark class from DarkModeProvider */
+html.dark body {
+  filter: invert(1) hue-rotate(180deg);
+}
+html.dark img,
+html.dark video,
+html.dark [style*="background-image"] {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 /* RTL-aware margin/padding overrides */
 [dir="rtl"] .rtl\:mr-auto { margin-right: auto; }
 [dir="ltr"] .ltr\:ml-auto { margin-left: auto; }

@@ -123,7 +123,7 @@ export default function IslamicPage({ locale }: { locale: string }) {
     const lower = q.toLowerCase();
     const filtered = all.filter(r =>
       r.mint && (!q || r.mint.toLowerCase().includes(lower) || r.mint_ar.includes(q))
-    ).slice(0, 50);
+    ).slice(0, 300);
     return filtered.map(r => ({ value: r.mint, label: isAr && r.mint_ar ? r.mint_ar : r.mint }));
   }, [isAr]);
 
@@ -132,7 +132,7 @@ export default function IslamicPage({ locale }: { locale: string }) {
     const lower = q.toLowerCase();
     const filtered = all.filter(r =>
       r.ruler && (!q || r.ruler.toLowerCase().includes(lower) || r.ruler_ar.includes(q))
-    ).slice(0, 50);
+    ).slice(0, 300);
     return filtered.map(r => ({ value: r.ruler, label: isAr && r.ruler_ar ? r.ruler_ar : r.ruler }));
   }, [isAr]);
 

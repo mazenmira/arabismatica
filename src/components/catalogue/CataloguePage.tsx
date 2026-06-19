@@ -87,7 +87,7 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
 
   // ── Supabase data state ──────────────────────────────────
   const [coins,       setCoins]       = useState<Coin[]>([]);
-  const [totalCount,  setTotalCount]  = useState(52808);
+  const [totalCount,  setTotalCount]  = useState(5505);
   const [loading,     setLoading]     = useState(false);
   const PER_PAGE_SUP = 60;
   const [view, setView] = useState<'grid' | 'list'>('grid');

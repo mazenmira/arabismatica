@@ -2,67 +2,33 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { getIslamicCoins, getIslamicFilters } from '@/lib/coinsApi';
-import type { CoinRow, IslamicCoinFilters, IslamicFilters } from '@/lib/coinsApi';
+import { getSasanianCoins, getSasanianFilters } from '@/lib/coinsApi';
+import type { CoinRow, SasanianCoinFilters, SasanianFilters } from '@/lib/coinsApi';
 
 const PER_PAGE = 40;
 
-const DYN_EN: Record<string, string> = {
-  'الخلافة العباسية': 'Abbasid Caliphate',
-  'السامانيون': 'Samanids',
-  'المماليك': 'Mamluks',
-  'الإيلخانيون': 'Ilkhanids',
-  'الدولة الأموية': 'Umayyad Caliphate',
-  'الأيوبيون': 'Ayyubids',
-  'الإسلام المبكر': 'Early Islam',
-  'الأرتقيون': 'Artuqids',
-  'البويهيون': 'Buyids',
-  'الزنكيون': 'Zengids',
-  'الخلافة الفاطمية': 'Fatimid Caliphate',
-  'الأمويون في الأندلس': 'Umayyads of al-Andalus',
-  'الموحدون': 'Almohads',
-  'المرابطون': 'Almoravids',
-  'الحمدانيون': 'Hamdanids',
-  'سلطنات شرق أفريقيا': 'East African Sultanates',
-};
+type SortKey = 'default' | 'yce_asc' | 'yce_desc';
 
-const TAG_AR: Record<string, string> = {
-  'Dirham': 'درهم', 'Dinar': 'دينار', 'Fals/Fils': 'فلس',
-  'Early Dirham': 'درهم مبكر', 'Fractional': 'كسور',
-  'Anonymous': 'مجهول', 'Arab-Byzantine': 'عربي-بيزنطي',
-  'Arab-Sasanian': 'عربي-ساساني', 'Standing Caliph': 'الخليفة القائم',
-};
-
-interface CoinIndexPageProps { locale: string }
-
-type SortKey = 'default' | 'yah_asc' | 'yah_desc' | 'yce_asc' | 'yce_desc';
-
-export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
+export default function SasanianCoinIndexPage({ locale }: { locale: string }) {
   const isAr = locale === 'ar';
 
-  const [coins,    setCoins]    = useState<CoinRow[]>([]);
-  const [total,    setTotal]    = useState(0);
-  const [loading,  setLoading]  = useState(true);
-  const [page,     setPage]     = useState(1);
-  const [filters,  setFilters]  = useState<IslamicCoinFilters>({});
-  const [sortBy,   setSortBy]   = useState<SortKey>('default');
-  const [opts,     setOpts]     = useState<IslamicFilters>({ dynasties: [], mints: [], rulers: [], tags: [] });
+  const [coins,   setCoins]   = useState<CoinRow[]>([]);
+  const [total,   setTotal]   = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [page,    setPage]    = useState(1);
+  const [filters, setFilters] = useState<SasanianCoinFilters>({});
+  const [sortBy,  setSortBy]  = useState<SortKey>('default');
+  const [opts,    setOpts]    = useState<SasanianFilters>({ rulers: [], mints: [], metals: [] });
 
-  // Load filter dropdown options once
   useEffect(() => {
-    getIslamicFilters().then(setOpts).catch(() => {});
+    getSasanianFilters().then(setOpts).catch(() => {});
   }, []);
 
-  // Fetch coins whenever filters, page, or sort change
   const load = useCallback(() => {
     setLoading(true);
-    // Apply sort as Supabase order — handled by mapping sortKey to yce/yah
-    getIslamicCoins(filters, page, PER_PAGE)
+    getSasanianCoins(filters, page, PER_PAGE)
       .then(({ data, count }) => {
-        // Client-side sort for yah (stored as text)
         let sorted = data;
-        if (sortBy === 'yah_asc')  sorted = [...data].sort((a, b) => parseInt(a.yah||'0') - parseInt(b.yah||'0'));
-        if (sortBy === 'yah_desc') sorted = [...data].sort((a, b) => parseInt(b.yah||'0') - parseInt(a.yah||'0'));
         if (sortBy === 'yce_asc')  sorted = [...data].sort((a, b) => parseInt(a.yce||'0') - parseInt(b.yce||'0'));
         if (sortBy === 'yce_desc') sorted = [...data].sort((a, b) => parseInt(b.yce||'0') - parseInt(a.yce||'0'));
         setCoins(sorted);
@@ -73,7 +39,7 @@ export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
 
   useEffect(() => { load(); }, [load]);
 
-  const updateFilter = (key: keyof IslamicCoinFilters, value: string | number | undefined) => {
+  const updateFilter = (key: keyof SasanianCoinFilters, value: string | number | undefined) => {
     setFilters(prev => ({ ...prev, [key]: value || undefined }));
     setPage(1);
   };
@@ -92,39 +58,30 @@ export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
             {isAr ? 'الرئيسية' : 'Home'}
           </Link>
           <span>/</span>
-          <span>{isAr ? 'العملات الإسلامية' : 'Islamic Coins'}</span>
+          <span>{isAr ? 'العملات الساسانية' : 'Sasanian Coins'}</span>
           <span>/</span>
           <span className="text-gold-500">{isAr ? 'فهرس العملات' : 'Coin Index'}</span>
         </div>
         <h1 className="font-amiri text-3xl text-gold-300 mb-2">
-          {isAr ? 'فهرس العملات الإسلامية' : 'Islamic Coin Index'}
+          {isAr ? 'فهرس العملات الساسانية' : 'Sasanian Coin Index'}
         </h1>
         <p className="text-[13px] text-ink/50">
           {isAr
-            ? 'قائمة مكثفة بجميع العملات الإسلامية مع إمكانية التصفية والترتيب.'
-            : 'Dense filterable index of all Islamic coins in the catalogue.'}
+            ? 'قائمة مكثفة بجميع العملات الساسانية مع إمكانية التصفية والترتيب.'
+            : 'Dense filterable index of all Sasanian coins in the catalogue.'}
         </p>
       </div>
 
       {/* Filter bar */}
       <div className="flex flex-wrap gap-2 mb-5 p-3 rounded-xl border border-gold-700/20 bg-parch-cream/30">
-        {/* Dynasty */}
-        <select value={filters.dyn || ''}
-          onChange={e => updateFilter('dyn', e.target.value)}
+        {/* Ruler */}
+        <select value={(filters as { ruler?: string }).ruler || ''}
+          onChange={e => updateFilter('ruler', e.target.value)}
           className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none cursor-pointer focus:border-gold-500
-            ${filters.dyn ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
+            ${(filters as { ruler?: string }).ruler ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
           dir={isAr ? 'rtl' : 'ltr'}>
-          <option value="">{isAr ? '☪️ السلالة' : '☪️ Dynasty'}</option>
-          {opts.dynasties.map(d => <option key={d} value={d}>{isAr ? d : (DYN_EN[d] ?? d)}</option>)}
-        </select>
-
-        {/* Coin type tag */}
-        <select value={filters.coin_type_tag || ''}
-          onChange={e => updateFilter('coin_type_tag', e.target.value)}
-          className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none cursor-pointer focus:border-gold-500
-            ${filters.coin_type_tag ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}>
-          <option value="">{isAr ? '🏷️ النوع' : '🏷️ Type'}</option>
-          {opts.tags.map(t => <option key={t} value={t}>{t}</option>)}
+          <option value="">{isAr ? '👑 الحاكم' : '👑 Ruler'}</option>
+          {opts.rulers.map(r => <option key={r.en} value={r.en}>{isAr ? (r.ar || r.en) : r.en}</option>)}
         </select>
 
         {/* Mint */}
@@ -137,26 +94,25 @@ export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
           {opts.mints.map(m => <option key={m.en} value={m.en}>{isAr ? (m.ar || m.en) : m.en}</option>)}
         </select>
 
-        {/* Ruler */}
-        <select value={(filters as { ruler?: string }).ruler || ''}
-          onChange={e => updateFilter('ruler', e.target.value)}
+        {/* Metal */}
+        <select value={(filters as { metal?: string }).metal || ''}
+          onChange={e => updateFilter('metal', e.target.value)}
           className={`text-[11px] px-2.5 py-1.5 rounded-lg border bg-parch-cream text-ink/70 outline-none cursor-pointer focus:border-gold-500
-            ${(filters as { ruler?: string }).ruler ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}
-          dir={isAr ? 'rtl' : 'ltr'}>
-          <option value="">{isAr ? '👑 الحاكم' : '👑 Ruler'}</option>
-          {opts.rulers.map(r => <option key={r.en} value={r.en}>{isAr ? (r.ar || r.en) : r.en}</option>)}
+            ${(filters as { metal?: string }).metal ? 'border-gold-500 font-semibold' : 'border-gold-700/30'}`}>
+          <option value="">{isAr ? '⚗️ المعدن' : '⚗️ Metal'}</option>
+          {opts.metals.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
 
-        {/* Hijri range */}
+        {/* Year CE range */}
         <div className="flex items-center gap-1">
-          <input type="number" placeholder={isAr ? 'هـ من' : 'AH from'}
-            value={filters.yah_from ?? ''}
-            onChange={e => updateFilter('yah_from', e.target.value ? Number(e.target.value) : undefined)}
+          <input type="number" placeholder={isAr ? 'م من' : 'CE from'}
+            value={filters.yce_from ?? ''}
+            onChange={e => updateFilter('yce_from', e.target.value ? Number(e.target.value) : undefined)}
             className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
           <span className="text-ink/30 text-[11px]">—</span>
-          <input type="number" placeholder={isAr ? 'هـ إلى' : 'AH to'}
-            value={filters.yah_to ?? ''}
-            onChange={e => updateFilter('yah_to', e.target.value ? Number(e.target.value) : undefined)}
+          <input type="number" placeholder={isAr ? 'م إلى' : 'CE to'}
+            value={filters.yce_to ?? ''}
+            onChange={e => updateFilter('yce_to', e.target.value ? Number(e.target.value) : undefined)}
             className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
         </div>
 
@@ -164,8 +120,6 @@ export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
         <select value={sortBy} onChange={e => { setSortBy(e.target.value as SortKey); setPage(1); }}
           className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
           <option value="default">{isAr ? 'ترتيب افتراضي' : 'Default'}</option>
-          <option value="yah_asc">{isAr ? 'الأقدم هجري' : 'Oldest AH'}</option>
-          <option value="yah_desc">{isAr ? 'الأحدث هجري' : 'Newest AH'}</option>
           <option value="yce_asc">{isAr ? 'الأقدم ميلادي' : 'Oldest CE'}</option>
           <option value="yce_desc">{isAr ? 'الأحدث ميلادي' : 'Newest CE'}</option>
         </select>
@@ -177,7 +131,7 @@ export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
           </button>
         )}
 
-        <span className="text-[11px] text-ink/40 self-center mr-auto">
+        <span className="text-[11px] text-ink/40 self-center ms-auto">
           {total.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {isAr ? 'عملة' : 'coins'}
         </span>
       </div>
@@ -199,11 +153,11 @@ export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
                   <th className={`px-3 py-3 ${isAr ? 'text-right' : 'text-left'}`}>
                     {isAr ? 'دار الضرب' : 'Mint'}
                   </th>
-                  <th className="px-3 py-3 text-center">{isAr ? 'سنة هـ' : 'Year AH'}</th>
-                  <th className="px-3 py-3 text-center">{isAr ? 'النوع' : 'Type'}</th>
+                  <th className="px-3 py-3 text-center">{isAr ? 'السنة م' : 'Year CE'}</th>
                   <th className={`px-3 py-3 ${isAr ? 'text-right' : 'text-left'}`}>
-                    {isAr ? 'السلالة · الحاكم' : 'Dynasty · Ruler'}
+                    {isAr ? 'الحاكم' : 'Ruler'}
                   </th>
+                  <th className="px-3 py-3 text-center">{isAr ? 'المعدن' : 'Metal'}</th>
                   <th className="px-3 py-3 text-center">{isAr ? 'المرجع' : 'Ref'}</th>
                 </tr>
               </thead>
@@ -220,29 +174,20 @@ export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={coin.o} alt="" className="w-9 h-9 rounded-full object-cover border border-gold-700/30 mx-auto" />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-parch-dark border border-gold-700/20 mx-auto flex items-center justify-center text-[10px] text-ink/20">☪</div>
+                        <div className="w-9 h-9 rounded-full bg-parch-dark border border-gold-700/20 mx-auto flex items-center justify-center text-[10px] text-ink/20">⚔</div>
                       )}
                     </td>
-                    <td className="px-3 py-2 font-amiri text-[13px] text-ink/80" dir={isAr ? 'rtl' : 'ltr'}>
+                    <td className="px-3 py-2 text-ink/80" dir={isAr ? 'rtl' : 'ltr'}>
                       {isAr ? (coin.mint_ar || coin.mint || '—') : (coin.mint || '—')}
                     </td>
                     <td className="px-3 py-2 text-center text-ink/70">
-                      {coin.yah || '—'}
+                      {coin.yce || '—'}
                     </td>
-                    <td className="px-3 py-2 text-center">
-                      {coin.coin_type_tag ? (
-                        <span className="inline-block px-2 py-0.5 rounded-full text-[10px] bg-gold-500/10 text-gold-700 border border-gold-700/20 whitespace-nowrap">
-                          {isAr ? (TAG_AR[coin.coin_type_tag] ?? coin.coin_type_tag) : coin.coin_type_tag}
-                        </span>
-                      ) : '—'}
+                    <td className="px-3 py-2 font-amiri text-[13px]" dir={isAr ? 'rtl' : 'ltr'}>
+                      {isAr ? (coin.ruler_ar || coin.ruler || '—') : (coin.ruler || '—')}
                     </td>
-                    <td className="px-3 py-2" dir={isAr ? 'rtl' : 'ltr'}>
-                      <div className="font-amiri text-[12px] text-ink/60">
-                        {isAr ? coin.dyn : (DYN_EN[coin.dyn ?? ''] ?? coin.dyn)}
-                      </div>
-                      <div className="font-amiri text-[11px] text-ink/40">
-                        {isAr ? (coin.ruler_ar || coin.ruler || '') : (coin.ruler || coin.ruler_ar || '')}
-                      </div>
+                    <td className="px-3 py-2 text-center text-ink/70">
+                      {coin.metal || '—'}
                     </td>
                     <td className="px-3 py-2 text-center">
                       <Link
@@ -266,7 +211,6 @@ export default function CoinIndexPage({ locale }: CoinIndexPageProps) {
             </table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-5 flex-wrap">
               <button onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}

@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { AuthProvider } from '@/lib/authContext';
 import { DarkModeProvider } from '@/lib/darkModeContext';
+import SiteFooter from '@/components/layout/SiteFooter';
 
 const BASE_URL = 'https://arabismatica.arabcollector.com';
 
@@ -108,6 +109,7 @@ export default async function LocaleLayout({
           <AuthProvider locale={locale}>
             <DarkModeProvider>
               {children}
+              <SiteFooter locale={locale} />
             </DarkModeProvider>
           </AuthProvider>
         </NextIntlClientProvider>

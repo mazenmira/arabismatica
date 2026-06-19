@@ -40,8 +40,9 @@ const TOP_NAV_ITEMS_AR: NavTopItem[] = [
   ]},
   { label: 'العالم القديم', children: [
     { label: 'العملات الساسانية', href: '/ar/sasanian', grandchildren: [
-      { label: 'الحكام',    href: '/ar/sasanian/rulers' },
-      { label: 'دور الضرب', href: '/ar/sasanian/mints' },
+      { label: 'الحكام',       href: '/ar/sasanian/rulers' },
+      { label: 'دور الضرب',    href: '/ar/sasanian/mints' },
+      { label: 'فهرس العملات', href: '/ar/sasanian/coin-index' },
     ]},
     { label: 'العملات النبطية (قريباً)',    href: '' },
     { label: 'العملات البيزنطية (قريباً)',  href: '' },
@@ -80,8 +81,9 @@ const TOP_NAV_ITEMS_EN: NavTopItem[] = [
   ]},
   { label: 'Ancient World', children: [
     { label: 'Sasanian Coins', href: '/en/sasanian', grandchildren: [
-      { label: 'Rulers', href: '/en/sasanian/rulers' },
-      { label: 'Mints',  href: '/en/sasanian/mints' },
+      { label: 'Rulers',     href: '/en/sasanian/rulers' },
+      { label: 'Mints',      href: '/en/sasanian/mints' },
+      { label: 'Coin Index', href: '/en/sasanian/coin-index' },
     ]},
     { label: 'Nabataean Coins (soon)',       href: '' },
     { label: 'Byzantine Arab Coins (soon)', href: '' },
@@ -131,6 +133,7 @@ const TOP_NAV_ITEMS_DE: NavTopItem[] = [
     { label: 'Sassanidische Münzen', href: '/de/sasanian', grandchildren: [
       { label: 'Herrscher',   href: '/de/sasanian/rulers' },
       { label: 'Münzstätten', href: '/de/sasanian/mints' },
+      { label: 'Münzindex',   href: '/de/sasanian/coin-index' },
     ]},
     { label: 'Nabatäische Münzen (bald)',         href: '' },
     { label: 'Byzantinisch-arab. Münzen (bald)',  href: '' },
