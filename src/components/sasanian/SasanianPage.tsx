@@ -6,6 +6,8 @@ import { Search, X, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-rea
 import { getSasanianCoins, getSasanianFilters } from '@/lib/coinsApi';
 import type { CoinRow, SasanianCoinFilters } from '@/lib/coinsApi';
 import { supabase } from '@/lib/supabase';
+import ComboFilter from '@/components/ui/ComboFilter';
+import type { ComboOption } from '@/components/ui/ComboFilter';
 import CoinCard from '@/components/catalogue/CoinCard';
 import CoinModal from '@/components/catalogue/CoinModal';
 import { useDarkMode } from '@/lib/darkModeContext';
@@ -16,8 +18,6 @@ const METALS_AR: Record<string, string> = {
   Lead: 'رصاص', Copper: 'نحاس', 'Fourrée': 'مطلي',
 };
 
-const PER_PAGE = 48;
-
 const TOP_MINTS = [
   { en: 'Gundeshapur', ar: 'جنديشاپور' },
   { en: 'Ray',         ar: 'الري' },
@@ -27,106 +27,7 @@ const TOP_MINTS = [
   { en: 'Nishapur',    ar: 'نيسابور' },
 ];
 
-// ── Searchable autocomplete ────────────────────────────────────────────────
-interface AutoOption { en: string; ar: string | null }
-
-function SearchableSelect({
-  value, onSelect, cc, field, placeholderEn, placeholderAr, isAr,
-}: {
-  value: string;
-  onSelect: (v: string) => void;
-  cc: string;
-  field: 'mint' | 'ruler';
-  placeholderEn: string;
-  placeholderAr: string;
-  isAr: boolean;
-}) {
-  const [inputVal, setInputVal] = useState('');
-  const [options,  setOptions]  = useState<AutoOption[]>([]);
-  const [open,     setOpen]     = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const timerRef     = useRef<NodeJS.Timeout>();
-
-  useEffect(() => { if (!value) setInputVal(''); }, [value]);
-
-  useEffect(() => {
-    clearTimeout(timerRef.current);
-    if (inputVal.length < 2) { setOptions([]); setOpen(false); return; }
-    timerRef.current = setTimeout(async () => {
-      const enField = field;
-      const arField = field === 'mint' ? 'mint_ar' : 'ruler_ar';
-      const { data } = await supabase
-        .from('coins')
-        .select(`${enField}, ${arField}`)
-        .eq('cc', cc)
-        .ilike(enField, `%${inputVal}%`)
-        .neq(enField, '')
-        .limit(100);
-      const seen = new Set<string>();
-      const opts: AutoOption[] = [];
-      for (const row of (data ?? [])) {
-        const enVal = (row as Record<string, string>)[enField];
-        const arVal = (row as Record<string, string>)[arField] ?? null;
-        if (enVal && !seen.has(enVal)) { seen.add(enVal); opts.push({ en: enVal, ar: arVal }); }
-      }
-      setOptions(opts.slice(0, 20));
-      setOpen(opts.length > 0);
-    }, 300);
-    return () => clearTimeout(timerRef.current);
-  }, [inputVal, cc, field]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const handleSelect = (opt: AutoOption) => {
-    onSelect(opt.en);
-    setInputVal(isAr ? (opt.ar || opt.en) : opt.en);
-    setOpen(false);
-  };
-
-  const handleClear = () => { onSelect(''); setInputVal(''); setOptions([]); setOpen(false); };
-
-  return (
-    <div ref={containerRef} className="relative">
-      <div className="flex items-center gap-0.5 rounded-lg border border-gold-700/30 bg-parch-cream overflow-hidden focus-within:border-gold-500">
-        <input
-          value={value
-            ? (isAr ? (options.find(o => o.en === value)?.ar || value) : value)
-            : inputVal}
-          readOnly={!!value}
-          onChange={e => { if (!value) setInputVal(e.target.value); }}
-          onFocus={() => { if (!value && inputVal.length >= 2) setOpen(true); }}
-          placeholder={isAr ? placeholderAr : placeholderEn}
-          className="text-[11px] px-2.5 py-1.5 bg-transparent text-ink/70 outline-none w-[140px] font-cairo placeholder:text-ink/40 cursor-text"
-        />
-        {value ? (
-          <button onClick={handleClear} className="pe-2 text-ink/40 hover:text-ink/70 shrink-0"><X size={11} /></button>
-        ) : (
-          <ChevronDown size={11} className="pe-2 text-ink/30 shrink-0 pointer-events-none" />
-        )}
-      </div>
-      {open && options.length > 0 && (
-        <div className="absolute top-full start-0 mt-1 w-56 bg-parch-cream border border-gold-700/25 rounded-lg shadow-lg z-50 max-h-52 overflow-y-auto">
-          {options.map(opt => (
-            <button
-              key={opt.en}
-              onMouseDown={e => { e.preventDefault(); handleSelect(opt); }}
-              className="w-full text-start px-3 py-1.5 text-[11px] hover:bg-gold-500/10 text-ink/70 flex justify-between gap-2"
-            >
-              <span className="truncate">{isAr ? (opt.ar || opt.en) : opt.en}</span>
-              {opt.ar && !isAr && <span className="text-ink/30 shrink-0 font-cairo">{opt.ar}</span>}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+const PER_PAGE = 48;
 
 function SkeletonCard() {
   return (
@@ -157,18 +58,45 @@ export default function SasanianPage({ locale }: { locale: string }) {
   const [total,        setTotal]        = useState(7995);
   const [loading,      setLoading]      = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
-  const [filters,      setFilters]      = useState<{
-    rulers: { en: string; ar: string | null }[];
-    mints:  { en: string; ar: string | null }[];
-    metals: string[];
-  }>({ rulers: [], mints: [], metals: [] });
-
+  const [metals,       setMetals]       = useState<string[]>([]);
   const queryRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    getSasanianFilters().then(setFilters).catch(() => {});
+    getSasanianFilters()
+      .then(f => setMetals(f.metals?.length ? f.metals : ['Gold','Silver','Bronze','Billon','Lead','Copper']))
+      .catch(() => setMetals(['Gold','Silver','Bronze','Billon','Lead','Copper']));
   }, []);
 
+  // ── ComboFilter loaders ─────────────────────────────────────────────────
+  const loadMints = useCallback(async (q: string): Promise<ComboOption[]> => {
+    const { data } = await supabase
+      .from('coins')
+      .select('mint, mint_ar')
+      .eq('cc', 'SS')
+      .neq('mint', '')
+      .ilike('mint', q ? `%${q}%` : '%')
+      .limit(50);
+    const seen = new Set<string>();
+    return (data ?? [])
+      .filter(r => { if (!r.mint || seen.has(r.mint)) return false; seen.add(r.mint); return true; })
+      .map(r => ({ value: r.mint, label: isAr && r.mint_ar ? r.mint_ar : r.mint }));
+  }, [isAr]);
+
+  const loadRulers = useCallback(async (q: string): Promise<ComboOption[]> => {
+    const { data } = await supabase
+      .from('coins')
+      .select('ruler, ruler_ar')
+      .eq('cc', 'SS')
+      .neq('ruler', '')
+      .ilike('ruler', q ? `%${q}%` : '%')
+      .limit(50);
+    const seen = new Set<string>();
+    return (data ?? [])
+      .filter(r => { if (!r.ruler || seen.has(r.ruler)) return false; seen.add(r.ruler); return true; })
+      .map(r => ({ value: r.ruler, label: isAr && r.ruler_ar ? r.ruler_ar : r.ruler }));
+  }, [isAr]);
+
+  // ── Fetch ───────────────────────────────────────────────────────────────
   const doFetch = useCallback(() => {
     setLoading(true);
     const f: SasanianCoinFilters = {};
@@ -217,7 +145,7 @@ export default function SasanianPage({ locale }: { locale: string }) {
         style={darkMode ? { filter: 'invert(1) hue-rotate(180deg)' } : {}}
       >
 
-        {/* ── SEARCH ─────────────────────────────────────────────────────── */}
+        {/* ── SEARCH ────────────────────────────────────────────────────── */}
         <div className="border-b border-gold-700/15 bg-white/50 py-3">
           <div className="relative">
             <Search size={15} className="absolute top-1/2 -translate-y-1/2 start-4 text-gold-500/50" />
@@ -230,42 +158,34 @@ export default function SasanianPage({ locale }: { locale: string }) {
           </div>
         </div>
 
-        {/* ── FILTER ROW ─────────────────────────────────────────────────── */}
+        {/* ── FILTER ROW ────────────────────────────────────────────────── */}
         <div className="bg-parch sticky top-[167px] z-30 border-b border-gold-700/15 shadow-sm">
           <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-2 flex-wrap">
 
-            {/* Ruler — searchable autocomplete */}
-            <SearchableSelect
+            {/* Ruler — ComboFilter */}
+            <ComboFilter
+              placeholder={isAr ? 'كل الحكام' : 'All Rulers'}
               value={ruler}
-              onSelect={val => { setRuler(val); setPage(1); }}
-              cc="SS"
-              field="ruler"
-              placeholderEn="Search rulers…"
-              placeholderAr="ابحث في الحكام…"
-              isAr={isAr}
+              onChange={v => { setRuler(v); setPage(1); }}
+              loadOptions={loadRulers}
             />
 
-            {/* Mint — searchable autocomplete */}
-            <SearchableSelect
+            {/* Mint — ComboFilter */}
+            <ComboFilter
+              placeholder={isAr ? 'كل دور الضرب' : 'All Mints'}
               value={mint}
-              onSelect={val => { setMint(val); setPage(1); }}
-              cc="SS"
-              field="mint"
-              placeholderEn="Search mints…"
-              placeholderAr="ابحث في دور الضرب…"
-              isAr={isAr}
+              onChange={v => { setMint(v); setPage(1); }}
+              loadOptions={loadMints}
             />
 
             {/* Metal */}
             <select value={metal} onChange={e => { setMetal(e.target.value); setPage(1); }}
               className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
               <option value="">{isAr ? 'كل المعادن' : 'All Metals'}</option>
-              {filters.metals.map(m => (
-                <option key={m} value={m}>{isAr ? (METALS_AR[m] ?? m) : m}</option>
-              ))}
+              {metals.map(m => <option key={m} value={m}>{isAr ? (METALS_AR[m] ?? m) : m}</option>)}
             </select>
 
-            {/* Year CE toggle */}
+            {/* Date toggle */}
             <button
               onClick={() => setMoreFilters(!moreFilters)}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
@@ -275,14 +195,12 @@ export default function SasanianPage({ locale }: { locale: string }) {
               {moreFilters ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
 
-            {/* Results count */}
             <div className="flex items-center gap-2 ms-auto">
               <span className="text-[11px] text-ink/40">
                 {total.toLocaleString(isAr ? 'ar-EG' : 'en-US')} {isAr ? 'عملة' : 'coins'}
               </span>
             </div>
 
-            {/* Clear */}
             {activeCount > 0 && (
               <button onClick={clearAll}
                 className="flex items-center gap-1 text-[11px] text-gold-600 hover:text-gold-500 border border-gold-700/30 rounded-full px-2.5 py-1 transition-colors">
@@ -293,7 +211,7 @@ export default function SasanianPage({ locale }: { locale: string }) {
           </div>
         </div>
 
-        {/* ── YEAR RANGE + TOP MINTS ─────────────────────────────────────── */}
+        {/* ── EXPANDED: year range + top mint pills ─────────────────────── */}
         {moreFilters && (
           <div className="border-b border-gold-700/10 bg-parch-cream/60 px-4 py-3 flex flex-col gap-3">
             <div className="flex items-center gap-3 flex-wrap">
@@ -326,7 +244,7 @@ export default function SasanianPage({ locale }: { locale: string }) {
           </div>
         )}
 
-        {/* ── ACTIVE FILTER PILLS ────────────────────────────────────────── */}
+        {/* ── ACTIVE FILTER TAGS ────────────────────────────────────────── */}
         {activeCount > 0 && (
           <div className="flex flex-wrap gap-1.5 py-2 px-4">
             {ruler && (
@@ -356,7 +274,7 @@ export default function SasanianPage({ locale }: { locale: string }) {
           </div>
         )}
 
-        {/* ── COIN GRID ──────────────────────────────────────────────────── */}
+        {/* ── COIN GRID ─────────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 px-4 pt-4">
           {loading
             ? Array.from({ length: 24 }).map((_, i) => <SkeletonCard key={i} />)
@@ -377,7 +295,7 @@ export default function SasanianPage({ locale }: { locale: string }) {
           </div>
         )}
 
-        {/* ── PAGINATION ─────────────────────────────────────────────────── */}
+        {/* ── PAGINATION ────────────────────────────────────────────────── */}
         {totalPages > 1 && !loading && (
           <div className="flex items-center justify-center gap-2 mt-6 pb-8 flex-wrap">
             <button onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 200, behavior: 'smooth' }); }}
@@ -385,7 +303,6 @@ export default function SasanianPage({ locale }: { locale: string }) {
               className="text-[12px] px-3 py-1.5 rounded-full border border-amber-200 text-amber-700 disabled:opacity-30 hover:bg-amber-50">
               {isAr ? '→' : '←'}
             </button>
-
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               const p = page <= 3 ? i + 1 : page - 2 + i;
               if (p < 1 || p > totalPages) return null;
@@ -397,7 +314,6 @@ export default function SasanianPage({ locale }: { locale: string }) {
                 </button>
               );
             })}
-
             <button onClick={() => { setPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 200, behavior: 'smooth' }); }}
               disabled={page === totalPages}
               className="text-[12px] px-3 py-1.5 rounded-full border border-amber-200 text-amber-700 disabled:opacity-30 hover:bg-amber-50">
@@ -406,7 +322,7 @@ export default function SasanianPage({ locale }: { locale: string }) {
           </div>
         )}
 
-        {/* ── BACK ───────────────────────────────────────────────────────── */}
+        {/* ── BACK ──────────────────────────────────────────────────────── */}
         <div className="py-6 border-t border-amber-100 px-4">
           <Link href={`/${locale}`}
             className="inline-flex items-center gap-2 text-[13px] text-amber-700 hover:text-amber-900 transition-colors">
