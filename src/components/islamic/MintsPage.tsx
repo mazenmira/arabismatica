@@ -18,7 +18,12 @@ export default function MintsPage({ locale }: MintsPageProps) {
 
   useEffect(() => {
     getMintStats()
-      .then(rows => setRows(rows.filter(r => r.mint_ar && r.mint_ar.trim())))
+      .then(rows => setRows(rows.filter(r =>
+        r.total > 10 &&
+        r.mint &&
+        r.mint.length <= 40 &&
+        !['uncertain','unidentified','not legible','corrupt','illegible'].some(t => r.mint.toLowerCase().includes(t))
+      )))
       .finally(() => setLoading(false));
   }, []);
 

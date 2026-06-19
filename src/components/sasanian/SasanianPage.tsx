@@ -4,8 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Search, X, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { getSasanianCoins, getSasanianFilters } from '@/lib/coinsApi';
-import type { CoinRow, SasanianCoinFilters } from '@/lib/coinsApi';
-import { supabase } from '@/lib/supabase';
+import type { CoinRow, SasanianCoinFilters, SasanianFilters } from '@/lib/coinsApi';
 import ComboFilter from '@/components/ui/ComboFilter';
 import type { ComboOption } from '@/components/ui/ComboFilter';
 import CoinCard from '@/components/catalogue/CoinCard';
@@ -59,41 +58,35 @@ export default function SasanianPage({ locale }: { locale: string }) {
   const [loading,      setLoading]      = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [metals,       setMetals]       = useState<string[]>([]);
-  const queryRef = useRef<NodeJS.Timeout>();
+  const queryRef   = useRef<NodeJS.Timeout>();
+  const ssFilters  = useRef<SasanianFilters | null>(null);
 
   useEffect(() => {
     getSasanianFilters()
-      .then(f => setMetals(f.metals?.length ? f.metals : ['Gold','Silver','Bronze','Billon','Lead','Copper']))
+      .then(f => {
+        ssFilters.current = f;
+        setMetals(f.metals?.length ? f.metals : ['Gold','Silver','Bronze','Billon','Lead','Copper']);
+      })
       .catch(() => setMetals(['Gold','Silver','Bronze','Billon','Lead','Copper']));
   }, []);
 
-  // ── ComboFilter loaders ─────────────────────────────────────────────────
+  // ── ComboFilter loaders — sorted by coin count descending ──────────────────
   const loadMints = useCallback(async (q: string): Promise<ComboOption[]> => {
-    const { data } = await supabase
-      .from('coins')
-      .select('mint, mint_ar')
-      .eq('cc', 'SS')
-      .neq('mint', '')
-      .ilike('mint', q ? `%${q}%` : '%')
-      .limit(50);
-    const seen = new Set<string>();
-    return (data ?? [])
-      .filter(r => { if (!r.mint || seen.has(r.mint)) return false; seen.add(r.mint); return true; })
-      .map(r => ({ value: r.mint, label: isAr && r.mint_ar ? r.mint_ar : r.mint }));
+    const all = ssFilters.current?.mints ?? [];
+    const lower = q.toLowerCase();
+    return all
+      .filter(r => !q || r.en.toLowerCase().includes(lower) || (r.ar ?? '').includes(q))
+      .slice(0, 50)
+      .map(r => ({ value: r.en, label: isAr && r.ar ? r.ar : r.en }));
   }, [isAr]);
 
   const loadRulers = useCallback(async (q: string): Promise<ComboOption[]> => {
-    const { data } = await supabase
-      .from('coins')
-      .select('ruler, ruler_ar')
-      .eq('cc', 'SS')
-      .neq('ruler', '')
-      .ilike('ruler', q ? `%${q}%` : '%')
-      .limit(50);
-    const seen = new Set<string>();
-    return (data ?? [])
-      .filter(r => { if (!r.ruler || seen.has(r.ruler)) return false; seen.add(r.ruler); return true; })
-      .map(r => ({ value: r.ruler, label: isAr && r.ruler_ar ? r.ruler_ar : r.ruler }));
+    const all = ssFilters.current?.rulers ?? [];
+    const lower = q.toLowerCase();
+    return all
+      .filter(r => !q || r.en.toLowerCase().includes(lower) || (r.ar ?? '').includes(q))
+      .slice(0, 50)
+      .map(r => ({ value: r.en, label: isAr && r.ar ? r.ar : r.en }));
   }, [isAr]);
 
   // ── Fetch ───────────────────────────────────────────────────────────────

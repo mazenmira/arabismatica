@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getSasanianFilters } from '@/lib/coinsApi';
 
-interface Ruler { en: string; ar: string | null; count?: number }
+interface Ruler { en: string; ar: string | null; count: number }
 
 export default function RulersPage({ locale }: { locale: string }) {
   const isAr = locale === 'ar';
@@ -13,7 +13,7 @@ export default function RulersPage({ locale }: { locale: string }) {
 
   useEffect(() => {
     getSasanianFilters().then(f => {
-      setRulers(f.rulers.filter(r => r.en && r.en.trim() && r.ar));
+      setRulers(f.rulers.filter(r => r.en && r.en.trim() && r.ar && r.count > 5));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);

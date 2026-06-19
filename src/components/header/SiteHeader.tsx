@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Globe, ChevronDown, Wrench, Settings, Moon, Sun } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, ChevronRight, Wrench, Settings, Moon, Sun } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, LinkedinIcon, YoutubeIcon, InstagramIcon, RssIcon } from './SocialIcons';
 import ToolsSidebar from '@/components/sidebar/ToolsSidebar';
 import IdentifyModal from '@/components/modals/IdentifyModal';
@@ -13,35 +13,48 @@ import { useDarkMode } from '@/lib/darkModeContext';
 
 const WP = 'https://arabcollector.com';
 
-const TOP_NAV_ITEMS_AR = [
+type NavGrand = { label: string; href: string };
+type NavChild = {
+  label: string;
+  href?: string;
+  grandchildren?: NavGrand[];
+  isHijriTool?: boolean;
+  isToolsSidebar?: boolean;
+};
+type NavTopItem = { label: string; isTools?: boolean; children: NavChild[] };
+
+const TOP_NAV_ITEMS_AR: NavTopItem[] = [
   { label: 'المقتني العربي', children: [
     { label: 'زيارة المقتني العربي', href: `${WP}/` },
     { label: 'عن المقتني العربي',   href: `${WP}/about-us/` },
   ]},
   { label: 'العالم العربي', children: [
-    { label: 'العملات العربية الحديثة', href: '/ar/catalogue' },
-    { label: '  ↳ حسب الدولة',          href: '/ar/catalogue/countries' },
-    { label: 'العملات الإسلامية',       href: '/ar/islamic' },
-    { label: '  ↳ السلالات',            href: '/ar/islamic/dynasties' },
-    { label: '  ↳ دور الضرب',           href: '/ar/islamic/mints' },
-    { label: '  ↳ فهرس العملات',        href: '/ar/islamic/coin-index' },
+    { label: 'العملات العربية الحديثة', href: '/ar/catalogue', grandchildren: [
+      { label: 'حسب الدولة', href: '/ar/catalogue/countries' },
+    ]},
+    { label: 'العملات الإسلامية', href: '/ar/islamic', grandchildren: [
+      { label: 'السلالات',      href: '/ar/islamic/dynasties' },
+      { label: 'دور الضرب',     href: '/ar/islamic/mints' },
+      { label: 'فهرس العملات',  href: '/ar/islamic/coin-index' },
+    ]},
   ]},
   { label: 'العالم القديم', children: [
-    { label: 'العملات الساسانية',            href: '/ar/sasanian' },
-    { label: '  ↳ الحكام',                  href: '/ar/sasanian/rulers' },
-    { label: '  ↳ دور الضرب',               href: '/ar/sasanian/mints' },
-    { label: 'العملات النبطية (قريباً)',      href: '' },
-    { label: 'العملات البيزنطية (قريباً)',   href: '' },
-    { label: 'العملات البطلمية (قريباً)',    href: '' },
-    { label: 'العملات الأخمينية (قريباً)',   href: '' },
+    { label: 'العملات الساسانية', href: '/ar/sasanian', grandchildren: [
+      { label: 'الحكام',    href: '/ar/sasanian/rulers' },
+      { label: 'دور الضرب', href: '/ar/sasanian/mints' },
+    ]},
+    { label: 'العملات النبطية (قريباً)',    href: '' },
+    { label: 'العملات البيزنطية (قريباً)',  href: '' },
+    { label: 'العملات البطلمية (قريباً)',   href: '' },
+    { label: 'العملات الأخمينية (قريباً)',  href: '' },
   ]},
   { label: 'الإسلام الهندي', children: [
-    { label: 'العملات المغولية (قريباً)',    href: '' },
-    { label: 'سلطنة دلهي (قريباً)',          href: '' },
+    { label: 'العملات المغولية (قريباً)', href: '' },
+    { label: 'سلطنة دلهي (قريباً)',       href: '' },
   ]},
   { label: 'الأدوات', isTools: true, children: [
-    { label: 'محول الهجري ↔ الميلادي', href: '#hijri-converter' },
-    { label: 'باقي الأدوات الداخلية',  href: '#tools-sidebar' },
+    { label: 'محول الهجري ↔ الميلادي', isHijriTool: true },
+    { label: 'باقي الأدوات الداخلية',  isToolsSidebar: true },
     { label: 'بوابة المعرفة',           href: `${WP}/knowledge-portal/` },
     { label: 'أدوات التقييم',           href: `${WP}/grading-tools/` },
     { label: 'مختبر المقتني الصغير',    href: `${WP}/young-collector-lab/` },
@@ -50,40 +63,43 @@ const TOP_NAV_ITEMS_AR = [
   ]},
 ];
 
-const TOP_NAV_ITEMS_EN = [
+const TOP_NAV_ITEMS_EN: NavTopItem[] = [
   { label: 'The Arab Collector', children: [
     { label: 'Visit The Arab Collector', href: `${WP}/` },
     { label: 'About',                    href: `${WP}/about-us/` },
   ]},
   { label: 'Arab World', children: [
-    { label: 'Modern Arab Coins',   href: '/en/catalogue' },
-    { label: '  ↳ By Country',      href: '/en/catalogue/countries' },
-    { label: 'Islamic Coins',       href: '/en/islamic' },
-    { label: '  ↳ Dynasties',       href: '/en/islamic/dynasties' },
-    { label: '  ↳ Mints',           href: '/en/islamic/mints' },
-    { label: '  ↳ Coin Index',      href: '/en/islamic/coin-index' },
+    { label: 'Modern Arab Coins', href: '/en/catalogue', grandchildren: [
+      { label: 'By Country', href: '/en/catalogue/countries' },
+    ]},
+    { label: 'Islamic Coins', href: '/en/islamic', grandchildren: [
+      { label: 'Dynasties',  href: '/en/islamic/dynasties' },
+      { label: 'Mints',      href: '/en/islamic/mints' },
+      { label: 'Coin Index', href: '/en/islamic/coin-index' },
+    ]},
   ]},
   { label: 'Ancient World', children: [
-    { label: 'Sasanian Coins',              href: '/en/sasanian' },
-    { label: '  ↳ Rulers',                 href: '/en/sasanian/rulers' },
-    { label: '  ↳ Mints',                  href: '/en/sasanian/mints' },
-    { label: 'Nabataean Coins (soon)',      href: '' },
+    { label: 'Sasanian Coins', href: '/en/sasanian', grandchildren: [
+      { label: 'Rulers', href: '/en/sasanian/rulers' },
+      { label: 'Mints',  href: '/en/sasanian/mints' },
+    ]},
+    { label: 'Nabataean Coins (soon)',       href: '' },
     { label: 'Byzantine Arab Coins (soon)', href: '' },
-    { label: 'Ptolemaic Coins (soon)',      href: '' },
-    { label: 'Achaemenid Coins (soon)',     href: '' },
+    { label: 'Ptolemaic Coins (soon)',       href: '' },
+    { label: 'Achaemenid Coins (soon)',      href: '' },
   ]},
   { label: 'Islamic India', children: [
     { label: 'Mughal Coins (soon)',    href: '' },
     { label: 'Delhi Sultanate (soon)', href: '' },
   ]},
   { label: 'Tools', isTools: true, children: [
-    { label: 'Hijri ↔ Gregorian Converter', href: '#hijri-converter' },
-    { label: 'More Built-in Tools',          href: '#tools-sidebar' },
-    { label: 'Knowledge Portal',             href: `${WP}/knowledge-portal/` },
-    { label: 'Grading Tools',               href: `${WP}/grading-tools/` },
-    { label: 'Young Collector Lab',         href: `${WP}/young-collector-lab/` },
-    { label: 'Arab Collector Academy',      href: `${WP}/ac-academy/` },
-    { label: 'Digital Library',             href: 'https://library.arabcollector.com/' },
+    { label: 'Hijri ↔ Gregorian Converter', isHijriTool: true },
+    { label: 'More Built-in Tools',          isToolsSidebar: true },
+    { label: 'Knowledge Portal',        href: `${WP}/knowledge-portal/` },
+    { label: 'Grading Tools',           href: `${WP}/grading-tools/` },
+    { label: 'Young Collector Lab',     href: `${WP}/young-collector-lab/` },
+    { label: 'Arab Collector Academy',  href: `${WP}/ac-academy/` },
+    { label: 'Digital Library',         href: 'https://library.arabcollector.com/' },
   ]},
 ];
 
@@ -96,35 +112,38 @@ const SOCIALS = [
   { icon: RssIcon,       href: `${WP}/feed/`,                                        label: 'RSS' },
 ];
 
-const TOP_NAV_ITEMS_DE = [
+const TOP_NAV_ITEMS_DE: NavTopItem[] = [
   { label: 'The Arab Collector', children: [
     { label: 'The Arab Collector besuchen', href: `${WP}/` },
     { label: 'Über uns',                    href: `${WP}/about-us/` },
   ]},
   { label: 'Arabische Welt', children: [
-    { label: 'Moderne arabische Münzen', href: '/de/catalogue' },
-    { label: '  ↳ Nach Land',            href: '/de/catalogue/countries' },
-    { label: 'Islamische Münzen',        href: '/de/islamic' },
-    { label: '  ↳ Dynastien',            href: '/de/islamic/dynasties' },
-    { label: '  ↳ Münzstätten',          href: '/de/islamic/mints' },
-    { label: '  ↳ Münzindex',            href: '/de/islamic/coin-index' },
+    { label: 'Moderne arabische Münzen', href: '/de/catalogue', grandchildren: [
+      { label: 'Nach Land', href: '/de/catalogue/countries' },
+    ]},
+    { label: 'Islamische Münzen', href: '/de/islamic', grandchildren: [
+      { label: 'Dynastien',   href: '/de/islamic/dynasties' },
+      { label: 'Münzstätten', href: '/de/islamic/mints' },
+      { label: 'Münzindex',   href: '/de/islamic/coin-index' },
+    ]},
   ]},
   { label: 'Alte Welt', children: [
-    { label: 'Sassanidische Münzen',             href: '/de/sasanian' },
-    { label: '  ↳ Herrscher',                   href: '/de/sasanian/rulers' },
-    { label: '  ↳ Münzstätten',                 href: '/de/sasanian/mints' },
-    { label: 'Nabatäische Münzen (bald)',        href: '' },
-    { label: 'Byzantinisch-arab. Münzen (bald)', href: '' },
-    { label: 'Ptolemäische Münzen (bald)',       href: '' },
-    { label: 'Achämenidische Münzen (bald)',     href: '' },
+    { label: 'Sassanidische Münzen', href: '/de/sasanian', grandchildren: [
+      { label: 'Herrscher',   href: '/de/sasanian/rulers' },
+      { label: 'Münzstätten', href: '/de/sasanian/mints' },
+    ]},
+    { label: 'Nabatäische Münzen (bald)',         href: '' },
+    { label: 'Byzantinisch-arab. Münzen (bald)',  href: '' },
+    { label: 'Ptolemäische Münzen (bald)',        href: '' },
+    { label: 'Achämenidische Münzen (bald)',      href: '' },
   ]},
   { label: 'Islam. Indien', children: [
-    { label: 'Mogulmünzen (bald)',     href: '' },
-    { label: 'Delhi-Sultanat (bald)',  href: '' },
+    { label: 'Mogulmünzen (bald)',    href: '' },
+    { label: 'Delhi-Sultanat (bald)', href: '' },
   ]},
   { label: 'Tools', isTools: true, children: [
-    { label: 'Hidschra ↔ Gregorian',    href: '#hijri-converter' },
-    { label: 'Weitere Tools',           href: '#tools-sidebar' },
+    { label: 'Hidschra ↔ Gregorian',  isHijriTool: true },
+    { label: 'Weitere Tools',          isToolsSidebar: true },
     { label: 'Wissensportal',           href: `${WP}/knowledge-portal/` },
     { label: 'Bewertungstools',         href: `${WP}/grading-tools/` },
     { label: 'Junger Sammler Lab',      href: `${WP}/young-collector-lab/` },
@@ -146,15 +165,16 @@ interface SiteHeaderProps {
 
 export default function SiteHeader({ locale }: SiteHeaderProps) {
   const isAr = locale === 'ar';
-  const TOP_NAV_ITEMS = locale === 'ar' ? TOP_NAV_ITEMS_AR : locale === 'de' ? TOP_NAV_ITEMS_DE : TOP_NAV_ITEMS_EN;
+  const TOP_NAV_ITEMS: NavTopItem[] = locale === 'ar' ? TOP_NAV_ITEMS_AR : locale === 'de' ? TOP_NAV_ITEMS_DE : TOP_NAV_ITEMS_EN;
 
   const { user, setAuthOpen, setDashOpen, setAdminOpen } = useAuth();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const pathname = usePathname();
 
-  const [mobileOpen,   setMobileOpen]   = useState(false);
-  const [activeMenu,   setActiveMenu]   = useState<string | null>(null);
-  const [toolsOpen,    setToolsOpen]    = useState(false);
+  const [mobileOpen,    setMobileOpen]    = useState(false);
+  const [activeMenu,    setActiveMenu]    = useState<string | null>(null);
+  const [activeMobSub,  setActiveMobSub]  = useState<string | null>(null);
+  const [toolsOpen,     setToolsOpen]     = useState(false);
   const [toolDefault,  setToolDefault]  = useState<string | undefined>(undefined);
   const [identifyOpen, setIdentifyOpen] = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
@@ -246,25 +266,25 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                 <div key={item.label} className="relative group">
                   <button
                     className={`flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium rounded transition-colors whitespace-nowrap
-                      ${ (item as { isTools?: boolean }).isTools
+                      ${ item.isTools
                           ? 'bg-amber-800 hover:bg-amber-700 text-amber-50 rounded-full px-3'
                           : 'text-amber-800 hover:text-amber-950 hover:bg-amber-50' }
-                      ${activeMenu === item.label ? (item as { isTools?: boolean }).isTools ? 'bg-amber-700' : 'bg-amber-100 text-amber-950' : ''}`}
+                      ${activeMenu === item.label ? item.isTools ? 'bg-amber-700' : 'bg-amber-100 text-amber-950' : ''}`}
                     onClick={() => setActiveMenu(activeMenu === item.label ? null : item.label)}
                     onMouseEnter={() => setActiveMenu(item.label)}
                   >
-                    {(item as { isTools?: boolean }).isTools && <Wrench size={12} className="shrink-0" />}
+                    {item.isTools && <Wrench size={12} className="shrink-0" />}
                     {item.label}
                     <ChevronDown size={12} className={`transition-transform ${activeMenu === item.label ? 'rotate-180' : ''}`} />
                   </button>
 
                   {activeMenu === item.label && item.children && (
                     <div
-                      className="absolute top-full right-0 mt-1 bg-white border border-amber-200 rounded-lg shadow-lg min-w-[220px] py-1 z-50 animate-fade-in"
+                      className="absolute top-full end-0 mt-1 bg-white border border-amber-200 rounded-lg shadow-lg min-w-[220px] py-1 z-50 animate-fade-in"
                       onMouseLeave={() => setActiveMenu(null)}
                     >
                       {item.children.map((child) => {
-                        if (child.href === '#hijri-converter') {
+                        if (child.isHijriTool) {
                           return (
                             <button key={child.label} onClick={() => { setToolDefault('hijriConverter'); setToolsOpen(true); setActiveMenu(null); }}
                               className="w-full text-start block px-4 py-2.5 text-[12px] transition-colors border-b border-amber-100 last:border-0 text-amber-800 hover:text-amber-950 hover:bg-amber-50 font-medium">
@@ -272,7 +292,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                             </button>
                           );
                         }
-                        if (child.href === '#tools-sidebar') {
+                        if (child.isToolsSidebar) {
                           return (
                             <button key={child.label} onClick={() => { setToolDefault(undefined); setToolsOpen(true); setActiveMenu(null); }}
                               className="w-full text-start block px-4 py-2.5 text-[12px] transition-colors border-b border-amber-100 last:border-0 text-amber-700 hover:text-amber-950 hover:bg-amber-50">
@@ -286,6 +306,28 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                               className="block px-4 py-2.5 text-[12px] border-b border-amber-100 last:border-0 text-amber-300 cursor-default select-none">
                               {child.label}
                             </span>
+                          );
+                        }
+                        if (child.grandchildren?.length) {
+                          const isExternal = child.href.startsWith('http');
+                          return (
+                            <div key={child.label} className="relative group/sub border-b border-amber-100 last:border-0">
+                              <div className="flex items-center justify-between px-4 py-2.5 text-[12px] text-amber-700 hover:text-amber-950 hover:bg-amber-50 cursor-pointer">
+                                <a href={child.href} {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                                  className="flex-1">
+                                  {child.label}
+                                </a>
+                                <ChevronRight size={11} className="text-amber-400 shrink-0" />
+                              </div>
+                              <div className={`hidden group-hover/sub:block absolute top-0 ${isAr ? 'end-full' : 'start-full'} min-w-[160px] bg-white border border-amber-200 rounded-lg shadow-lg py-1 z-[60]`}>
+                                {child.grandchildren.map(gc => (
+                                  <a key={gc.label} href={gc.href}
+                                    className="block px-4 py-2 text-[12px] text-amber-700 hover:text-amber-950 hover:bg-amber-50 border-b border-amber-100 last:border-0">
+                                    {gc.label}
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
                           );
                         }
                         const isExternal = child.href.startsWith('http');
@@ -362,14 +404,14 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
               <div key={item.label}>
                 <button
                   className="w-full flex items-center justify-between px-5 py-3 text-[13px] text-amber-800 hover:text-amber-950 border-b border-amber-200/60"
-                  onClick={() => setActiveMenu(activeMenu === item.label ? null : item.label)}>
+                  onClick={() => { setActiveMenu(activeMenu === item.label ? null : item.label); setActiveMobSub(null); }}>
                   <span>{item.label}</span>
                   <ChevronDown size={14} className={`transition-transform ${activeMenu === item.label ? 'rotate-180' : ''}`} />
                 </button>
                 {activeMenu === item.label && item.children && (
                   <div className="bg-amber-50">
                     {item.children.map((child) => {
-                      if (child.href === '#hijri-converter') {
+                      if (child.isHijriTool) {
                         return (
                           <button key={child.label}
                             onClick={() => { setToolDefault('hijriConverter'); setToolsOpen(true); setMobileOpen(false); setActiveMenu(null); }}
@@ -378,7 +420,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                           </button>
                         );
                       }
-                      if (child.href === '#tools-sidebar') {
+                      if (child.isToolsSidebar) {
                         return (
                           <button key={child.label}
                             onClick={() => { setToolDefault(undefined); setToolsOpen(true); setMobileOpen(false); setActiveMenu(null); }}
@@ -393,6 +435,36 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                             className="block px-8 py-2.5 text-[12px] text-amber-300 border-b border-amber-100 last:border-0 cursor-default">
                             {child.label}
                           </span>
+                        );
+                      }
+                      if (child.grandchildren?.length) {
+                        const subKey = `${item.label}:${child.label}`;
+                        const subOpen = activeMobSub === subKey;
+                        return (
+                          <div key={child.label}>
+                            <div className="flex items-center border-b border-amber-100 last:border-0">
+                              <Link href={child.href}
+                                onClick={() => setMobileOpen(false)}
+                                className="flex-1 px-8 py-2.5 text-[12px] text-amber-700 hover:text-amber-950">
+                                {child.label}
+                              </Link>
+                              <button onClick={() => setActiveMobSub(subOpen ? null : subKey)}
+                                className="px-3 py-2.5 text-amber-400 hover:text-amber-700">
+                                <ChevronDown size={12} className={`transition-transform ${subOpen ? 'rotate-180' : ''}`} />
+                              </button>
+                            </div>
+                            {subOpen && (
+                              <div className="bg-amber-100/60">
+                                {child.grandchildren.map(gc => (
+                                  <Link key={gc.label} href={gc.href}
+                                    onClick={() => setMobileOpen(false)}
+                                    className="block px-12 py-2 text-[12px] text-amber-600 hover:text-amber-950 border-b border-amber-100 last:border-0">
+                                    {gc.label}
+                                  </Link>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         );
                       }
                       const isExternal = child.href.startsWith('http');

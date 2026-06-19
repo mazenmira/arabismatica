@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getSasanianFilters } from '@/lib/coinsApi';
 
-interface Mint { en: string; ar: string | null }
+interface Mint { en: string; ar: string | null; count: number }
 
 export default function MintsPage({ locale }: { locale: string }) {
   const isAr = locale === 'ar';
@@ -13,7 +13,7 @@ export default function MintsPage({ locale }: { locale: string }) {
 
   useEffect(() => {
     getSasanianFilters().then(f => {
-      setMints(f.mints.filter(m => m.en && m.en.trim() && m.ar));
+      setMints(f.mints.filter(m => m.en && m.en.trim() && m.ar && m.count > 5));
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);

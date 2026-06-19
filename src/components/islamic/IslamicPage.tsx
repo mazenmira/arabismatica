@@ -3,10 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Search, X, ChevronDown, ChevronUp, SlidersHorizontal, FileDown } from 'lucide-react';
-import { getIslamicCoins } from '@/lib/coinsApi';
-import type { CoinRow, IslamicCoinFilters } from '@/lib/coinsApi';
-// IslamicCoinFilters used below in doFetch
-import { supabase } from '@/lib/supabase';
+import { getIslamicCoins, getMintStats, getRulerStats } from '@/lib/coinsApi';
+import type { CoinRow, IslamicCoinFilters, MintStat, RulerStat } from '@/lib/coinsApi';
 import ComboFilter from '@/components/ui/ComboFilter';
 import type { ComboOption } from '@/components/ui/ComboFilter';
 import CoinCard from '@/components/catalogue/CoinCard';
@@ -111,34 +109,31 @@ export default function IslamicPage({ locale }: { locale: string }) {
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const metals = ['Gold', 'Silver', 'Bronze', 'Billon', 'Lead', 'Copper'];
   const queryRef = useRef<NodeJS.Timeout>();
+  const mintStatsRef  = useRef<MintStat[]>([]);
+  const rulerStatsRef = useRef<RulerStat[]>([]);
 
-  // ── ComboFilter loaders (memoised so the effect inside ComboFilter is stable) ──
+  useEffect(() => {
+    getMintStats().then(r => { mintStatsRef.current = r; }).catch(() => {});
+    getRulerStats().then(r => { rulerStatsRef.current = r; }).catch(() => {});
+  }, []);
+
+  // ── ComboFilter loaders — sorted by coin count descending ──────────────────
   const loadMints = useCallback(async (q: string): Promise<ComboOption[]> => {
-    const { data } = await supabase
-      .from('coins')
-      .select('mint, mint_ar')
-      .eq('cc', 'IS')
-      .neq('mint', '')
-      .ilike('mint', q ? `%${q}%` : '%')
-      .limit(50);
-    const seen = new Set<string>();
-    return (data ?? [])
-      .filter(r => { if (!r.mint || seen.has(r.mint)) return false; seen.add(r.mint); return true; })
-      .map(r => ({ value: r.mint, label: isAr && r.mint_ar ? r.mint_ar : r.mint }));
+    const all = mintStatsRef.current;
+    const lower = q.toLowerCase();
+    const filtered = all.filter(r =>
+      r.mint && (!q || r.mint.toLowerCase().includes(lower) || r.mint_ar.includes(q))
+    ).slice(0, 50);
+    return filtered.map(r => ({ value: r.mint, label: isAr && r.mint_ar ? r.mint_ar : r.mint }));
   }, [isAr]);
 
   const loadRulers = useCallback(async (q: string): Promise<ComboOption[]> => {
-    const { data } = await supabase
-      .from('coins')
-      .select('ruler, ruler_ar')
-      .eq('cc', 'IS')
-      .neq('ruler', '')
-      .ilike('ruler', q ? `%${q}%` : '%')
-      .limit(50);
-    const seen = new Set<string>();
-    return (data ?? [])
-      .filter(r => { if (!r.ruler || seen.has(r.ruler)) return false; seen.add(r.ruler); return true; })
-      .map(r => ({ value: r.ruler, label: isAr && r.ruler_ar ? r.ruler_ar : r.ruler }));
+    const all = rulerStatsRef.current;
+    const lower = q.toLowerCase();
+    const filtered = all.filter(r =>
+      r.ruler && (!q || r.ruler.toLowerCase().includes(lower) || r.ruler_ar.includes(q))
+    ).slice(0, 50);
+    return filtered.map(r => ({ value: r.ruler, label: isAr && r.ruler_ar ? r.ruler_ar : r.ruler }));
   }, [isAr]);
 
   // ── Fetch coins ─────────────────────────────────────────────────────────

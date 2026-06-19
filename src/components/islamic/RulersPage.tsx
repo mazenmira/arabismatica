@@ -20,7 +20,11 @@ export default function RulersPage({ locale }: RulersPageProps) {
 
   useEffect(() => {
     Promise.all([getRulerStats(), getDynastyStats()]).then(([rulers, dyns]) => {
-      setRows(rulers.filter(r => r.ruler_ar && r.ruler_ar.trim()));
+      setRows(rulers.filter(r =>
+        r.ruler_ar && r.ruler_ar.trim() &&
+        r.total > 5 &&
+        !['type','imitation'].some(t => r.ruler.toLowerCase().includes(t))
+      ));
       setDynasties(dyns.map(d => d.dyn).filter(Boolean));
     }).finally(() => setLoading(false));
   }, []);

@@ -191,7 +191,10 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
   // ── Grid view — Classic light style ──────────────────────────────────────
   const isZeno       = coin.nref?.startsWith('Z#');
   const denomination = (coin as Coin & { denomination?: string }).denomination;
-  const ruler        = (coin as Coin & { ruler?: string }).ruler;
+  const ruler        = (coin as Coin & { ruler?: string; ruler_ar?: string }).ruler;
+  const ruler_ar_val = (coin as Coin & { ruler?: string; ruler_ar?: string }).ruler_ar;
+  const mint_en      = (coin as Coin & { mint?: string; mint_ar?: string }).mint;
+  const mint_ar_val  = (coin as Coin & { mint?: string; mint_ar?: string }).mint_ar;
 
   return (
     <Link
@@ -251,9 +254,18 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
           <div className="text-[9px] text-ink/40 truncate">{coin.dyn}</div>
         )}
 
-        {/* Ruler for Islamic coins */}
+        {/* Ruler */}
         {ruler && (
-          <div className="text-[9px] text-gold-600/60 truncate">{ruler}</div>
+          <div className="text-[9px] text-gold-600/60 truncate">
+            {isAr && ruler_ar_val ? ruler_ar_val : ruler}
+          </div>
+        )}
+
+        {/* Mint */}
+        {mint_en && (
+          <div className="text-[9px] text-ink/35 truncate">
+            🏛 {isAr && mint_ar_val ? mint_ar_val : mint_en}
+          </div>
         )}
 
         {/* Year */}

@@ -497,7 +497,7 @@ export async function getIslamicCoins(
 export async function getIslamicFilters(): Promise<IslamicFilters> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function distinctIS(col: string): Promise<string[]> {
-    const { data } = await db.from('coins').select(col).eq('cc', 'IS');
+    const { data } = await db.from('coins').select(col).eq('cc', 'IS').limit(10000);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const vals: string[] = (data ?? []).map((r: any) => r[col]).filter(Boolean) as string[];
     return Array.from(new Set(vals)).sort();
@@ -506,8 +506,8 @@ export async function getIslamicFilters(): Promise<IslamicFilters> {
   const [dynasties, tags, mintData, rulerData] = await Promise.all([
     distinctIS('dyn'),
     distinctIS('coin_type_tag'),
-    db.from('coins').select('mint,mint_ar').eq('cc', 'IS').neq('mint', ''),
-    db.from('coins').select('ruler,ruler_ar').eq('cc', 'IS').neq('ruler', ''),
+    db.from('coins').select('mint,mint_ar').eq('cc', 'IS').neq('mint', '').limit(10000),
+    db.from('coins').select('ruler,ruler_ar').eq('cc', 'IS').neq('ruler', '').limit(10000),
   ]);
 
   // Build bilingual mint pairs (keyed by English name for uniqueness)
@@ -543,8 +543,8 @@ export interface SasanianCoinFilters extends CoinFilters {
 }
 
 export interface SasanianFilters {
-  rulers: { en: string; ar: string | null }[];
-  mints:  { en: string; ar: string | null }[];
+  rulers: { en: string; ar: string | null; count: number }[];
+  mints:  { en: string; ar: string | null; count: number }[];
   metals: string[];
 }
 
@@ -584,28 +584,36 @@ export async function getSasanianCoins(
 
 export async function getSasanianFilters(): Promise<SasanianFilters> {
   const [mintData, rulerData, metalData] = await Promise.all([
-    db.from('coins').select('mint,mint_ar').eq('cc', 'SS').neq('mint', ''),
-    db.from('coins').select('ruler,ruler_ar').eq('cc', 'SS').neq('ruler', ''),
-    db.from('coins').select('metal').eq('cc', 'SS'),
+    db.from('coins').select('mint,mint_ar').eq('cc', 'SS').neq('mint', '').limit(10000),
+    db.from('coins').select('ruler,ruler_ar').eq('cc', 'SS').neq('ruler', '').limit(10000),
+    db.from('coins').select('metal').eq('cc', 'SS').limit(10000),
   ]);
 
-  const mintMap = new Map<string, string | null>();
+  const mintMap = new Map<string, { ar: string | null; count: number }>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (mintData.data ?? []).forEach((r: any) => {
-    if (r.mint && !mintMap.has(r.mint)) mintMap.set(r.mint, r.mint_ar || null);
+    if (r.mint) {
+      const entry = mintMap.get(r.mint) ?? { ar: r.mint_ar || null, count: 0 };
+      entry.count++;
+      mintMap.set(r.mint, entry);
+    }
   });
   const mints = Array.from(mintMap.entries())
-    .map(([en, ar]) => ({ en, ar }))
-    .sort((a, b) => a.en.localeCompare(b.en));
+    .map(([en, { ar, count }]) => ({ en, ar, count }))
+    .sort((a, b) => b.count - a.count);
 
-  const rulerMap = new Map<string, string | null>();
+  const rulerMap = new Map<string, { ar: string | null; count: number }>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (rulerData.data ?? []).forEach((r: any) => {
-    if (r.ruler && !rulerMap.has(r.ruler)) rulerMap.set(r.ruler, r.ruler_ar || null);
+    if (r.ruler) {
+      const entry = rulerMap.get(r.ruler) ?? { ar: r.ruler_ar || null, count: 0 };
+      entry.count++;
+      rulerMap.set(r.ruler, entry);
+    }
   });
   const rulers = Array.from(rulerMap.entries())
-    .map(([en, ar]) => ({ en, ar }))
-    .sort((a, b) => a.en.localeCompare(b.en));
+    .map(([en, { ar, count }]) => ({ en, ar, count }))
+    .sort((a, b) => b.count - a.count);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const metalSet = new Set<string>((metalData.data ?? []).map((r: any) => r.metal).filter(Boolean));
