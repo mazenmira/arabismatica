@@ -15,7 +15,7 @@ export interface ShellNavItem {
 interface CatalogueShellProps {
   catalogueId: string;
   locale: string;
-  heroSize: 'large' | 'compact';
+  heroSize?: 'large' | 'compact';
   heroTitle: string;
   heroSubtitle?: string;
   heroCoinCount?: number;
@@ -27,7 +27,6 @@ interface CatalogueShellProps {
 export default function CatalogueShell({
   catalogueId,
   locale,
-  heroSize,
   heroTitle,
   heroSubtitle,
   heroCoinCount,
