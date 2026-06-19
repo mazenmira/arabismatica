@@ -18,6 +18,15 @@ const METALS_AR: Record<string, string> = {
 
 const PER_PAGE = 48;
 
+const TOP_MINTS = [
+  { en: 'Gundeshapur', ar: 'جنديشاپور' },
+  { en: 'Ray',         ar: 'الري' },
+  { en: 'Bishapur',    ar: 'بيشابور' },
+  { en: 'Merv',        ar: 'مرو' },
+  { en: 'Ctesiphon',   ar: 'المدائن' },
+  { en: 'Nishapur',    ar: 'نيسابور' },
+];
+
 // ── Searchable autocomplete ────────────────────────────────────────────────
 interface AutoOption { en: string; ar: string | null }
 
@@ -284,19 +293,36 @@ export default function SasanianPage({ locale }: { locale: string }) {
           </div>
         </div>
 
-        {/* ── YEAR RANGE ─────────────────────────────────────────────────── */}
+        {/* ── YEAR RANGE + TOP MINTS ─────────────────────────────────────── */}
         {moreFilters && (
-          <div className="border-b border-gold-700/10 bg-parch-cream/60 px-4 py-3 flex items-center gap-3 flex-wrap">
-            <span className="text-[11px] text-ink/60 font-medium shrink-0">
-              {isAr ? 'السنة الميلادية:' : 'Year CE:'}
-            </span>
-            <input value={yceFrom} onChange={e => { setYceFrom(e.target.value); setPage(1); }}
-              type="number" placeholder={isAr ? 'من' : 'From'}
-              className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
-            <span className="text-ink/30 text-[11px]">—</span>
-            <input value={yceTo} onChange={e => { setYceTo(e.target.value); setPage(1); }}
-              type="number" placeholder={isAr ? 'إلى' : 'To'}
-              className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+          <div className="border-b border-gold-700/10 bg-parch-cream/60 px-4 py-3 flex flex-col gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-[11px] text-ink/60 font-medium shrink-0">
+                {isAr ? 'السنة الميلادية:' : 'Year CE:'}
+              </span>
+              <input value={yceFrom} onChange={e => { setYceFrom(e.target.value); setPage(1); }}
+                type="number" placeholder={isAr ? 'من' : 'From'}
+                className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+              <span className="text-ink/30 text-[11px]">—</span>
+              <input value={yceTo} onChange={e => { setYceTo(e.target.value); setPage(1); }}
+                type="number" placeholder={isAr ? 'إلى' : 'To'}
+                className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] text-ink/60 font-medium shrink-0">
+                {isAr ? 'دور الضرب:' : 'Top mints:'}
+              </span>
+              {TOP_MINTS.map(m => (
+                <button key={m.en}
+                  onClick={() => { setMint(mint === m.en ? '' : m.en); setPage(1); }}
+                  className={`text-[10px] px-2.5 py-1 rounded-full border shrink-0 transition-all font-cairo
+                    ${mint === m.en
+                      ? 'bg-gold-500 border-gold-500 text-ink font-semibold'
+                      : 'border-gold-700/25 text-ink/50 hover:border-gold-500/60 hover:text-ink/70'}`}>
+                  {isAr ? m.ar : m.en}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

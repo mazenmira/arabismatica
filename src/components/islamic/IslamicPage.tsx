@@ -52,16 +52,14 @@ const DYNASTIES = [
   { value: 'سلطنات شرق أفريقيا',    labelAr: 'سلطنات شرق أفريقيا',    labelEn: 'East African Sultanates' },
 ];
 
-// Top-8 mints quick-select pills
+// Top mints quick-select pills
 const TOP_MINTS = [
-  { en: 'Damascus',         ar: 'دمشق' },
-  { en: 'Aleppo',           ar: 'حلب' },
-  { en: 'Baghdad',          ar: 'بغداد' },
-  { en: 'al-Basra',         ar: 'البصرة' },
-  { en: 'al-Kufa',          ar: 'الكوفة' },
-  { en: 'Nishapur',         ar: 'نيسابور' },
-  { en: 'Samarqand',        ar: 'سمرقند' },
-  { en: 'al-Qahira',        ar: 'القاهرة' },
+  { en: 'Damascus',   ar: 'دمشق' },
+  { en: 'Aleppo',     ar: 'حلب' },
+  { en: 'Baghdad',    ar: 'بغداد' },
+  { en: 'al-Basra',   ar: 'البصرة' },
+  { en: 'Nishapur',   ar: 'نيسابور' },
+  { en: 'Samarqand',  ar: 'سمرقند' },
 ];
 
 // Top-6 rulers quick-select pills
