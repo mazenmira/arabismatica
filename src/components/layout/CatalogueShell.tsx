@@ -40,25 +40,19 @@ export default function CatalogueShell({
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const altLocale = isAr ? 'en' : 'ar';
-  const altPath   = pathname.replace(`/${locale}/`, `/${altLocale}/`);
-  const dePath    = pathname.replace(`/${locale}/`, '/de/');
-
   return (
-    <div className="min-h-screen" style={{ background: 'var(--parch, #FAF6EE)' }} dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[#FAF6EE]" dir={isAr ? 'rtl' : 'ltr'}>
       <SiteHeader locale={locale} />
 
-      {/* ── TOP BAR ─────────────────────────────────────────────────────── */}
-      <div className="bg-ink text-xs border-b border-gold-700/30 sticky top-[64px] z-40">
-        <div className="max-w-[1440px] mx-auto px-4 h-10 flex items-center gap-3">
-          {/* Back to main site */}
+      {/* ── BREADCRUMB BAR ──────────────────────────────────────────────── */}
+      <div className="bg-ink border-b border-gold-700/30 sticky top-[48px] z-40">
+        <div className="max-w-[1440px] mx-auto px-4 h-9 flex items-center gap-2">
           <Link href={`/${locale}`}
-            className="flex items-center gap-1.5 text-gold-400 hover:text-gold-200 text-[12px] transition-colors shrink-0">
-            {isAr ? '← أرابيزماتيكا' : '← Arabismatica'}
+            className="text-gold-500 hover:text-gold-300 text-[11px] transition-colors shrink-0">
+            {isAr ? 'أرابيزماتيكا' : 'Arabismatica'}
           </Link>
-
-          <span className="text-gold-700 hidden sm:block">/</span>
-          <span className="text-gold-300 text-[12px] hidden sm:block font-amiri">{heroTitle}</span>
+          <span className="text-gold-700 text-[11px]">/</span>
+          <span className="text-gold-300 text-[11px] font-amiri">{heroTitle}</span>
 
           <div className="flex-1" />
 
@@ -68,107 +62,97 @@ export default function CatalogueShell({
             <Link href={pathname.replace(`/${locale}/`, '/ar/')}
               className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'ar' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>ع</Link>
             <span className="text-gold-700 text-[10px]">|</span>
-            <Link href={altLocale === 'en' ? altPath : pathname.replace(`/${locale}/`, '/en/')}
+            <Link href={pathname.replace(`/${locale}/`, '/en/')}
               className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'en' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>EN</Link>
             <span className="text-gold-700 text-[10px]">|</span>
-            <Link href={dePath}
+            <Link href={pathname.replace(`/${locale}/`, '/de/')}
               className={`px-1.5 py-0.5 rounded text-[11px] transition-colors ${locale === 'de' ? 'bg-gold-500 text-ink font-semibold' : 'text-gold-300 hover:text-gold-100'}`}>DE</Link>
           </div>
 
-          {/* Mobile nav toggle */}
           <button onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            className="md:hidden flex items-center justify-center w-8 h-8 rounded text-gold-400 hover:bg-white/10 transition-colors">
-            {mobileNavOpen ? <X size={16} /> : <Menu size={16} />}
+            className="md:hidden flex items-center justify-center w-7 h-7 rounded text-gold-400 hover:bg-white/10 transition-colors">
+            {mobileNavOpen ? <X size={14} /> : <Menu size={14} />}
           </button>
         </div>
+      </div>
 
-        {/* Desktop section nav */}
-        <div className="hidden md:block border-t border-gold-800/30">
-          <div className="max-w-[1440px] mx-auto px-4">
-            <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
-              {navItems.map(item => {
-                const isActive = pathname === item.href || (item.href !== `/${locale}/islamic` && pathname.startsWith(item.href));
-                const isExact  = pathname === item.href;
-                const active   = item.href === `/${locale}/islamic` ? isExact : isActive;
-                return (
-                  <Link key={item.href} href={item.href}
-                    className={`shrink-0 px-4 py-2 text-[12px] font-medium border-b-2 transition-colors whitespace-nowrap
-                      ${active
-                        ? 'border-gold-400 text-gold-300'
-                        : 'border-transparent text-gold-600 hover:text-gold-300 hover:border-gold-700'}`}>
-                    {isAr ? item.labelAr : item.labelEn}
-                  </Link>
-                );
-              })}
+      {/* ── ACADEMIC HEADER ─────────────────────────────────────────────── */}
+      <div className="border-b border-amber-200/60 bg-[#FAF6EE]">
+        <div className="max-w-[1440px] mx-auto px-4 py-6 md:py-8">
+          <div className="flex items-start gap-3 flex-wrap justify-between">
+            <div>
+              {icon && <span className="text-2xl mb-2 block">{icon}</span>}
+              <h1 className="font-amiri text-2xl md:text-3xl text-amber-950 leading-tight mb-1">
+                {heroTitle}
+              </h1>
+              {heroSubtitle && (
+                <p className="text-[12px] text-amber-700/70 max-w-xl">{heroSubtitle}</p>
+              )}
+              {heroCoinCount && (
+                <div className="mt-2 flex items-baseline gap-1.5">
+                  <span className="font-amiri text-2xl font-bold text-amber-800">
+                    {heroCoinCount.toLocaleString(isAr ? 'ar-EG' : 'en-US')}
+                  </span>
+                  <span className="text-[11px] text-amber-600/70">
+                    {isAr ? 'عملة' : 'coins'}
+                  </span>
+                </div>
+              )}
+              {catalogueId === 'arab' && !heroCoinCount && (
+                <div className="mt-1 flex items-center gap-2 text-[11px] text-amber-600/60 flex-wrap">
+                  <span>5,505 {isAr ? 'عملة' : 'coins'}</span>
+                  <span className="text-amber-300">·</span>
+                  <span>20 {isAr ? 'دولة' : 'countries'}</span>
+                  <span className="text-amber-300">·</span>
+                  <span>1500–2026</span>
+                </div>
+              )}
+              {catalogueId === 'islamic' && !heroCoinCount && (
+                <div className="mt-1 flex items-center gap-2 text-[11px] text-amber-600/60 flex-wrap">
+                  <span>47,303 {isAr ? 'عملة' : 'coins'}</span>
+                  <span className="text-amber-300">·</span>
+                  <span>18 {isAr ? 'سلالة' : 'dynasties'}</span>
+                  <span className="text-amber-300">·</span>
+                  <span>41–922 {isAr ? 'هـ' : 'AH'}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Mobile nav drawer */}
-        {mobileNavOpen && (
-          <div className="md:hidden bg-ink border-t border-gold-800/50 animate-fade-in">
+        {/* Tab nav */}
+        <div className="max-w-[1440px] mx-auto px-4">
+          <div className="hidden md:flex items-center gap-0 overflow-x-auto scrollbar-none border-t border-amber-200/40">
             {navItems.map(item => {
-              const isActive = pathname === item.href;
+              const isExact  = pathname === item.href;
+              const isActive = item.href === `/${locale}/islamic` || item.href === `/${locale}/catalogue`
+                ? isExact
+                : (pathname === item.href || pathname.startsWith(item.href + '/'));
               return (
                 <Link key={item.href} href={item.href}
-                  onClick={() => setMobileNavOpen(false)}
-                  className={`block px-5 py-3 text-[13px] border-b border-gold-900/20
-                    ${isActive ? 'text-gold-300 bg-white/5' : 'text-gold-500 hover:text-gold-300'}`}>
+                  className={`shrink-0 px-4 py-2.5 text-[12px] font-medium border-b-2 -mb-px transition-colors whitespace-nowrap
+                    ${isActive
+                      ? 'border-amber-700 text-amber-900'
+                      : 'border-transparent text-amber-600/70 hover:text-amber-900 hover:border-amber-300'}`}>
                   {isAr ? item.labelAr : item.labelEn}
                 </Link>
               );
             })}
           </div>
-        )}
-      </div>
 
-      {/* ── HERO ────────────────────────────────────────────────────────── */}
-      <div style={{ background: 'linear-gradient(135deg, #0a0602 0%, #1a0e05 60%, #2a1a08 100%)' }}>
-        <div className={`max-w-[1440px] mx-auto px-4 flex flex-col justify-center
-          ${heroSize === 'large' ? 'min-h-[160px] md:min-h-[220px] py-8' : 'min-h-[64px] py-4'}`}>
-
-          {heroSize === 'large' ? (
-            <div className="flex items-start gap-4">
-              <span className="text-4xl md:text-5xl">{icon}</span>
-              <div>
-                <h1 className="font-amiri text-2xl md:text-3xl text-amber-100 mb-1">{heroTitle}</h1>
-                {heroSubtitle && (
-                  <p className="text-[13px] text-amber-300/70 max-w-xl">{heroSubtitle}</p>
-                )}
-                {heroCoinCount && (
-                  <div className="mt-2">
-                    <span className="text-2xl md:text-3xl font-bold text-gold-400">
-                      {heroCoinCount.toLocaleString(isAr ? 'ar-EG' : 'en-US')}
-                    </span>
-                    <span className="text-[12px] text-amber-300/60 ms-2">
-                      {isAr ? 'عملة' : 'coins'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-xl">{icon}</span>
-              <h1 className="font-amiri text-lg text-amber-200">{heroTitle}</h1>
-              {catalogueId === 'arab' && (
-                <div className="flex items-center gap-3 ms-auto text-[11px] text-amber-300/60">
-                  <span>5,505 {isAr ? 'عملة' : 'coins'}</span>
-                  <span className="text-gold-700">·</span>
-                  <span>20 {isAr ? 'دولة' : 'countries'}</span>
-                  <span className="text-gold-700">·</span>
-                  <span>1500–2026</span>
-                </div>
-              )}
-              {catalogueId === 'islamic' && (
-                <div className="flex items-center gap-3 ms-auto text-[11px] text-amber-300/60">
-                  <span>47,303 {isAr ? 'عملة' : 'coins'}</span>
-                  <span className="text-gold-700">·</span>
-                  <span>18 {isAr ? 'سلالة' : 'dynasties'}</span>
-                  <span className="text-gold-700">·</span>
-                  <span>41–922 {isAr ? 'هـ' : 'AH'}</span>
-                </div>
-              )}
+          {mobileNavOpen && (
+            <div className="md:hidden bg-white border-t border-amber-200/40 animate-fade-in">
+              {navItems.map(item => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link key={item.href} href={item.href}
+                    onClick={() => setMobileNavOpen(false)}
+                    className={`block px-4 py-3 text-[13px] border-b border-amber-100
+                      ${isActive ? 'text-amber-900 bg-amber-50 font-medium' : 'text-amber-700 hover:text-amber-900'}`}>
+                    {isAr ? item.labelAr : item.labelEn}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>

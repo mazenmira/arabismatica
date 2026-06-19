@@ -19,10 +19,10 @@ export async function generateMetadata({
   const pageUrl = `${BASE_URL}/${locale}`;
 
   const title = isAr
-    ? 'أرابيزماتيكا — كتالوج العملات العربية والإسلامية'
+    ? 'أرابيزماتيكا · Arabismatica — الموسوعة الرقمية للعملات العربية والإسلامية'
     : isDe
-    ? 'Arabismatica — Arabischer & Islamischer Münzkatalog'
-    : 'Arabismatica — Arab & Islamic Coin Catalogue';
+    ? 'Arabismatica · أرابيزماتيكا — Digitale Enzyklopädie arabischer & islamischer Münzen'
+    : 'Arabismatica · أرابيزماتيكا — Digital Encyclopaedia of Arab & Islamic Coins';
 
   const description = isAr
     ? 'أشمل كتالوج إلكتروني للعملات العربية والإسلامية. تصفح 52,808 عملة من الدولة الأموية والعباسية والفاطمية والمماليك و20 دولة عربية. تعرف على عملتك مجاناً.'

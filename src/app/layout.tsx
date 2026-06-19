@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'أرابيزماتيكا | Arabismatica — The Arab Coin Catalogue',
+  title: 'Arabismatica · أرابيزماتيكا — Digital Encyclopaedia of Arab & Islamic Coins',
   description:
     'Arabismatica is the most comprehensive online catalogue of Arab coins, covering 19 Arab countries from 1500 to the present day. Search 4,700+ coins by name, KM number, metal, dynasty, and year. Free price guide, grading tools, and collector resources.',
   keywords: [
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     alternateLocale: 'en_US',
     url: 'https://arabismatica.arabcollector.com',
     siteName: 'Arabismatica | أرابيزماتيكا',
-    title: 'Arabismatica — The Arab Coin Catalogue | كتالوج العملات العربية',
+    title: 'Arabismatica · أرابيزماتيكا — Digital Encyclopaedia of Arab & Islamic Coins',
     description:
       'The most comprehensive catalogue of Arab and Islamic coins. 4,700+ coins from 19 Arab countries, with price guides, grading tools, and collector resources.',
     images: [
@@ -34,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Arabismatica — The Arab Coin Catalogue',
-    description: 'Search 4,700+ Arab coins from 19 countries. Free price guide, grading tools, and collector resources.',
+    title: 'Arabismatica — Digital Encyclopaedia of Arab & Islamic Coins',
+    description: 'Explore 60,803+ Arab, Islamic and Sasanian coins. Free identification, price guide, and collector resources.',
     images: ['https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2026/05/Arabismatica-logo-Small.png'],
     creator: '@ArabCollector',
   },

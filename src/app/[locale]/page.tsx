@@ -1,14 +1,11 @@
-// v4.3 — landing page
+// v5.0 — academic catalogue landing page
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { CalendarDays } from 'lucide-react';
 import SiteHeader from '@/components/header/SiteHeader';
 import { supabase } from '@/lib/supabase';
-
-const HERO_IMG = 'https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2026/05/Arabismatica-Hero.jpg';
 
 type CardEntry = {
   id: string;
@@ -88,10 +85,25 @@ const INDIAN_ISLAMIC_CARDS: CardEntry[] = [
 ];
 
 const STATS = [
-  { numAr: '٦٠٬٨٠٣',      numEn: '60,803',       numDe: '60.803',       labelAr: 'عملة مفهرسة',     labelEn: 'coins indexed',          labelDe: 'Münzen indexiert' },
-  { numAr: '٢٠+',          numEn: '20+',          numDe: '20+',          labelAr: 'دولة وإمارة',    labelEn: 'countries & states',     labelDe: 'Länder & Staaten' },
-  { numAr: '١٨',           numEn: '18',           numDe: '18',           labelAr: 'سلالة وخلافة',   labelEn: 'dynasties & caliphates', labelDe: 'Dynastien & Kalifate' },
-  { numAr: '٦٦١م–اليوم',  numEn: '661 CE–today', numDe: '661 n.Chr.–h.', labelAr: 'النطاق الزمني', labelEn: 'time span',               labelDe: 'Zeitraum' },
+  { numAr: '٦٠٬٨٠٣', numEn: '60,803', numDe: '60.803',         labelAr: 'عملة مفهرسة',    labelEn: 'coins indexed',          labelDe: 'Münzen indexiert' },
+  { numAr: '٢٠+',     numEn: '20+',    numDe: '20+',            labelAr: 'دولة وإمارة',   labelEn: 'countries & states',     labelDe: 'Länder & Staaten' },
+  { numAr: '١٨',      numEn: '18',     numDe: '18',             labelAr: 'سلالة وخلافة',  labelEn: 'dynasties & caliphates', labelDe: 'Dynastien & Kalifate' },
+  { numAr: '٦٦١م–اليوم', numEn: '661 CE–today', numDe: '661 n.Chr.–h.', labelAr: 'النطاق الزمني', labelEn: 'time span', labelDe: 'Zeitraum' },
+];
+
+const CATALOGUE_GROUPS = [
+  {
+    idAr: 'العالم العربي', idEn: 'Arab World', idDe: 'Arabische Welt',
+    cards: ARAB_WORLD_CARDS,
+  },
+  {
+    idAr: 'الشرق الأوسط القديم', idEn: 'Ancient Middle East', idDe: 'Alter Naher Osten',
+    cards: ANCIENT_CARDS,
+  },
+  {
+    idAr: 'الإسلام الهندي', idEn: 'Islamic India', idDe: 'Islamisches Indien',
+    cards: INDIAN_ISLAMIC_CARDS,
+  },
 ];
 
 function CatalogueCard({ card, locale, isAr, isDe }: {
@@ -100,35 +112,29 @@ function CatalogueCard({ card, locale, isAr, isDe }: {
   const isActive = card.status === 'active';
   const title    = isAr ? card.titleAr    : isDe ? card.titleDe    : card.titleEn;
   const subtitle = isAr ? card.subtitleAr : isDe ? card.subtitleDe : card.subtitleEn;
-  const browseLabel   = isAr ? '← تصفح' : isDe ? 'Ansehen →' : 'Browse →';
-  const comingSoon    = isAr ? 'قريباً'  : isDe ? 'Demnächst' : 'Coming Soon';
+  const browseLabel = isAr ? '← تصفح' : isDe ? 'Ansehen →' : 'Browse →';
+  const comingSoon  = isAr ? 'قريباً'  : isDe ? 'Demnächst' : 'Coming Soon';
 
   const inner = (
-    <div className={`relative rounded-xl border h-full transition-all duration-200 ${
+    <div className={`relative rounded-lg border h-full transition-all duration-200 p-4 ${
       isActive
-        ? 'bg-[#FAF6EE] border-[#B8860B]/40 hover:border-[#B8860B] hover:shadow-[0_4px_20px_rgba(184,134,11,0.18)] hover:-translate-y-0.5 cursor-pointer'
-        : 'border-dashed border-gray-300 cursor-default'
-    }`}
-    style={isActive ? undefined : { background: '#f5f5f5', opacity: 0.75 }}
-    >
+        ? 'bg-white border-amber-200 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 cursor-pointer'
+        : 'bg-amber-50/40 border-dashed border-amber-200/50 cursor-default'
+    }`}>
       {!isActive && (
-        <div className="absolute top-2 end-2 text-[9px] px-2 py-0.5 rounded-full bg-gray-200 text-gray-500 font-medium">
+        <span className="absolute top-2 end-2 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-500 font-medium">
           {comingSoon}
-        </div>
+        </span>
       )}
-      <div className="p-5">
-        <div className={`font-amiri text-[15px] leading-snug mb-1.5 ${isActive ? 'text-amber-900' : 'text-gray-400'}`}>
-          {title}
-        </div>
-        <div className={`text-[11px] mb-3 ${isActive ? 'text-amber-700/70' : 'text-gray-400'}`}>
-          {subtitle}
-        </div>
-        {isActive && (
-          <div className="inline-flex items-center gap-1 text-[11px] text-[#B8860B] font-medium border border-[#B8860B]/40 rounded-full px-2.5 py-0.5">
-            {browseLabel}
-          </div>
-        )}
+      <div className={`font-amiri text-[14px] leading-snug mb-1 ${isActive ? 'text-amber-900' : 'text-amber-400'}`}>
+        {title}
       </div>
+      <div className={`text-[10px] leading-relaxed ${isActive ? 'text-amber-700/60' : 'text-amber-300'}`}>
+        {subtitle}
+      </div>
+      {isActive && (
+        <div className="mt-3 text-[10px] text-amber-600 font-medium">{browseLabel}</div>
+      )}
     </div>
   );
 
@@ -138,28 +144,10 @@ function CatalogueCard({ card, locale, isAr, isDe }: {
   return <div>{inner}</div>;
 }
 
-function CatalogueGroup({ titleAr, titleEn, titleDe, cards, locale, isAr, isDe }: {
-  titleAr: string; titleEn: string; titleDe: string;
-  cards: CardEntry[]; locale: string; isAr: boolean; isDe: boolean;
-}) {
-  const title = isAr ? titleAr : isDe ? titleDe : titleEn;
-  return (
-    <div className="mb-8">
-      <h3 className="font-amiri text-lg text-amber-900 mb-3 border-b border-amber-200/60 pb-1.5">
-        {title}
-      </h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        {cards.map(card => (
-          <CatalogueCard key={card.id} card={card} locale={locale} isAr={isAr} isDe={isDe} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function LandingPage({ params: { locale } }: { params: { locale: string } }) {
   const isAr = locale === 'ar';
   const isDe = locale === 'de';
+
   const [coinOfDay, setCoinOfDay] = useState<{
     id: string; name: string; nar?: string; yce?: string;
     o?: string; cc?: string; co?: string; co_ar?: string;
@@ -171,64 +159,46 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
     const offset = seed % 60803;
     supabase.from('coins').select('id,name,nar,yce,o,cc,co,co_ar').range(offset, offset)
       .then(({ data }) => { if (data && data.length > 0) setCoinOfDay(data[0] as typeof coinOfDay); });
-    // ignore errors — Coin of the Day is non-critical
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const t = (ar: string, en: string, de: string) => isAr ? ar : isDe ? de : en;
 
   return (
-    <main className="min-h-screen" style={{ background: 'var(--parch)' }} dir={isAr ? 'rtl' : 'ltr'}>
+    <main className="min-h-screen bg-[#FAF6EE]" dir={isAr ? 'rtl' : 'ltr'}>
       <SiteHeader locale={locale} />
 
-      {/* ── HERO ────────────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden" style={{ minHeight: '420px' }}>
-        <Image
-          src={HERO_IMG}
-          alt="Arabismatica hero"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(10,6,2,0.55) 0%, rgba(10,6,2,0.75) 60%, rgba(10,6,2,0.95) 100%)' }} />
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-20">
-          <p className="text-gold-400 text-[11px] tracking-[0.2em] uppercase mb-3 font-medium">
-            {t('الموسوعة الرقمية للعملات', 'THE DIGITAL ENCYCLOPAEDIA OF COINS', 'DIE DIGITALE MÜNZENZYKLOPÄDIE')}
-          </p>
-          <h1 className="font-amiri text-4xl md:text-5xl text-white leading-tight mb-2">
-            Arabismatica <span className="text-amber-300/50">|</span> <span>أرابيزماتيكا</span>
-          </h1>
-          <p className="text-amber-300/80 text-[14px] md:text-[16px] max-w-lg mb-8">
-            {t(
-              'استكشف عملات العالم العربي والتاريخ الإسلامي والشرق الأوسط القديم',
-              'Explore coins from across the Arab world, Islamic history, and the ancient Middle East',
-              'Erkunde Münzen aus der arabischen Welt, der islamischen Geschichte und dem alten Nahen Osten'
-            )}
-          </p>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link href={`/${locale}/catalogue`}
-              className="px-6 py-2.5 rounded-full text-[13px] font-medium transition-all"
-              style={{ background: 'linear-gradient(135deg, #B8860B, #8B6D2E)', color: '#FAF6EE' }}>
-              {t('تصفح الكتالوج العربي', 'Browse Arab Catalogue', 'Arabischen Katalog durchsuchen')}
-            </Link>
-            <Link href={`/${locale}/islamic`}
-              className="px-6 py-2.5 rounded-full text-[13px] font-medium border border-gold-500/60 text-gold-300 hover:bg-white/5 transition-all">
-              {t('العملات الإسلامية', 'Islamic Coins', 'Islamische Münzen')}
-            </Link>
+      {/* ── MASTHEAD ────────────────────────────────────────────────────── */}
+      <div className="border-b border-amber-200/60" style={{ background: '#FAF6EE' }}>
+        <div className="max-w-[1440px] mx-auto px-4 py-8 md:py-10">
+          <div className="max-w-2xl">
+            <p className="text-[10px] tracking-[0.2em] uppercase text-amber-600/70 font-medium mb-2">
+              {t('الموسوعة الرقمية للعملات', 'Digital Encyclopaedia of Coins', 'Digitale Münzenzyklopädie')}
+            </p>
+            <h1 className="font-amiri text-3xl md:text-4xl text-amber-950 leading-tight mb-2">
+              Arabismatica <span className="text-amber-400 font-normal">·</span> <span>أرابيزماتيكا</span>
+            </h1>
+            <p className="text-[13px] text-amber-800/70 max-w-lg">
+              {t(
+                'استكشف عملات العالم العربي والتاريخ الإسلامي والشرق الأوسط القديم',
+                'Explore coins from across the Arab world, Islamic history, and the ancient Middle East',
+                'Erkunde Münzen aus der arabischen Welt, der islamischen Geschichte und dem alten Nahen Osten'
+              )}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* ── STATS STRIP ─────────────────────────────────────────────────── */}
-      <div style={{ background: 'linear-gradient(135deg, #0a0602, #1a0e05)' }}>
-        <div className="max-w-[1440px] mx-auto px-4 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+      {/* ── STATS ROW ───────────────────────────────────────────────────── */}
+      <div className="border-b border-amber-200/40 bg-amber-50/60">
+        <div className="max-w-[1440px] mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-amber-200/40 rtl:divide-x-reverse">
             {STATS.map((s, i) => (
-              <div key={i}>
-                <div className="text-2xl md:text-3xl font-bold text-gold-400 font-amiri">
-                  {isAr ? s.numAr : s.numEn}
+              <div key={i} className="px-4 py-5 text-center">
+                <div className="font-amiri text-2xl md:text-3xl text-amber-800 font-bold">
+                  {isAr ? s.numAr : isDe ? s.numDe : s.numEn}
                 </div>
-                <div className="text-[11px] text-amber-300/60 mt-0.5">
+                <div className="text-[10px] text-amber-600/70 mt-0.5 uppercase tracking-wide">
                   {isAr ? s.labelAr : isDe ? s.labelDe : s.labelEn}
                 </div>
               </div>
@@ -237,29 +207,51 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
         </div>
       </div>
 
-      {/* ── COIN OF THE DAY ─────────────────────────────────────────────── */}
+      {/* ── CATALOGUE INDEX ─────────────────────────────────────────────── */}
+      <div className="max-w-[1440px] mx-auto px-4 py-10">
+        <h2 className="font-amiri text-[11px] tracking-[0.15em] uppercase text-amber-600/70 mb-6">
+          {t('الكتالوجات', 'Catalogues', 'Kataloge')}
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {CATALOGUE_GROUPS.map(g => (
+            <div key={g.idEn}>
+              <h3 className="font-amiri text-[13px] text-amber-900 font-semibold mb-3 pb-1.5 border-b border-amber-200/60">
+                {isAr ? g.idAr : isDe ? g.idDe : g.idEn}
+              </h3>
+              <div className="flex flex-col gap-2">
+                {g.cards.map(card => (
+                  <CatalogueCard key={card.id} card={card} locale={locale} isAr={isAr} isDe={isDe} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── LATEST / COIN OF THE DAY ─────────────────────────────────────── */}
       {coinOfDay && (
-        <div style={{ background: 'linear-gradient(135deg, #0a0602, #1a0e05)' }} className="border-t border-gold-700/20">
-          <div className="max-w-[1440px] mx-auto px-4 py-3">
+        <div className="border-t border-amber-200/40 bg-amber-50/40">
+          <div className="max-w-[1440px] mx-auto px-4 py-4">
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-[10px] text-gold-500/70 uppercase tracking-widest font-medium shrink-0 flex items-center gap-1">
+              <span className="text-[10px] text-amber-600/60 uppercase tracking-widest font-medium shrink-0 flex items-center gap-1">
                 <CalendarDays size={10} />
                 {isAr ? 'عملة اليوم' : isDe ? 'Münze des Tages' : 'Coin of the Day'}
               </span>
               {coinOfDay.o && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={coinOfDay.o} alt="" className="w-8 h-8 rounded-full object-cover border border-gold-700/40 shrink-0" />
+                <img src={coinOfDay.o} alt="" className="w-8 h-8 rounded-full object-cover border border-amber-200 shrink-0" />
               )}
-              <span className="font-amiri text-gold-300 text-[14px]">
+              <span className="font-amiri text-amber-900 text-[14px]">
                 {isAr ? (coinOfDay.nar || coinOfDay.name) : coinOfDay.name}
               </span>
               {coinOfDay.yce && (
-                <span className="text-[11px] text-gold-600/50 hidden sm:block">
+                <span className="text-[11px] text-amber-600/50 hidden sm:block">
                   {coinOfDay.yce} · {isAr ? coinOfDay.co_ar : coinOfDay.co}
                 </span>
               )}
               <Link href={`/${locale}/catalogue/${coinOfDay.id}`}
-                className="ms-auto text-[11px] text-gold-600 hover:text-gold-400 border border-gold-700/30 rounded-full px-3 py-1 transition-colors shrink-0">
+                className="ms-auto text-[11px] text-amber-700 hover:text-amber-900 border border-amber-300 rounded-full px-3 py-1 transition-colors shrink-0">
                 {isAr ? 'عرض ←' : isDe ? 'Ansehen →' : 'View →'}
               </Link>
             </div>
@@ -267,67 +259,38 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
         </div>
       )}
 
-      {/* ── CATALOGUE GROUPS ────────────────────────────────────────────── */}
-      <div className="max-w-[1440px] mx-auto px-4 py-10">
-        <h2 className="font-amiri text-xl md:text-2xl text-amber-900 mb-1">
-          {t('اختر الكتالوج', 'Choose a Catalogue', 'Katalog wählen')}
-        </h2>
-        <p className="text-[12px] text-amber-700/70 mb-6">
-          {t('كتالوجات متخصصة تشمل عملات العالم العربي والشرق الأوسط القديم والإسلام الهندي',
-             'Specialised catalogues covering Arab world, ancient Middle East, and Islamic India',
-             'Spezialisierte Kataloge für arabische Welt, alter Naher Osten und islamisches Indien')}
-        </p>
-
-        <CatalogueGroup
-          titleAr="العالم العربي" titleEn="Arab World" titleDe="Arabische Welt"
-          cards={ARAB_WORLD_CARDS} locale={locale} isAr={isAr} isDe={isDe}
-        />
-        <CatalogueGroup
-          titleAr="الشرق الأوسط القديم" titleEn="Ancient Middle East" titleDe="Alter Naher Osten"
-          cards={ANCIENT_CARDS} locale={locale} isAr={isAr} isDe={isDe}
-        />
-        <CatalogueGroup
-          titleAr="الإسلام الهندي" titleEn="Islamic India" titleDe="Islamisches Indien"
-          cards={INDIAN_ISLAMIC_CARDS} locale={locale} isAr={isAr} isDe={isDe}
-        />
-      </div>
-
-      {/* ── ABOUT STRIP ─────────────────────────────────────────────────── */}
-      <div className="border-t border-amber-200/40 bg-amber-50/50">
-        <div className="max-w-[1440px] mx-auto px-4 py-10 flex flex-col md:flex-row gap-8 items-start">
-          <div className="flex-1">
-            <h2 className="font-amiri text-xl text-amber-900 mb-3">
-              {t('عن أرابيزماتيكا', 'About Arabismatica', 'Über Arabismatica')}
-            </h2>
-            <p className="text-[13px] text-amber-800/80 leading-relaxed max-w-xl">
-              {t(
-                'أرابيزماتيكا هي الموسوعة الرقمية الشاملة للعملات في العالم العربي والشرق الأوسط، تضم أكثر من 60,803 عملة عربية وإسلامية وساسانية مفهرسة بالتفصيل مع صور وبيانات شاملة. مبادرة شبكة المقتني العربي.',
-                'Arabismatica is the comprehensive digital encyclopaedia of coins covering the Arab world and Middle East, featuring over 60,803 Arab, Islamic and Sasanian coins indexed with detailed images and data. An initiative of The Arab Collector Network.',
-                'Arabismatica ist die umfassende digitale Münzenzyklopädie der arabischen Welt und des Nahen Ostens mit über 60.803 arabischen, islamischen und sassanidischen Münzen, detailliert indexiert. Eine Initiative des Arabischen Sammler-Netzwerks.'
-              )}
-            </p>
-            <a href="https://arabcollector.com" target="_blank" rel="noopener"
-              className="inline-flex items-center gap-1.5 mt-4 text-[12px] text-amber-700 hover:text-amber-900 transition-colors">
-              arabcollector.com →
-            </a>
-          </div>
-          <div className="flex-shrink-0 flex flex-col gap-2 text-[12px] text-amber-700">
-            <Link href={`/${locale}/catalogue`} className="hover:text-amber-900 transition-colors">
-              {t('← كتالوج العملات العربية', '→ Arab Coin Catalogue', '→ Arabischer Münzkatalog')}
-            </Link>
-            <Link href={`/${locale}/islamic`} className="hover:text-amber-900 transition-colors">
-              {t('← كتالوج العملات الإسلامية', '→ Islamic Coin Catalogue', '→ Islamischer Münzkatalog')}
-            </Link>
-            <Link href={`/${locale}/islamic/dynasties`} className="hover:text-amber-900 transition-colors">
-              {t('← السلالات الإسلامية', '→ Islamic Dynasties', '→ Islamische Dynastien')}
-            </Link>
-            <Link href={`/${locale}/sasanian`} className="hover:text-amber-900 transition-colors">
-              {t('← العملات الساسانية', '→ Sasanian Coins', '→ Sassanidische Münzen')}
-            </Link>
+      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
+      <footer className="border-t border-amber-200/40 bg-amber-900">
+        <div className="max-w-[1440px] mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+            <div>
+              <div className="font-amiri text-lg text-amber-100 mb-1">Arabismatica · أرابيزماتيكا</div>
+              <div className="text-[11px] text-amber-300/70">
+                {t(
+                  'مبادرة شبكة المقتني العربي',
+                  'An initiative of The Arab Collector Network',
+                  'Eine Initiative des Arabischen Sammler-Netzwerks'
+                )}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-amber-400/80">
+              <Link href={`/${locale}/catalogue`} className="hover:text-amber-200 transition-colors">
+                {t('العملات العربية', 'Arab Coins', 'Arabische Münzen')}
+              </Link>
+              <Link href={`/${locale}/islamic`} className="hover:text-amber-200 transition-colors">
+                {t('العملات الإسلامية', 'Islamic Coins', 'Islamische Münzen')}
+              </Link>
+              <Link href={`/${locale}/sasanian`} className="hover:text-amber-200 transition-colors">
+                {t('العملات الساسانية', 'Sasanian Coins', 'Sassanidische Münzen')}
+              </Link>
+              <a href="https://arabcollector.com" target="_blank" rel="noopener"
+                className="hover:text-amber-200 transition-colors">
+                arabcollector.com →
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-
+      </footer>
     </main>
   );
 }

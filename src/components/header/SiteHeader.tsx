@@ -223,11 +223,11 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
 
       {/* ── MAIN NAV ────────────────────────────────────────────────────── */}
       <header
-        className={`bg-ink sticky top-0 z-50 transition-shadow duration-300 ${scrolled ? 'shadow-[0_4px_30px_rgba(0,0,0,0.5)]' : ''}`}
-        style={{ borderBottom: '2px solid #8B6D2E' }}
+        className={`bg-[#FAF6EE] sticky top-0 z-50 transition-shadow duration-300 ${scrolled ? 'shadow-sm' : ''}`}
+        style={{ borderBottom: '1px solid rgba(184,134,11,0.25)' }}
       >
         <div className="max-w-[1440px] mx-auto px-4">
-          <div className="flex items-center h-[64px] gap-4">
+          <div className="flex items-center h-[48px] gap-4">
 
             {/* Logo */}
             <Link href={`/${locale}`} className="shrink-0">
@@ -245,11 +245,11 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
               {TOP_NAV_ITEMS.map((item) => (
                 <div key={item.label} className="relative group">
                   <button
-                    className={`flex items-center gap-1 px-3 py-2 text-[13px] font-medium rounded transition-colors whitespace-nowrap
+                    className={`flex items-center gap-1 px-3 py-1.5 text-[13px] font-medium rounded transition-colors whitespace-nowrap
                       ${ (item as { isTools?: boolean }).isTools
-                          ? 'bg-gold-700/80 hover:bg-gold-600 text-gold-100 rounded-full px-3'
-                          : 'text-gold-400 hover:text-white hover:bg-white/5' }
-                      ${activeMenu === item.label ? (item as { isTools?: boolean }).isTools ? 'bg-gold-600' : 'bg-white/10 text-white' : ''}`}
+                          ? 'bg-amber-800 hover:bg-amber-700 text-amber-50 rounded-full px-3'
+                          : 'text-amber-800 hover:text-amber-950 hover:bg-amber-50' }
+                      ${activeMenu === item.label ? (item as { isTools?: boolean }).isTools ? 'bg-amber-700' : 'bg-amber-100 text-amber-950' : ''}`}
                     onClick={() => setActiveMenu(activeMenu === item.label ? null : item.label)}
                     onMouseEnter={() => setActiveMenu(item.label)}
                   >
@@ -260,14 +260,14 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
 
                   {activeMenu === item.label && item.children && (
                     <div
-                      className="absolute top-full right-0 mt-1 bg-ink border border-gold-800/50 rounded-lg shadow-2xl min-w-[220px] py-1 z-50 animate-fade-in"
+                      className="absolute top-full right-0 mt-1 bg-white border border-amber-200 rounded-lg shadow-lg min-w-[220px] py-1 z-50 animate-fade-in"
                       onMouseLeave={() => setActiveMenu(null)}
                     >
                       {item.children.map((child) => {
                         if (child.href === '#hijri-converter') {
                           return (
                             <button key={child.label} onClick={() => { setToolDefault('hijriConverter'); setToolsOpen(true); setActiveMenu(null); }}
-                              className="w-full text-start block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0 text-gold-300 hover:text-white hover:bg-white/5 font-medium">
+                              className="w-full text-start block px-4 py-2.5 text-[12px] transition-colors border-b border-amber-100 last:border-0 text-amber-800 hover:text-amber-950 hover:bg-amber-50 font-medium">
                               {child.label}
                             </button>
                           );
@@ -275,7 +275,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                         if (child.href === '#tools-sidebar') {
                           return (
                             <button key={child.label} onClick={() => { setToolDefault(undefined); setToolsOpen(true); setActiveMenu(null); }}
-                              className="w-full text-start block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0 text-white/70 hover:text-white hover:bg-white/5">
+                              className="w-full text-start block px-4 py-2.5 text-[12px] transition-colors border-b border-amber-100 last:border-0 text-amber-700 hover:text-amber-950 hover:bg-amber-50">
                               {child.label}
                             </button>
                           );
@@ -283,7 +283,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                         if (!child.href) {
                           return (
                             <span key={child.label}
-                              className="block px-4 py-2.5 text-[12px] border-b border-gold-900/30 last:border-0 text-white/30 cursor-default select-none">
+                              className="block px-4 py-2.5 text-[12px] border-b border-amber-100 last:border-0 text-amber-300 cursor-default select-none">
                               {child.label}
                             </span>
                           );
@@ -292,7 +292,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                         return (
                           <a key={child.label} href={child.href}
                             {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                            className="block px-4 py-2.5 text-[12px] transition-colors border-b border-gold-900/30 last:border-0 text-white/70 hover:text-white hover:bg-white/5">
+                            className="block px-4 py-2.5 text-[12px] transition-colors border-b border-amber-100 last:border-0 text-amber-700 hover:text-amber-950 hover:bg-amber-50">
                             {child.label}
                           </a>
                         );
@@ -309,7 +309,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
 
               {/* AI Identify */}
               <button onClick={() => setIdentifyOpen(true)}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-500/70 text-gold-400 hover:text-white hover:border-gold-400 transition-colors"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1 text-[11px] rounded-full border border-amber-400/60 text-amber-700 hover:text-amber-950 hover:border-amber-600 transition-colors"
                 title={isAr ? 'تحديد العملة بالصورة' : 'Identify coin by image'}>
                 <span>🔍</span>
                 {isAr ? 'تحديد بالصورة' : 'Identify'}
@@ -317,15 +317,15 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
 
               {/* Dark mode toggle */}
               <button onClick={toggleDarkMode}
-                className="hidden md:flex items-center justify-center w-8 h-8 rounded-full border border-gold-700/40 text-gold-500 hover:border-gold-500 hover:text-gold-300 transition-colors"
+                className="hidden md:flex items-center justify-center w-7 h-7 rounded-full border border-amber-300 text-amber-700 hover:border-amber-500 hover:text-amber-950 transition-colors"
                 title={darkMode ? (isAr ? 'الوضع الفاتح' : 'Light mode') : (isAr ? 'الوضع الداكن' : 'Dark mode')}>
-                {darkMode ? <Sun size={14} /> : <Moon size={14} />}
+                {darkMode ? <Sun size={13} /> : <Moon size={13} />}
               </button>
 
               {/* Admin Panel */}
               <button
                 onClick={() => setAdminOpen(true)}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-500/70 hover:border-gold-600 hover:text-gold-400 transition-colors"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1 text-[11px] rounded-full border border-amber-300 text-amber-700/80 hover:border-amber-500 hover:text-amber-950 transition-colors"
                 title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}
               >
                 <Settings size={12} />
@@ -335,21 +335,21 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
               {/* Auth button */}
               {user ? (
                 <button onClick={() => setDashOpen(true)}
-                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 hover:bg-gold-500/25 transition-colors">
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1 text-[11px] rounded-full bg-amber-100 border border-amber-300 text-amber-800 hover:bg-amber-200 transition-colors">
                   <span>👤</span>
                   <span className="max-w-[80px] truncate">{user.email.split('@')[0]}</span>
                 </button>
               ) : (
                 <button onClick={() => setAuthOpen(true)}
-                  className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-full border border-gold-700/40 text-gold-500/70 hover:border-gold-600 hover:text-gold-400 transition-colors">
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1 text-[11px] rounded-full border border-amber-300 text-amber-700/80 hover:border-amber-500 hover:text-amber-950 transition-colors">
                   {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>
               )}
 
               {/* Mobile toggle */}
               <button onClick={() => setMobileOpen(!mobileOpen)}
-                className="xl:hidden flex items-center justify-center w-9 h-9 rounded-full text-white hover:bg-white/10 transition-colors">
-                {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+                className="xl:hidden flex items-center justify-center w-8 h-8 rounded-full text-amber-800 hover:bg-amber-100 transition-colors">
+                {mobileOpen ? <X size={17} /> : <Menu size={17} />}
               </button>
             </div>
           </div>
@@ -357,25 +357,23 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
 
         {/* ── MOBILE MENU ─────────────────────────────────────────────────── */}
         {mobileOpen && (
-          <div className="xl:hidden bg-ink border-t border-gold-800/50 max-h-[80vh] overflow-y-auto animate-fade-in" dir={isAr ? 'rtl' : 'ltr'}>
-
-
+          <div className="xl:hidden bg-[#FAF6EE] border-t border-amber-200 max-h-[80vh] overflow-y-auto animate-fade-in" dir={isAr ? 'rtl' : 'ltr'}>
             {TOP_NAV_ITEMS.map((item) => (
               <div key={item.label}>
                 <button
-                  className="w-full flex items-center justify-between px-5 py-3 text-[13px] text-gold-400 hover:text-white border-b border-gold-900/20"
+                  className="w-full flex items-center justify-between px-5 py-3 text-[13px] text-amber-800 hover:text-amber-950 border-b border-amber-200/60"
                   onClick={() => setActiveMenu(activeMenu === item.label ? null : item.label)}>
                   <span>{item.label}</span>
                   <ChevronDown size={14} className={`transition-transform ${activeMenu === item.label ? 'rotate-180' : ''}`} />
                 </button>
                 {activeMenu === item.label && item.children && (
-                  <div className="bg-ink/80">
+                  <div className="bg-amber-50">
                     {item.children.map((child) => {
                       if (child.href === '#hijri-converter') {
                         return (
                           <button key={child.label}
                             onClick={() => { setToolDefault('hijriConverter'); setToolsOpen(true); setMobileOpen(false); setActiveMenu(null); }}
-                            className="w-full text-start block px-8 py-2.5 text-[12px] text-gold-300 font-medium hover:text-white border-b border-gold-900/10 last:border-0">
+                            className="w-full text-start block px-8 py-2.5 text-[12px] text-amber-800 font-medium hover:text-amber-950 border-b border-amber-100 last:border-0">
                             {child.label}
                           </button>
                         );
@@ -384,7 +382,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                         return (
                           <button key={child.label}
                             onClick={() => { setToolDefault(undefined); setToolsOpen(true); setMobileOpen(false); setActiveMenu(null); }}
-                            className="w-full text-start block px-8 py-2.5 text-[12px] text-gold-400 hover:text-white border-b border-gold-900/10 last:border-0">
+                            className="w-full text-start block px-8 py-2.5 text-[12px] text-amber-700 hover:text-amber-950 border-b border-amber-100 last:border-0">
                             {child.label}
                           </button>
                         );
@@ -392,7 +390,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                       if (!child.href) {
                         return (
                           <span key={child.label}
-                            className="block px-8 py-2.5 text-[12px] text-white/30 border-b border-gold-900/10 last:border-0 cursor-default">
+                            className="block px-8 py-2.5 text-[12px] text-amber-300 border-b border-amber-100 last:border-0 cursor-default">
                             {child.label}
                           </span>
                         );
@@ -401,13 +399,13 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                       return isExternal ? (
                         <a key={child.label} href={child.href}
                           target="_blank" rel="noopener noreferrer"
-                          className="block px-8 py-2.5 text-[12px] text-gold-400 hover:text-white border-b border-gold-900/10 last:border-0">
+                          className="block px-8 py-2.5 text-[12px] text-amber-700 hover:text-amber-950 border-b border-amber-100 last:border-0">
                           {child.label}
                         </a>
                       ) : (
                         <Link key={child.label} href={child.href}
                           onClick={() => setMobileOpen(false)}
-                          className="block px-8 py-2.5 text-[12px] text-gold-400 hover:text-white border-b border-gold-900/10 last:border-0">
+                          className="block px-8 py-2.5 text-[12px] text-amber-700 hover:text-amber-950 border-b border-amber-100 last:border-0">
                           {child.label}
                         </Link>
                       );
@@ -417,27 +415,27 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
               </div>
             ))}
 
-            <div className="px-4 py-4 flex gap-3 border-t border-gold-800/30 flex-wrap">
+            <div className="px-4 py-4 flex gap-3 border-t border-amber-200 flex-wrap">
               <button onClick={() => { setIdentifyOpen(true); setMobileOpen(false); }}
-                className="flex-1 py-2 text-[12px] rounded-full border border-gold-500/70 text-gold-400 text-center">
+                className="flex-1 py-2 text-[12px] rounded-full border border-amber-400 text-amber-700 text-center">
                 {isAr ? 'تحديد بالصورة' : 'Identify'}
               </button>
               <button onClick={() => { toggleDarkMode(); setMobileOpen(false); }}
-                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500/70 text-center flex items-center justify-center gap-1">
+                className="flex-1 py-2 text-[12px] rounded-full border border-amber-300 text-amber-700 text-center flex items-center justify-center gap-1">
                 {darkMode ? <Sun size={12} /> : <Moon size={12} />} {darkMode ? (isAr ? 'فاتح' : 'Light') : (isAr ? 'داكن' : 'Dark')}
               </button>
               <button onClick={() => { setAdminOpen(true); setMobileOpen(false); }}
-                className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500/70 text-center flex items-center justify-center gap-1">
+                className="flex-1 py-2 text-[12px] rounded-full border border-amber-300 text-amber-700 text-center flex items-center justify-center gap-1">
                 <Settings size={12} /> {isAr ? 'الإدارة' : 'Admin'}
               </button>
               {user ? (
                 <button onClick={() => { setDashOpen(true); setMobileOpen(false); }}
-                  className="flex-1 py-2 text-[12px] rounded-full bg-gold-500/15 border border-gold-500/40 text-gold-400 text-center">
+                  className="flex-1 py-2 text-[12px] rounded-full bg-amber-100 border border-amber-300 text-amber-800 text-center">
                   👤 {user.email.split('@')[0]}
                 </button>
               ) : (
                 <button onClick={() => { setAuthOpen(true); setMobileOpen(false); }}
-                  className="flex-1 py-2 text-[12px] rounded-full border border-gold-700/40 text-gold-500/70 text-center">
+                  className="flex-1 py-2 text-[12px] rounded-full border border-amber-300 text-amber-700 text-center">
                   {isAr ? 'دخول / تسجيل' : 'Sign in'}
                 </button>
               )}
