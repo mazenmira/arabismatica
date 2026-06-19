@@ -1,8 +1,8 @@
 // v2.2 - Full Supabase auth + role-based access
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, Plus, Save, Trash2, Lock, Eye, EyeOff, ChevronDown, ChevronUp, DollarSign, Search, Users, LogOut } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { X, Plus, Save, Trash2, Lock, Eye, EyeOff, ChevronDown, ChevronUp, DollarSign, Search, Users, LogOut, Database, Merge } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import COINS_RAW from '@/data/coins.json';
 import type { Coin as CoinType } from '@/types/coin';
@@ -55,6 +55,7 @@ const SOURCES = [
 ];
 
 type UserRole = 'super_admin' | 'coin_admin' | 'price_admin';
+type DupGroup = { normalized: string; variants: string[]; counts: number[]; total: number };
 
 interface RoleRecord {
   id: string;
@@ -96,7 +97,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   const [checkingSession, setCheckingSession] = useState(true);
 
   // -- Tab state --
-  const [adminTab, setAdminTab] = useState<'coins' | 'edit' | 'prices' | 'submissions' | 'team'>('coins');
+  const [adminTab, setAdminTab] = useState<'coins' | 'edit' | 'prices' | 'submissions' | 'team' | 'data'>('coins');
 
   // -- Edit coin state --
   const [editSearch,  setEditSearch]  = useState('');
@@ -135,6 +136,15 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   const [newMemberRole, setNewMemberRole]   = useState<'coin_admin' | 'price_admin'>('price_admin');
   const [teamError, setTeamError]       = useState('');
   const [teamSaved, setTeamSaved]       = useState(false);
+
+  // -- Data Quality state --
+  const [dqField,    setDqField]    = useState<'mint' | 'ruler'>('mint');
+  const [dqCc,       setDqCc]       = useState<'IS' | 'SS'>('IS');
+  const [dqGroups,   setDqGroups]   = useState<DupGroup[]>([]);
+  const [dqLoading,  setDqLoading]  = useState(false);
+  const [dqMerging,  setDqMerging]  = useState<string | null>(null);
+  const [dqMerged,   setDqMerged]   = useState<string | null>(null);
+  const [dqError,    setDqError]    = useState('');
 
   // -- Check existing session on mount --
   useEffect(() => {
@@ -310,6 +320,78 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     setTeamMembers(prev => prev.filter(m => m.id !== id));
   };
 
+  // -- Data quality helpers --
+  const normalizeMint = (s: string) =>
+    s.toLowerCase().replace(/[^a-z]/g, '');
+
+  const loadDuplicates = useCallback(async (field: 'mint' | 'ruler', cc: 'IS' | 'SS') => {
+    setDqLoading(true);
+    setDqGroups([]);
+    setDqError('');
+    const arField = field === 'mint' ? 'mint_ar' : 'ruler_ar';
+    // Paginate to get all distinct values with counts
+    const freq: Record<string, number> = {};
+    let offset = 0;
+    while (true) {
+      const { data, error } = await supabase
+        .from('coins')
+        .select(field)
+        .eq('cc', cc)
+        .neq(field, '')
+        .range(offset, offset + 999);
+      if (error || !data) { setDqError(error?.message ?? 'Fetch error'); break; }
+      for (const row of data) {
+        const v = (row as Record<string, string>)[field];
+        if (v) freq[v] = (freq[v] || 0) + 1;
+      }
+      if (data.length < 1000) break;
+      offset += 1000;
+    }
+    void arField;
+    // Group by normalized key
+    const groups: Record<string, { v: string; c: number }[]> = {};
+    for (const [v, c] of Object.entries(freq)) {
+      const key = normalizeMint(v);
+      if (!key) continue;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push({ v, c });
+    }
+    const dups: DupGroup[] = Object.entries(groups)
+      .filter(([, arr]) => arr.length > 1)
+      .map(([normalized, arr]) => {
+        const sorted = arr.sort((a, b) => b.c - a.c);
+        return {
+          normalized,
+          variants: sorted.map(x => x.v),
+          counts:   sorted.map(x => x.c),
+          total:    sorted.reduce((s, x) => s + x.c, 0),
+        };
+      })
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 50);
+    setDqGroups(dups);
+    setDqLoading(false);
+  }, []);
+
+  const mergeVariants = async (field: 'mint' | 'ruler', canonical: string, variants: string[]) => {
+    const nonCanonical = variants.filter(v => v !== canonical);
+    if (!nonCanonical.length) return;
+    setDqMerging(canonical);
+    setDqError('');
+    const { error } = await supabase
+      .from('coins')
+      .update({ [field]: canonical })
+      .in(field, nonCanonical);
+    if (error) {
+      setDqError(error.message);
+    } else {
+      setDqMerged(canonical);
+      setDqGroups(prev => prev.filter(g => g.variants[0] !== canonical));
+      setTimeout(() => setDqMerged(null), 2000);
+    }
+    setDqMerging(null);
+  };
+
   // -- Coin helpers --
   const coinSearchResults = priceSearch.length >= 2
     ? ALL_COINS_DATA.filter(c =>
@@ -428,6 +510,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
   const canSeePrices      = userRole === 'super_admin' || userRole === 'price_admin';
   const canSeeSubmissions = userRole === 'super_admin' || userRole === 'price_admin';
   const canSeeTeam        = userRole === 'super_admin';
+  const canSeeData        = userRole === 'super_admin';
 
   const tabs = [
     canSeeCoins       && { key: 'coins'       as const, icon: <Plus size={13} />,        label: isAr ? 'إضافة عملة'  : 'Add Coin' },
@@ -435,7 +518,8 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
     canSeePrices      && { key: 'prices'      as const, icon: <DollarSign size={13} />,  label: isAr ? 'الأسعار'     : 'Prices' },
     canSeeSubmissions && { key: 'submissions' as const, icon: <Search size={13} />,      label: isAr ? 'المقترحات'   : 'Submissions' },
     canSeeTeam        && { key: 'team'        as const, icon: <Users size={13} />,       label: isAr ? 'الفريق'      : 'Team' },
-  ].filter(Boolean) as { key: 'coins' | 'edit' | 'prices' | 'submissions' | 'team'; icon: React.ReactNode; label: string }[];
+    canSeeData        && { key: 'data'        as const, icon: <Database size={13} />,    label: isAr ? 'جودة البيانات' : 'Data Quality' },
+  ].filter(Boolean) as { key: 'coins' | 'edit' | 'prices' | 'submissions' | 'team' | 'data'; icon: React.ReactNode; label: string }[];
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
@@ -478,6 +562,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                   setAdminTab(tab.key);
                   if (tab.key === 'submissions') loadSubmissions();
                   if (tab.key === 'team') loadTeam();
+                  if (tab.key === 'data') loadDuplicates(dqField, dqCc);
                 }}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[12px] font-medium transition-colors border-b-2
                   ${adminTab === tab.key ? 'border-gold-500 text-gold-600' : 'border-transparent text-ink/40 hover:text-ink/70'}`}>
@@ -1015,6 +1100,120 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                 )}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── DATA QUALITY TAB (super_admin only) ── */}
+        {adminTab === 'data' && canSeeData && (
+          <div className="px-6 py-5 space-y-4">
+            {/* Controls */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex rounded-lg border border-gold-700/30 overflow-hidden text-[11px]">
+                {(['mint', 'ruler'] as const).map(f => (
+                  <button key={f}
+                    onClick={() => { setDqField(f); setDqGroups([]); }}
+                    className={`px-3 py-1.5 transition-colors
+                      ${dqField === f ? 'bg-gold-500 text-ink font-semibold' : 'bg-parch-cream text-ink/50 hover:text-ink/80'}`}>
+                    {f === 'mint' ? (isAr ? 'دار الضرب' : 'Mint') : (isAr ? 'الحاكم' : 'Ruler')}
+                  </button>
+                ))}
+              </div>
+              <div className="flex rounded-lg border border-gold-700/30 overflow-hidden text-[11px]">
+                {(['IS', 'SS'] as const).map(cc => (
+                  <button key={cc}
+                    onClick={() => { setDqCc(cc); setDqGroups([]); }}
+                    className={`px-3 py-1.5 transition-colors
+                      ${dqCc === cc ? 'bg-gold-500 text-ink font-semibold' : 'bg-parch-cream text-ink/50 hover:text-ink/80'}`}>
+                    {cc === 'IS' ? 'Islamic' : 'Sasanian'}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => loadDuplicates(dqField, dqCc)}
+                disabled={dqLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-lg bg-gold-600 hover:bg-gold-500 text-ink font-medium disabled:opacity-40 transition-colors">
+                <Database size={12} />
+                {dqLoading ? (isAr ? 'جاري التحميل...' : 'Loading…') : (isAr ? 'تحليل' : 'Analyse')}
+              </button>
+            </div>
+
+            {dqError && (
+              <p className="text-[11px] text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{dqError}</p>
+            )}
+
+            {dqMerged && (
+              <p className="text-[11px] text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                ✓ {isAr ? 'تم الدمج إلى:' : 'Merged to:'} <strong>{dqMerged}</strong>
+              </p>
+            )}
+
+            {/* Results table */}
+            {!dqLoading && dqGroups.length === 0 && (
+              <p className="text-[12px] text-ink/40 text-center py-8">
+                {isAr ? 'اضغط "تحليل" لعرض المكررات' : 'Click "Analyse" to find duplicates'}
+              </p>
+            )}
+
+            {dqGroups.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-[11px] text-ink/40">
+                  {isAr
+                    ? `${dqGroups.length} مجموعة مكررة (أعلى 50 بالحجم)`
+                    : `${dqGroups.length} duplicate groups (top 50 by volume)`}
+                </p>
+                <div className="overflow-x-auto rounded-xl border border-gold-700/20">
+                  <table className="w-full text-[11px]">
+                    <thead>
+                      <tr className="bg-ink/5 border-b border-gold-700/20">
+                        <th className="text-start px-3 py-2 font-medium text-ink/50 w-24">{isAr ? 'المعيار' : 'Normalised'}</th>
+                        <th className="text-start px-3 py-2 font-medium text-ink/50">{isAr ? 'المتغيرات' : 'Variants'}</th>
+                        <th className="text-start px-3 py-2 font-medium text-ink/50 w-16">{isAr ? 'المجموع' : 'Total'}</th>
+                        <th className="px-3 py-2 w-24"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dqGroups.map(g => (
+                        <tr key={g.normalized} className="border-b border-gold-700/10 hover:bg-gold-500/5">
+                          <td className="px-3 py-2 font-mono text-ink/40 text-[10px] align-top">{g.normalized}</td>
+                          <td className="px-3 py-2 align-top">
+                            <div className="space-y-0.5">
+                              {g.variants.map((v, i) => (
+                                <div key={v} className="flex items-center gap-1.5">
+                                  {i === 0 && (
+                                    <span className="text-[9px] px-1 py-0.5 rounded bg-gold-500/20 text-gold-600 font-medium shrink-0">
+                                      {isAr ? 'معيار' : 'canonical'}
+                                    </span>
+                                  )}
+                                  <span className={i === 0 ? 'text-ink font-medium' : 'text-ink/50'}>{v}</span>
+                                  <span className="text-ink/25">({g.counts[i]})</span>
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="px-3 py-2 text-ink/60 align-top font-medium">{g.total.toLocaleString()}</td>
+                          <td className="px-3 py-2 align-top">
+                            <button
+                              onClick={() => mergeVariants(dqField, g.variants[0], g.variants)}
+                              disabled={dqMerging === g.variants[0]}
+                              className="flex items-center gap-1 px-2.5 py-1 text-[10px] rounded-lg bg-gold-600 hover:bg-gold-500 text-ink font-medium disabled:opacity-40 transition-colors whitespace-nowrap">
+                              <Merge size={10} />
+                              {dqMerging === g.variants[0]
+                                ? (isAr ? 'جارٍ...' : '…')
+                                : (isAr ? 'دمج' : 'Merge')}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-[10px] text-ink/30">
+                  {isAr
+                    ? 'الدمج يحول جميع المتغيرات إلى الشكل الأكثر شيوعاً (الأول في القائمة). لا يمكن التراجع عنه.'
+                    : 'Merge rewrites all variants to the most-common form (first in list). This cannot be undone.'}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
