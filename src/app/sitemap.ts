@@ -14,9 +14,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/${locale}/islamic/mints`,        lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.90 },
     { url: `${BASE}/${locale}/islamic/rulers`,       lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.90 },
     { url: `${BASE}/${locale}/islamic/coin-index`,   lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 },
+    { url: `${BASE}/${locale}/islamic/timeline`,     lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 },
     { url: `${BASE}/${locale}/sasanian`,             lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.90 },
     { url: `${BASE}/${locale}/sasanian/rulers`,      lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 },
     { url: `${BASE}/${locale}/sasanian/mints`,       lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 },
+    { url: `${BASE}/${locale}/mughal`,               lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.90 },
+    { url: `${BASE}/${locale}/mughal/rulers`,        lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 },
+    { url: `${BASE}/${locale}/mughal/mints`,         lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 },
+    { url: `${BASE}/${locale}/delhi`,                lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.90 },
+    { url: `${BASE}/${locale}/delhi/rulers`,         lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 },
+    { url: `${BASE}/${locale}/delhi/mints`,          lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 },
   ]);
 
   const countryPages: MetadataRoute.Sitemap = LOCALES.flatMap(locale =>

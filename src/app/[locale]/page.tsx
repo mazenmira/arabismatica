@@ -1,4 +1,4 @@
-// v7.0 — contrast fixes, scraping status, admin guard
+// v8.0 — dark catalogue section, coin-of-day repositioned, Ottoman/Parthian/Seleucid/Phoenician added
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -47,6 +47,12 @@ const ARAB_ISLAMIC_CARDS: CardEntry[] = [
     subtitleAr: '1206–1526م · الهند الإسلامية', subtitleEn: '1206–1526 CE · Islamic India', subtitleDe: '1206–1526 n.Chr. · Islamisches Indien',
     href: '/delhi', status: 'scraping',
   },
+  {
+    id: 'ottoman',
+    titleAr: 'الدولة العثمانية', titleEn: 'Ottoman Empire', titleDe: 'Osmanisches Reich',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
+  },
 ];
 
 const ANCIENT_CARDS: CardEntry[] = [
@@ -92,6 +98,24 @@ const ANCIENT_CARDS: CardEntry[] = [
     subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
     href: '', status: 'coming_soon',
   },
+  {
+    id: 'parthian',
+    titleAr: 'الإمبراطورية الفرثية', titleEn: 'Parthian Empire', titleDe: 'Partherreich',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
+  },
+  {
+    id: 'seleucid',
+    titleAr: 'الإمبراطورية السلوقية', titleEn: 'Seleucid Empire', titleDe: 'Seleukidenreich',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
+  },
+  {
+    id: 'phoenician',
+    titleAr: 'المدن الفينيقية', titleEn: 'Phoenician Cities', titleDe: 'Phönizische Städte',
+    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
+    href: '', status: 'coming_soon',
+  },
 ];
 
 const HERO_STATS = [
@@ -116,43 +140,49 @@ function CatalogueCard({ card, locale, isAr, isDe }: {
   const inner = (
     <div className={`relative rounded-lg border h-full transition-all duration-200 p-4 ${
       isActive
-        ? 'bg-white border-gray-200 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 cursor-pointer'
+        ? 'hover:border-amber-500/60 hover:shadow-md hover:-translate-y-0.5 cursor-pointer'
         : isScraping
-        ? 'bg-white border border-amber-200 hover:border-amber-300 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer'
-        : 'bg-gray-50 border-dashed border-gray-300 cursor-default'
-    }`}>
+        ? 'hover:border-amber-600/40 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer'
+        : 'cursor-default'
+    }`} style={
+      isActive
+        ? { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(139,109,46,0.3)' }
+        : isScraping
+        ? { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(139,109,46,0.2)' }
+        : { background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(139,109,46,0.15)' }
+    }>
 
       {isScraping && (
-        <span className="absolute top-2 end-2 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-medium">
+        <span className="absolute top-2 end-2 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-400 border border-amber-700/40 font-medium">
           {isAr ? 'في الإعداد' : 'Preparing'}
         </span>
       )}
       {card.status === 'coming_soon' && (
-        <span className="absolute top-2 end-2 text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-400 font-medium">
+        <span className="absolute top-2 end-2 text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-amber-200/30 font-medium">
           {comingSoon}
         </span>
       )}
 
       <div className={`font-amiri text-[14px] leading-snug mb-1 ${
-        isActive || isScraping ? 'text-gray-900' : 'text-gray-400'
+        isActive ? 'text-amber-100' : isScraping ? 'text-amber-200/70' : 'text-amber-200/25'
       }`}>
         {title}
       </div>
       <div className={`text-[10px] leading-relaxed ${
-        isActive ? 'text-gray-500' : isScraping ? 'text-gray-400' : 'text-gray-300'
+        isActive ? 'text-amber-300/60' : isScraping ? 'text-amber-300/40' : 'text-amber-300/20'
       }`}>
         {subtitle}
       </div>
       {note && (
-        <div className={`mt-1 text-[9px] italic ${isScraping || isActive ? 'text-amber-500/70' : 'text-gray-300'}`}>
+        <div className={`mt-1 text-[9px] italic ${isScraping || isActive ? 'text-amber-500/60' : 'text-amber-300/20'}`}>
           {note}
         </div>
       )}
       {isActive && (
-        <div className="mt-3 text-[11px] text-amber-700 font-medium">{browseLabel}</div>
+        <div className="mt-3 text-[11px] text-amber-400 font-medium">{browseLabel}</div>
       )}
       {isScraping && (
-        <div className="mt-3 text-[10px] text-amber-500/80 italic">{scrapingLabel}</div>
+        <div className="mt-3 text-[10px] text-amber-500/60 italic">{scrapingLabel}</div>
       )}
     </div>
   );
@@ -246,38 +276,9 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
         </div>
       </div>
 
-      {/* ── CATALOGUE INDEX ─────────────────────────────────────────────── */}
-      <div className="max-w-[1440px] mx-auto px-4 py-10">
-        <h2 className="text-[11px] text-gray-500 uppercase tracking-widest font-medium mb-7">
-          {t('الكتالوجات', 'Catalogues', 'Kataloge')}
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {GROUPS.map(g => (
-            <div key={g.idEn}>
-              <div className="mb-3 pb-2 border-b border-gray-200">
-                <h3 className="text-[15px] font-semibold text-gray-900 mb-1">
-                  {isAr ? g.idAr : isDe ? g.idDe : g.idEn}
-                </h3>
-                {(isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn) && (
-                  <p className="text-[12px] text-gray-500 italic">
-                    {isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn}
-                  </p>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {g.cards.map(card => (
-                  <CatalogueCard key={card.id} card={card} locale={locale} isAr={isAr} isDe={isDe} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* ── COIN OF THE DAY ─────────────────────────────────────────────── */}
       {coinOfDay && (
-        <div style={{ background: '#1a0e05' }}>
+        <div style={{ background: '#1a0e05', borderTop: '1px solid rgba(139,109,46,0.2)', borderBottom: '1px solid rgba(139,109,46,0.15)' }}>
           <div className="max-w-[1440px] mx-auto px-4 py-4">
             <div className="flex items-center gap-3 flex-wrap">
               <span className="text-[10px] text-amber-200/60 uppercase tracking-widest font-medium shrink-0 flex items-center gap-1">
@@ -304,6 +305,37 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
           </div>
         </div>
       )}
+
+      {/* ── CATALOGUE INDEX ─────────────────────────────────────────────── */}
+      <div style={{ background: '#1a0e05' }}>
+        <div className="max-w-[1440px] mx-auto px-4 py-10">
+          <h2 className="text-[11px] text-amber-300/40 uppercase tracking-widest font-medium mb-7">
+            {t('الكتالوجات', 'Catalogues', 'Kataloge')}
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {GROUPS.map(g => (
+              <div key={g.idEn}>
+                <div className="mb-3 pb-2" style={{ borderBottom: '1px solid rgba(139,109,46,0.2)' }}>
+                  <h3 className="text-[15px] font-semibold text-amber-200/80 mb-1">
+                    {isAr ? g.idAr : isDe ? g.idDe : g.idEn}
+                  </h3>
+                  {(isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn) && (
+                    <p className="text-[12px] text-amber-300/40 italic">
+                      {isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn}
+                    </p>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {g.cards.map(card => (
+                    <CatalogueCard key={card.id} card={card} locale={locale} isAr={isAr} isDe={isDe} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
     </main>
   );

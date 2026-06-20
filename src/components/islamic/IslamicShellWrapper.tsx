@@ -8,6 +8,7 @@ const NAV_ITEMS: ShellNavItem[] = [
   { labelAr: 'السلالات',      labelEn: 'Dynasties',   href: '/dynasties' },
   { labelAr: 'دور الضرب',     labelEn: 'Mints',       href: '/mints' },
   { labelAr: 'الحكام',        labelEn: 'Rulers',      href: '/rulers' },
+  { labelAr: 'الجدول الزمني', labelEn: 'Timeline',    href: '/timeline' },
   { labelAr: 'فهرس العملات',  labelEn: 'Coin Index',  href: '/coin-index' },
 ];
 

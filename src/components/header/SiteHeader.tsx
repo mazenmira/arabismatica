@@ -20,6 +20,8 @@ type NavChild = {
   grandchildren?: NavGrand[];
   isHijriTool?: boolean;
   isToolsSidebar?: boolean;
+  isDivider?: boolean;
+  isComingSoon?: boolean;
 };
 type NavTopItem = { label: string; isTools?: boolean; children: NavChild[] };
 
@@ -28,29 +30,18 @@ const TOP_NAV_ITEMS_AR: NavTopItem[] = [
     { label: 'زيارة المقتني العربي', href: `${WP}/` },
     { label: 'عن المقتني العربي',   href: `${WP}/about-us/` },
   ]},
-  { label: 'العالم العربي', children: [
+  { label: 'العالم العربي والإسلامي', children: [
     { label: 'العملات العربية الحديثة', href: '/ar/catalogue', grandchildren: [
       { label: 'حسب الدولة', href: '/ar/catalogue/countries' },
     ]},
     { label: 'العملات الإسلامية', href: '/ar/islamic', grandchildren: [
-      { label: 'السلالات',      href: '/ar/islamic/dynasties' },
-      { label: 'دور الضرب',     href: '/ar/islamic/mints' },
-      { label: 'فهرس العملات',  href: '/ar/islamic/coin-index' },
+      { label: 'السلالات',        href: '/ar/islamic/dynasties' },
+      { label: 'دور الضرب',       href: '/ar/islamic/mints' },
+      { label: 'الجدول الزمني',   href: '/ar/islamic/timeline' },
+      { label: 'فهرس العملات',    href: '/ar/islamic/coin-index' },
     ]},
-  ]},
-  { label: 'العالم القديم', children: [
-    { label: 'العملات الساسانية', href: '/ar/sasanian', grandchildren: [
-      { label: 'الحكام',       href: '/ar/sasanian/rulers' },
-      { label: 'دور الضرب',    href: '/ar/sasanian/mints' },
-      { label: 'فهرس العملات', href: '/ar/sasanian/coin-index' },
-    ]},
-    { label: 'العملات النبطية (قريباً)',    href: '' },
-    { label: 'العملات البيزنطية (قريباً)',  href: '' },
-    { label: 'العملات البطلمية (قريباً)',   href: '' },
-    { label: 'العملات الأخمينية (قريباً)',  href: '' },
-  ]},
-  { label: 'الإسلام الهندي', children: [
-    { label: 'العملات المغولية', href: '/ar/mughal', grandchildren: [
+    { isDivider: true, label: '' },
+    { label: 'الإمبراطورية المغولية', href: '/ar/mughal', grandchildren: [
       { label: 'الحكام',    href: '/ar/mughal/rulers' },
       { label: 'دور الضرب', href: '/ar/mughal/mints' },
     ]},
@@ -58,6 +49,22 @@ const TOP_NAV_ITEMS_AR: NavTopItem[] = [
       { label: 'الحكام',    href: '/ar/delhi/rulers' },
       { label: 'دور الضرب', href: '/ar/delhi/mints' },
     ]},
+    { isDivider: true, label: '' },
+    { label: 'الدولة العثمانية', isComingSoon: true },
+  ]},
+  { label: 'الشرق الأوسط القديم', children: [
+    { label: 'الإمبراطورية الساسانية', href: '/ar/sasanian', grandchildren: [
+      { label: 'الحكام',        href: '/ar/sasanian/rulers' },
+      { label: 'دور الضرب',     href: '/ar/sasanian/mints' },
+      { label: 'فهرس العملات',  href: '/ar/sasanian/coin-index' },
+    ]},
+    { isDivider: true, label: '' },
+    { label: 'الفرثيون',             isComingSoon: true },
+    { label: 'السلوقيون',            isComingSoon: true },
+    { label: 'المملكة النبطية',      isComingSoon: true },
+    { label: 'الإمبراطورية البيزنطية', isComingSoon: true },
+    { label: 'المملكة البطلمية',     isComingSoon: true },
+    { label: 'المدن الفينيقية',      isComingSoon: true },
   ]},
   { label: 'الأدوات', isTools: true, children: [
     { label: 'محول الهجري ↔ الميلادي', isHijriTool: true },
@@ -75,29 +82,18 @@ const TOP_NAV_ITEMS_EN: NavTopItem[] = [
     { label: 'Visit The Arab Collector', href: `${WP}/` },
     { label: 'About',                    href: `${WP}/about-us/` },
   ]},
-  { label: 'Arab World', children: [
+  { label: 'Arab & Islamic World', children: [
     { label: 'Modern Arab Coins', href: '/en/catalogue', grandchildren: [
       { label: 'By Country', href: '/en/catalogue/countries' },
     ]},
     { label: 'Islamic Coins', href: '/en/islamic', grandchildren: [
       { label: 'Dynasties',  href: '/en/islamic/dynasties' },
       { label: 'Mints',      href: '/en/islamic/mints' },
+      { label: 'Timeline',   href: '/en/islamic/timeline' },
       { label: 'Coin Index', href: '/en/islamic/coin-index' },
     ]},
-  ]},
-  { label: 'Ancient World', children: [
-    { label: 'Sasanian Coins', href: '/en/sasanian', grandchildren: [
-      { label: 'Rulers',     href: '/en/sasanian/rulers' },
-      { label: 'Mints',      href: '/en/sasanian/mints' },
-      { label: 'Coin Index', href: '/en/sasanian/coin-index' },
-    ]},
-    { label: 'Nabataean Coins (soon)',       href: '' },
-    { label: 'Byzantine Arab Coins (soon)', href: '' },
-    { label: 'Ptolemaic Coins (soon)',       href: '' },
-    { label: 'Achaemenid Coins (soon)',      href: '' },
-  ]},
-  { label: 'Islamic India', children: [
-    { label: 'Mughal Coins', href: '/en/mughal', grandchildren: [
+    { isDivider: true, label: '' },
+    { label: 'Mughal Empire', href: '/en/mughal', grandchildren: [
       { label: 'Rulers', href: '/en/mughal/rulers' },
       { label: 'Mints',  href: '/en/mughal/mints' },
     ]},
@@ -105,6 +101,22 @@ const TOP_NAV_ITEMS_EN: NavTopItem[] = [
       { label: 'Rulers', href: '/en/delhi/rulers' },
       { label: 'Mints',  href: '/en/delhi/mints' },
     ]},
+    { isDivider: true, label: '' },
+    { label: 'Ottoman Empire', isComingSoon: true },
+  ]},
+  { label: 'Ancient World', children: [
+    { label: 'Sasanian Empire', href: '/en/sasanian', grandchildren: [
+      { label: 'Rulers',     href: '/en/sasanian/rulers' },
+      { label: 'Mints',      href: '/en/sasanian/mints' },
+      { label: 'Coin Index', href: '/en/sasanian/coin-index' },
+    ]},
+    { isDivider: true, label: '' },
+    { label: 'Parthian Empire',     isComingSoon: true },
+    { label: 'Seleucid Empire',     isComingSoon: true },
+    { label: 'Nabataean Kingdom',   isComingSoon: true },
+    { label: 'Byzantine Empire',    isComingSoon: true },
+    { label: 'Ptolemaic Kingdom',   isComingSoon: true },
+    { label: 'Phoenician Cities',   isComingSoon: true },
   ]},
   { label: 'Tools', isTools: true, children: [
     { label: 'Hijri ↔ Gregorian Converter', isHijriTool: true },
@@ -131,29 +143,18 @@ const TOP_NAV_ITEMS_DE: NavTopItem[] = [
     { label: 'The Arab Collector besuchen', href: `${WP}/` },
     { label: 'Über uns',                    href: `${WP}/about-us/` },
   ]},
-  { label: 'Arabische Welt', children: [
+  { label: 'Arabische & Islamische Welt', children: [
     { label: 'Moderne arabische Münzen', href: '/de/catalogue', grandchildren: [
       { label: 'Nach Land', href: '/de/catalogue/countries' },
     ]},
     { label: 'Islamische Münzen', href: '/de/islamic', grandchildren: [
       { label: 'Dynastien',   href: '/de/islamic/dynasties' },
       { label: 'Münzstätten', href: '/de/islamic/mints' },
+      { label: 'Zeitleiste',  href: '/de/islamic/timeline' },
       { label: 'Münzindex',   href: '/de/islamic/coin-index' },
     ]},
-  ]},
-  { label: 'Alte Welt', children: [
-    { label: 'Sassanidische Münzen', href: '/de/sasanian', grandchildren: [
-      { label: 'Herrscher',   href: '/de/sasanian/rulers' },
-      { label: 'Münzstätten', href: '/de/sasanian/mints' },
-      { label: 'Münzindex',   href: '/de/sasanian/coin-index' },
-    ]},
-    { label: 'Nabatäische Münzen (bald)',         href: '' },
-    { label: 'Byzantinisch-arab. Münzen (bald)',  href: '' },
-    { label: 'Ptolemäische Münzen (bald)',        href: '' },
-    { label: 'Achämenidische Münzen (bald)',      href: '' },
-  ]},
-  { label: 'Islam. Indien', children: [
-    { label: 'Mogulreichmünzen', href: '/de/mughal', grandchildren: [
+    { isDivider: true, label: '' },
+    { label: 'Mogulreich', href: '/de/mughal', grandchildren: [
       { label: 'Herrscher',   href: '/de/mughal/rulers' },
       { label: 'Münzstätten', href: '/de/mughal/mints' },
     ]},
@@ -161,6 +162,22 @@ const TOP_NAV_ITEMS_DE: NavTopItem[] = [
       { label: 'Herrscher',   href: '/de/delhi/rulers' },
       { label: 'Münzstätten', href: '/de/delhi/mints' },
     ]},
+    { isDivider: true, label: '' },
+    { label: 'Osmanisches Reich', isComingSoon: true },
+  ]},
+  { label: 'Antike Welt', children: [
+    { label: 'Sassanidisches Reich', href: '/de/sasanian', grandchildren: [
+      { label: 'Herrscher',   href: '/de/sasanian/rulers' },
+      { label: 'Münzstätten', href: '/de/sasanian/mints' },
+      { label: 'Münzindex',   href: '/de/sasanian/coin-index' },
+    ]},
+    { isDivider: true, label: '' },
+    { label: 'Partherreich',              isComingSoon: true },
+    { label: 'Seleukidenreich',           isComingSoon: true },
+    { label: 'Nabatäisches Königreich',   isComingSoon: true },
+    { label: 'Byzantinisches Reich',      isComingSoon: true },
+    { label: 'Ptolemäisches Königreich',  isComingSoon: true },
+    { label: 'Phönizische Städte',        isComingSoon: true },
   ]},
   { label: 'Tools', isTools: true, children: [
     { label: 'Hidschra ↔ Gregorian',  isHijriTool: true },
@@ -321,6 +338,18 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                             </button>
                           );
                         }
+                        if (child.isDivider) {
+                          return <hr key={`div-${child.label || Math.random()}`} className="my-1 border-amber-100" />;
+                        }
+                        if (child.isComingSoon) {
+                          return (
+                            <span key={child.label}
+                              className="text-[12px] text-amber-300 cursor-not-allowed flex items-center justify-between px-4 py-2.5 select-none border-b border-amber-100 last:border-0">
+                              {child.label}
+                              <span className="text-[10px] bg-amber-100 text-amber-400 px-1.5 py-0.5 rounded-full font-medium">Soon</span>
+                            </span>
+                          );
+                        }
                         if (!child.href) {
                           return (
                             <span key={child.label}
@@ -450,6 +479,18 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                             className="w-full text-start block px-8 py-2.5 text-[12px] text-amber-700 hover:text-amber-950 border-b border-amber-100 last:border-0">
                             {child.label}
                           </button>
+                        );
+                      }
+                      if (child.isDivider) {
+                        return <hr key={`mob-div-${child.label}`} className="my-1 border-amber-200" />;
+                      }
+                      if (child.isComingSoon) {
+                        return (
+                          <span key={child.label}
+                            className="flex items-center justify-between px-8 py-2.5 text-[12px] text-amber-300 border-b border-amber-100 last:border-0 cursor-not-allowed select-none">
+                            {child.label}
+                            <span className="text-[10px] bg-amber-100 text-amber-400 px-1.5 py-0.5 rounded-full font-medium">Soon</span>
+                          </span>
                         );
                       }
                       if (!child.href) {

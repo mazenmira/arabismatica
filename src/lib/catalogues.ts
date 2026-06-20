@@ -1,11 +1,9 @@
 export type CatalogueStatus = 'active' | 'scraping' | 'coming_soon';
-export type CatalogueGroup = 'arab_islamic' | 'ancient';
+export type CatalogueGroup = 'arab_islamic_world' | 'ancient';
 
-export const CATALOGUE_GROUPS: Record<CatalogueGroup, {
-  labelAr: string; labelEn: string; labelDe: string;
-  descAr:  string; descEn:  string; descDe:  string;
-}> = {
-  arab_islamic: {
+export const CATALOGUE_GROUPS = [
+  {
+    id: 'arab_islamic_world' as CatalogueGroup,
     labelAr: 'المنطقة العربية والإسلامية',
     labelEn: 'Arab & Islamic World',
     labelDe: 'Arabische & Islamische Welt',
@@ -13,7 +11,8 @@ export const CATALOGUE_GROUPS: Record<CatalogueGroup, {
     descEn:  'Coins of the Arab world and Islamic tradition across continents',
     descDe:  'Münzen der arabischen Welt und der islamischen Tradition über Kontinente',
   },
-  ancient: {
+  {
+    id: 'ancient' as CatalogueGroup,
     labelAr: 'الشرق الأوسط القديم',
     labelEn: 'Ancient Middle East',
     labelDe: 'Antiker Naher Osten',
@@ -21,14 +20,14 @@ export const CATALOGUE_GROUPS: Record<CatalogueGroup, {
     descEn:  'Coins of ancient civilisations across the Middle East and North Africa',
     descDe:  'Münzen antiker Zivilisationen im Nahen Osten und Nordafrika',
   },
-};
+] as const;
 
 export const CATALOGUES = [
   // ── Arab & Islamic World ────────────────────────────────────────────────
   {
     id: 'arab',
     slug: 'catalogue',
-    group: 'arab_islamic' as CatalogueGroup,
+    group: 'arab_islamic_world' as CatalogueGroup,
     title: { ar: 'العملات العربية الحديثة', en: 'Modern Arab Coins', de: 'Moderne arabische Münzen' },
     subtitle: {
       ar: '5,505 عملة · 20 دولة · 1500–2026م',
@@ -52,7 +51,7 @@ export const CATALOGUES = [
   {
     id: 'islamic',
     slug: 'islamic',
-    group: 'arab_islamic' as CatalogueGroup,
+    group: 'arab_islamic_world' as CatalogueGroup,
     title: { ar: 'العملات الإسلامية الدينستية', en: 'Islamic Dynastic Coins', de: 'Islamische Dynastiemünzen' },
     subtitle: {
       ar: '47,303 عملة · 18 سلالة · 41–922هـ',
@@ -76,7 +75,7 @@ export const CATALOGUES = [
   {
     id: 'mughal',
     slug: 'mughal',
-    group: 'arab_islamic' as CatalogueGroup,
+    group: 'arab_islamic_world' as CatalogueGroup,
     title: { ar: 'العملات المغولية', en: 'Mughal Empire', de: 'Mogulreich' },
     subtitle: {
       ar: '1526–1857م · الهند الإسلامية',
@@ -95,7 +94,7 @@ export const CATALOGUES = [
   {
     id: 'delhi',
     slug: 'delhi',
-    group: 'arab_islamic' as CatalogueGroup,
+    group: 'arab_islamic_world' as CatalogueGroup,
     title: { ar: 'سلطنة دلهي', en: 'Delhi Sultanate', de: 'Delhi-Sultanat' },
     subtitle: {
       ar: '1206–1526م · الهند الإسلامية',
@@ -110,6 +109,20 @@ export const CATALOGUES = [
     navPath: '/delhi',
     ccFilter: { include: ['DS'] },
     status: 'scraping' as CatalogueStatus,
+  },
+
+  {
+    id: 'ottoman',
+    slug: 'ottoman',
+    group: 'arab_islamic_world' as CatalogueGroup,
+    title: { ar: 'الدولة العثمانية', en: 'Ottoman Empire', de: 'Osmanisches Reich' },
+    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
+    description: {
+      ar: 'عملات الدولة العثمانية العريقة التي حكمت على مدار ستة قرون',
+      en: 'Coins of the Ottoman Empire, which ruled for six centuries across three continents',
+      de: 'Münzen des Osmanischen Reichs, das sechs Jahrhunderte lang drei Kontinente regierte',
+    },
+    status: 'coming_soon' as CatalogueStatus,
   },
 
   // ── Ancient Middle East ─────────────────────────────────────────────────
@@ -212,6 +225,45 @@ export const CATALOGUES = [
       ar: 'عملات الإمبراطورية الأخمينية الفارسية — من قورش الكبير حتى دارا الثالث',
       en: 'Coins of the Achaemenid Persian Empire — from Cyrus the Great to Darius III',
       de: 'Münzen des achämenidischen Perserreichs — von Kyros dem Großen bis Dareios III',
+    },
+    status: 'coming_soon' as CatalogueStatus,
+  },
+  {
+    id: 'parthian',
+    slug: 'parthian',
+    group: 'ancient' as CatalogueGroup,
+    title: { ar: 'الإمبراطورية الفرثية', en: 'Parthian Empire', de: 'Partherreich' },
+    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
+    description: {
+      ar: 'عملات الإمبراطورية الفرثية — الحضارة الإيرانية التي حكمت الشرق الأوسط قرونًا',
+      en: 'Coins of the Parthian Empire — the Iranian dynasty that rivalled Rome for centuries',
+      de: 'Münzen des Partherreichs — die iranische Dynastie, die Roms Rivale war',
+    },
+    status: 'coming_soon' as CatalogueStatus,
+  },
+  {
+    id: 'seleucid',
+    slug: 'seleucid',
+    group: 'ancient' as CatalogueGroup,
+    title: { ar: 'الإمبراطورية السلوقية', en: 'Seleucid Empire', de: 'Seleukidenreich' },
+    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
+    description: {
+      ar: 'عملات الإمبراطورية السلوقية — خلفاء الإسكندر في الشرق',
+      en: 'Coins of the Seleucid Empire — Alexander\'s successors in the East',
+      de: 'Münzen des Seleukidenreichs — Alexanders Nachfolger im Osten',
+    },
+    status: 'coming_soon' as CatalogueStatus,
+  },
+  {
+    id: 'phoenician',
+    slug: 'phoenician',
+    group: 'ancient' as CatalogueGroup,
+    title: { ar: 'المدن الفينيقية', en: 'Phoenician Cities', de: 'Phönizische Städte' },
+    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
+    description: {
+      ar: 'عملات المدن الفينيقية — صور وصيدا وبيبلوس على ساحل لبنان',
+      en: 'Coins of the Phoenician cities — Tyre, Sidon and Byblos on the Lebanese coast',
+      de: 'Münzen der phönizischen Städte — Tyros, Sidon und Byblos an der libanesischen Küste',
     },
     status: 'coming_soon' as CatalogueStatus,
   },
