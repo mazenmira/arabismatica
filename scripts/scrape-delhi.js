@@ -33,6 +33,40 @@ const BATCH_SIZE       = 500;
 const LOG_EVERY        = 50;
 const TEST_LIMIT       = 5;
 
+// ── Ruler tables ─────────────────────────────────────────────────────────────
+
+const DELHI_RULER_AR = {
+  'Qutb al-Din Aybak':      'قطب الدين أيبك',
+  'Taj al-Din Yildiz':      'تاج الدين يلدز',
+  'Shams al-Din Iltutmish': 'شمس الدين إلتتمش',
+  'Iltutmish':              'إلتتمش',
+  'Raziya Sultana':         'رضية سلطانة',
+  'Balban':                 'بلبن',
+  'Jalal al-Din Firuz':     'جلال الدين فيروز',
+  'Ala al-Din Khalji':      'علاء الدين خلجي',
+  'Alauddin Khalji':        'علاء الدين خلجي',
+  'Muhammad bin Tughluq':   'محمد بن تغلق',
+  'Firuz Shah Tughluq':     'فيروز شاه تغلق',
+  'Ibrahim Lodi':           'إبراهيم لودي',
+  'Alauddin Masud':         'علاء الدين مسعود',
+  'Muhammad Adil Shah':     'محمد عادل شاه',
+};
+
+function cleanDelhiRuler(raw) {
+  if (!raw) return { ruler: '', ruler_ar: '' };
+  // Strip trailing AH date ranges: "Jalal al-Din Firuz AH689-695 / AD1290-1296"
+  let clean = raw
+    .replace(/\s+AH\d{3,4}[-–\/][\d\s\w]+$/, '')
+    .replace(/\s+AH\d{3,4}$/, '')
+    .replace(/\s+AD\d{4}[-–\/].*$/, '')
+    .replace(/,?\s*AH\d.*$/, '')
+    .trim();
+  // Also strip parenthetical dynasty notes like "(D0200)"
+  clean = clean.replace(/\s*\(D\d+\).*$/, '').trim();
+  const ruler_ar = DELHI_RULER_AR[clean] || '';
+  return { ruler: clean, ruler_ar };
+}
+
 // Delhi Sultanate category on Zeno.ru  (confirmed: cat=3265 under Medieval India - Islamic dynasties > cat=1053)
 const DEFAULT_CAT = {
   id:      3265,
@@ -49,6 +83,7 @@ const TEST_MODE    = hasFlag('--test');
 const RESUME_MODE  = hasFlag('--resume');
 const FULL_RUN     = hasFlag('--run');
 const DISCOVER     = hasFlag('--discover');
+const COUNT_MODE   = hasFlag('--count');
 const CUSTOM_LIMIT = getArg('--limit') ? parseInt(getArg('--limit')) : null;
 const CUSTOM_CAT   = getArg('--cat')   ? parseInt(getArg('--cat'))   : null;
 
@@ -248,14 +283,19 @@ function parseCoinPage(html, photoId) {
   const metalRaw  = extractField(infoHtml, 'Metal');
   const imgM     = html.match(/<img\s+class="photo"[^>]*src="([^"]+)"/);
   const photoUrl = imgM ? imgM[1] : '';
+  // Extract ruler from the subcategory breadcrumb (Zeno organises by ruler)
   const crumbRe  = /showgallery\.php\?cat=\d+[^>]*>([^<]{3,80})</g;
   const crumbs   = [];
   let cm;
   while ((cm = crumbRe.exec(html)) !== null) {
     const name = stripHtml(cm[1]).trim();
-    if (name && !name.toLowerCase().includes('delhi') && !name.toLowerCase().includes('sultanate')) crumbs.push(name);
+    if (name && !name.toLowerCase().includes('delhi') && !name.toLowerCase().includes('sultanate')
+             && !name.toLowerCase().includes('medieval') && !name.toLowerCase().includes('india')) {
+      crumbs.push(name);
+    }
   }
-  const subCatName = crumbs[crumbs.length - 1] || '';
+  const rawRulerCrumb = crumbs[crumbs.length - 1] || '';
+  const { ruler, ruler_ar } = cleanDelhiRuler(rawRulerCrumb);
   const yah = extractAH(dateRaw);
   const yce = yah ? ahToCe(yah) : '';
   const enrichment = parseEnrichmentData(html);
@@ -268,7 +308,7 @@ function parseCoinPage(html, photoId) {
     dyn:            'سلطنة دلهي',
     dyn_en:         'Delhi Sultanate',
     period_ce:      '1206-1526',
-    name:           rawTitle || [denomRaw, subCatName].filter(Boolean).join(', ') || `Z#${photoId}`,
+    name:           rawTitle || denomRaw || `Z#${photoId}`,
     nar:            '',
     yce,
     yah,
@@ -281,8 +321,8 @@ function parseCoinPage(html, photoId) {
     type:           'Circulation',
     mint:           mintRaw.replace(/[,\-\s]+$/g, '').trim(),
     mint_ar:        '',
-    ruler:          subCatName,
-    ruler_ar:       '',
+    ruler,
+    ruler_ar,
     o:              photoUrl,
     r:              '',
     prices:         null,
@@ -375,9 +415,10 @@ const loadOutput   = () => { try { return JSON.parse(fs.readFileSync(OUTPUT_FILE
 const saveOutput   = (c) => fs.writeFileSync(OUTPUT_FILE, JSON.stringify(c, null, 2));
 
 async function main() {
-  if (!TEST_MODE && !FULL_RUN && !RESUME_MODE && !CUSTOM_LIMIT && !DISCOVER && !CUSTOM_CAT) {
+  if (!TEST_MODE && !FULL_RUN && !RESUME_MODE && !CUSTOM_LIMIT && !DISCOVER && !CUSTOM_CAT && !COUNT_MODE) {
     console.log('Delhi Sultanate coin scraper');
     console.log('\nUsage:');
+    console.log('  node scripts/scrape-delhi.js --count          # count all coins across subcategories');
     console.log('  node scripts/scrape-delhi.js --test           # 5 coins from cat=3265');
     console.log('  node scripts/scrape-delhi.js --cat 375 --test # 5 coins from specific cat');
     console.log('  node scripts/scrape-delhi.js --discover       # find correct category IDs');
@@ -396,6 +437,14 @@ async function main() {
 
   if (DISCOVER) {
     await discoverCategories(session);
+    return;
+  }
+
+  if (COUNT_MODE) {
+    console.log(`\n══ Counting all coin IDs under cat=${CAT.id} (all subcategories)... ══`);
+    const allIds = new Set();
+    await collectIds(session, CAT.id, Infinity, allIds, new Set());
+    console.log(`  Total unique coins across all subcategories: ${allIds.size}`);
     return;
   }
 

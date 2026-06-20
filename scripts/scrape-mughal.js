@@ -33,6 +33,47 @@ const BATCH_SIZE       = 500;
 const LOG_EVERY        = 50;
 const TEST_LIMIT       = 5;
 
+// ── Ruler tables ─────────────────────────────────────────────────────────────
+
+// Ordered longest-first so "Aurangzeb Alamgir" matches before "Aurangzeb"
+const MUGHAL_RULERS = [
+  'Aurangzeb Alamgir', 'Bahadur Shah II', 'Shah Alam II', 'Alamgir II',
+  'Ahmad Shah', 'Muhammad Shah', 'Farrukhsiyar', 'Jahandar Shah',
+  'Bahadur Shah', 'Shah Jahan', 'Nur Jahan', 'Jahangir',
+  'Akbar', 'Humayun', 'Babur',
+];
+
+const MUGHAL_RULER_AR = {
+  'Aurangzeb Alamgir': 'أورنكزيب عالمكير',
+  'Muhammad Shah':     'محمد شاه',
+  'Shah Jahan':        'شاه جهان',
+  'Akbar':             'أكبر',
+  'Jahangir':          'جهانكير',
+  'Babur':             'بابر',
+  'Humayun':           'همايون',
+  'Farrukhsiyar':      'فرخسير',
+  'Bahadur Shah':      'بهادر شاه',
+  'Bahadur Shah II':   'بهادر شاه الثاني',
+  'Ahmad Shah':        'أحمد شاه',
+  'Shah Alam II':      'شاه عالم الثاني',
+  'Alamgir II':        'عالمكير الثاني',
+  'Jahandar Shah':     'جهاندار شاه',
+  'Nur Jahan':         'نور جهان',
+};
+
+function extractMughalRuler(coinName) {
+  if (!coinName) return { ruler: '', ruler_ar: '' };
+  for (const r of MUGHAL_RULERS) {
+    if (coinName.includes(r)) {
+      return { ruler: r, ruler_ar: MUGHAL_RULER_AR[r] || '' };
+    }
+  }
+  // Fallback: first comma-delimited segment that doesn't look like a denomination/AH date
+  const first = coinName.split(',')[0].trim();
+  const looksLikeDenom = /^(AR|AE|AV|BI)\b/i.test(first) || /^AH\d/i.test(first);
+  return { ruler: looksLikeDenom ? '' : first, ruler_ar: '' };
+}
+
 // Mughal Empire category on Zeno.ru  (confirmed: cat=585 under India > cat=861)
 const DEFAULT_CAT = {
   id:      585,
@@ -49,6 +90,7 @@ const TEST_MODE    = hasFlag('--test');
 const RESUME_MODE  = hasFlag('--resume');
 const FULL_RUN     = hasFlag('--run');
 const DISCOVER     = hasFlag('--discover');
+const COUNT_MODE   = hasFlag('--count');
 const CUSTOM_LIMIT = getArg('--limit') ? parseInt(getArg('--limit')) : null;
 const CUSTOM_CAT   = getArg('--cat')   ? parseInt(getArg('--cat'))   : null;
 
@@ -255,10 +297,11 @@ function parseCoinPage(html, photoId) {
     const name = stripHtml(cm[1]).trim();
     if (name && !name.toLowerCase().includes('mughal') && !name.toLowerCase().includes('india')) crumbs.push(name);
   }
-  const subCatName = crumbs[crumbs.length - 1] || '';
   const yah = extractAH(dateRaw);
   const yce = yah ? ahToCe(yah) : '';
   const enrichment = parseEnrichmentData(html);
+  const coinName = rawTitle || [denomRaw].filter(Boolean).join(', ') || `Z#${photoId}`;
+  const { ruler, ruler_ar } = extractMughalRuler(coinName);
 
   return {
     id:             `zeno-${photoId}`,
@@ -268,7 +311,7 @@ function parseCoinPage(html, photoId) {
     dyn:            'الإمبراطورية المغولية',
     dyn_en:         'Mughal Empire',
     period_ce:      '1526-1857',
-    name:           rawTitle || [denomRaw, subCatName].filter(Boolean).join(', ') || `Z#${photoId}`,
+    name:           coinName,
     nar:            '',
     yce,
     yah,
@@ -281,8 +324,8 @@ function parseCoinPage(html, photoId) {
     type:           'Circulation',
     mint:           mintRaw.replace(/[,\-\s]+$/g, '').trim(),
     mint_ar:        '',
-    ruler:          subCatName,
-    ruler_ar:       '',
+    ruler,
+    ruler_ar,
     o:              photoUrl,
     r:              '',
     prices:         null,
@@ -380,10 +423,19 @@ const saveProgress = (p) => fs.writeFileSync(PROGRESS_FILE, JSON.stringify(p, nu
 const loadOutput   = () => { try { return JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8')); } catch { return []; } };
 const saveOutput   = (c) => fs.writeFileSync(OUTPUT_FILE, JSON.stringify(c, null, 2));
 
+async function countAllIds(session, catId) {
+  console.log(`\n══ Counting all coin IDs under cat=${catId} (all subcategories)... ══`);
+  const allIds = new Set();
+  await collectIds(session, catId, Infinity, allIds, new Set());
+  console.log(`  Total unique coins across all subcategories: ${allIds.size}`);
+  return allIds;
+}
+
 async function main() {
-  if (!TEST_MODE && !FULL_RUN && !RESUME_MODE && !CUSTOM_LIMIT && !DISCOVER && !CUSTOM_CAT) {
+  if (!TEST_MODE && !FULL_RUN && !RESUME_MODE && !CUSTOM_LIMIT && !DISCOVER && !CUSTOM_CAT && !COUNT_MODE) {
     console.log('Mughal Empire coin scraper');
     console.log('\nUsage:');
+    console.log('  node scripts/scrape-mughal.js --count          # count all coins across subcategories');
     console.log('  node scripts/scrape-mughal.js --test           # 5 coins from cat=585');
     console.log('  node scripts/scrape-mughal.js --cat 392 --test # 5 coins from specific cat');
     console.log('  node scripts/scrape-mughal.js --discover       # find correct category IDs');
@@ -402,6 +454,11 @@ async function main() {
 
   if (DISCOVER) {
     await discoverCategories(session);
+    return;
+  }
+
+  if (COUNT_MODE) {
+    await countAllIds(session, CAT.id);
     return;
   }
 
