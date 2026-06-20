@@ -130,20 +130,20 @@ export default function CoinDetailPage({ coin, locale }: Props) {
       {/* JSON-LD */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div className="min-h-screen" style={{ background: 'var(--parch, #FAF6EE)' }} dir={isAr ? 'rtl' : 'ltr'}>
+      <div className="min-h-screen bg-white" dir={isAr ? 'rtl' : 'ltr'}>
         <div className="max-w-[900px] mx-auto px-4 py-8">
 
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-[12px] text-amber-700/60 mb-6 flex-wrap">
-            <Link href={`/${locale}`} className="hover:text-amber-700 transition-colors">
+          <nav className="flex items-center gap-1.5 text-[12px] text-gray-400 mb-6 flex-wrap">
+            <Link href={`/${locale}`} className="hover:text-gray-600 transition-colors">
               {isAr ? 'أرابيزماتيكا' : 'Arabismatica'}
             </Link>
             <ArrowRight size={12} className={isAr ? 'rotate-180' : ''} />
-            <Link href={`/${locale}`} className="hover:text-amber-700 transition-colors">
+            <Link href={`/${locale}`} className="hover:text-gray-600 transition-colors">
               {isAr ? coin.co_ar : coin.co}
             </Link>
             <ArrowRight size={12} className={isAr ? 'rotate-180' : ''} />
-            <span className="text-amber-900 font-medium truncate max-w-[240px]">{coinName}</span>
+            <span className="text-gray-600 font-medium truncate max-w-[240px]">{coinName}</span>
           </nav>
 
           <div className="bg-white rounded-2xl shadow-sm border border-amber-100 overflow-hidden">
@@ -190,9 +190,9 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                   coin.wt  ? { label: isAr ? 'الوزن' : 'Weight',   value: `${coin.wt} g` }  : null,
                   coin.dia ? { label: isAr ? 'القطر' : 'Diameter', value: `${coin.dia} mm` } : null,
                 ].filter(Boolean).map((item, i) => (
-                  <div key={i} className="bg-amber-50 rounded-xl px-3 py-2.5 border border-amber-100">
-                    <div className="text-[9px] text-amber-600/60 uppercase tracking-wider mb-1">{item!.label}</div>
-                    <div className="text-[13px] font-medium text-amber-900">{item!.value}</div>
+                  <div key={i} className="bg-white rounded-lg px-3 py-2.5 border border-gray-200 shadow-sm">
+                    <div className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-1">{item!.label}</div>
+                    <div className="text-[14px] font-medium text-gray-900">{item!.value}</div>
                   </div>
                 ))}
               </div>
@@ -282,9 +282,9 @@ export default function CoinDetailPage({ coin, locale }: Props) {
               {/* ── Mintage table ── */}
               {mintageData.length > 0 && (
                 <div className="mb-6">
-                  <h2 className="text-[13px] font-semibold text-amber-900 mb-2 flex items-center gap-2">
+                  <h2 className="text-[13px] font-semibold text-gray-900 mb-2 flex items-center gap-2">
                     {isAr ? 'إصدارات النوع' : 'Type Issues'}
-                    <span className="text-[10px] font-normal text-amber-600/50">({mintageData.length})</span>
+                    <span className="text-[10px] font-normal text-gray-400">({mintageData.length})</span>
                   </h2>
 
                   {mintageData.some(d => d.Mintmark && d.Mintmark !== 'None') && (
@@ -293,19 +293,19 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                     </div>
                   )}
 
-                  <div className="rounded-xl overflow-hidden border border-amber-100">
+                  <div className="rounded-lg overflow-hidden border border-gray-200">
                     <table className="w-full text-[12px]" dir={isAr ? 'rtl' : 'ltr'}>
                       <thead>
-                        <tr className="bg-amber-50 border-b border-amber-100">
-                          <th className="px-3 py-2 text-[10px] text-amber-600/70 font-medium text-start uppercase tracking-wide">{isAr ? 'التاريخ' : 'Date'}</th>
-                          <th className="px-3 py-2 text-[10px] text-amber-600/70 font-medium text-center uppercase tracking-wide">{isAr ? 'علامة' : 'Mint'}</th>
-                          <th className="px-3 py-2 text-[10px] text-amber-600/70 font-medium text-end uppercase tracking-wide">{isAr ? 'المضروب' : 'Mintage'}</th>
-                          <th className="px-3 py-2 text-[10px] text-amber-600/70 font-medium text-center uppercase tracking-wide">{isAr ? 'الندرة' : 'Rarity'}</th>
+                        <tr className="bg-gray-50 border-b border-gray-200">
+                          <th className="px-3 py-2 text-[10px] text-gray-500 font-medium text-start uppercase tracking-wide">{isAr ? 'التاريخ' : 'Date'}</th>
+                          <th className="px-3 py-2 text-[10px] text-gray-500 font-medium text-center uppercase tracking-wide">{isAr ? 'علامة' : 'Mint'}</th>
+                          <th className="px-3 py-2 text-[10px] text-gray-500 font-medium text-end uppercase tracking-wide">{isAr ? 'المضروب' : 'Mintage'}</th>
+                          <th className="px-3 py-2 text-[10px] text-gray-500 font-medium text-center uppercase tracking-wide">{isAr ? 'الندرة' : 'Rarity'}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {mintageData.map((entry, i) => (
-                          <tr key={i} className="border-b border-amber-50 last:border-0 hover:bg-amber-50/50 transition-colors">
+                          <tr key={i} className="bg-white border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
                             <td className="px-3 py-2.5">
                               {entry.YearHijri && <div className="font-amiri text-amber-900 text-[13px]">{entry.YearHijri} هـ</div>}
                               {entry.YearGregorian && <div className="text-[11px] text-amber-700/60">{entry.YearGregorian} م</div>}
@@ -351,23 +351,21 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                 const grades = ['G','VG','F','VF','XF','AU','UNC'] as const;
                 const filled = grades.filter(g => coin.prices![g] !== null);
                 return (
-                  <div className="mb-6 rounded-xl border border-amber-200 overflow-hidden">
-                    <div className="flex items-center justify-between bg-amber-50 px-4 py-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9px] text-amber-600/60 uppercase tracking-widest font-medium">
-                          {isAr ? 'دليل الأسعار — أسعار مرجعية (USD)' : 'Price Guide — Reference Prices (USD)'}
-                        </span>
-                      </div>
-                      <span className="text-[9px] text-amber-500/60 italic">
+                  <div className="mb-6 rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                    <div className="flex items-center justify-between bg-gray-50 px-4 py-2 border-b border-gray-200">
+                      <span className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">
+                        {isAr ? 'دليل الأسعار — أسعار مرجعية (USD)' : 'Price Guide — Reference Prices (USD)'}
+                      </span>
+                      <span className="text-[9px] text-gray-400 italic">
                         {isAr ? 'مصدر: كتالوج' : 'Source: catalogue'}
                       </span>
                     </div>
                     <div className="grid grid-cols-4 sm:grid-cols-7 bg-white">
                       {filled.map((g, i) => (
                         <div key={g}
-                          className={`flex flex-col items-center py-3 px-1 ${i < filled.length - 1 ? 'border-e border-amber-100' : ''}`}>
-                          <div className="text-[9px] text-amber-600/60 font-semibold uppercase mb-1">{g}</div>
-                          <div className="text-[14px] font-bold text-amber-900 font-amiri">${coin.prices![g]}</div>
+                          className={`flex flex-col items-center py-3 px-1 ${i < filled.length - 1 ? 'border-e border-gray-100' : ''}`}>
+                          <div className="text-[10px] text-gray-400 uppercase tracking-wider font-medium mb-1">{g}</div>
+                          <div className="text-xl font-bold text-gray-900">${coin.prices![g]}</div>
                         </div>
                       ))}
                     </div>
@@ -381,9 +379,9 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                 if (related.length === 0) return null;
                 return (
                   <div className="mb-6">
-                    <h2 className="text-[13px] font-semibold text-amber-900 mb-3 flex items-center gap-2">
+                    <h2 className="text-[13px] font-semibold text-gray-900 mb-3 flex items-center gap-2">
                       {isAr ? 'عملات ذات صلة' : 'Related Coins'}
-                      <span className="text-[10px] font-normal text-amber-600/50">({related.length})</span>
+                      <span className="text-[10px] font-normal text-gray-400">({related.length})</span>
                     </h2>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                       {related.map(rc => {
@@ -393,7 +391,7 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                           <a
                             key={rc.id}
                             href={`/${locale}/catalogue/${rc.id}`}
-                            className="flex flex-col items-center gap-1.5 p-2 rounded-xl border border-amber-100 hover:border-amber-300 hover:bg-amber-50 transition-all group"
+                            className="flex flex-col items-center gap-1.5 p-2 rounded-xl border border-gray-200 hover:border-amber-400 hover:shadow-sm hover:bg-white transition-all group"
                           >
                             {isValidImageUrl(rc.o) ? (
                               // eslint-disable-next-line @next/next/no-img-element
@@ -406,8 +404,8 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                             ) : (
                               <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-lg border-2 border-amber-200">🪙</div>
                             )}
-                            <span className="text-[9px] text-amber-800 text-center leading-tight line-clamp-2 font-amiri">{rcName}</span>
-                            {rcYear && <span className="text-[8px] text-amber-500">{rcYear}</span>}
+                            <span className="text-[9px] text-gray-700 text-center leading-tight line-clamp-2 font-amiri">{rcName}</span>
+                            {rcYear && <span className="text-[8px] text-gray-400">{rcYear}</span>}
                           </a>
                         );
                       })}
@@ -417,9 +415,9 @@ export default function CoinDetailPage({ coin, locale }: Props) {
               })()}
 
               {/* ── View in catalogue CTA ── */}
-              <div className="flex items-center justify-between flex-wrap gap-3 pt-4 border-t border-amber-100">
+              <div className="flex items-center justify-between flex-wrap gap-3 pt-4 border-t border-gray-200">
                 <Link href={`/${locale}`}
-                  className="inline-flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-full bg-[#1a0e05] text-amber-300 hover:bg-[#2a1a08] transition-colors font-medium">
+                  className="inline-flex items-center gap-2 text-[13px] px-5 py-2.5 rounded-full bg-gray-900 text-white hover:bg-gray-700 transition-colors font-medium">
                   <ArrowRight size={14} className={isAr ? '' : 'rotate-180'} />
                   {isAr ? 'العودة إلى الكتالوج' : 'Back to Catalogue'}
                 </Link>

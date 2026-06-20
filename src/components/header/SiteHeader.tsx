@@ -52,7 +52,7 @@ const TOP_NAV_ITEMS_AR: NavTopItem[] = [
     { isDivider: true, label: '' },
     { label: 'الدولة العثمانية', isComingSoon: true },
   ]},
-  { label: 'الشرق الأوسط القديم', children: [
+  { label: 'الشرق الأدنى القديم', children: [
     { label: 'الإمبراطورية الساسانية', href: '/ar/sasanian', grandchildren: [
       { label: 'الحكام',        href: '/ar/sasanian/rulers' },
       { label: 'دور الضرب',     href: '/ar/sasanian/mints' },
@@ -104,7 +104,7 @@ const TOP_NAV_ITEMS_EN: NavTopItem[] = [
     { isDivider: true, label: '' },
     { label: 'Ottoman Empire', isComingSoon: true },
   ]},
-  { label: 'Ancient World', children: [
+  { label: 'Ancient Near East', children: [
     { label: 'Sasanian Empire', href: '/en/sasanian', grandchildren: [
       { label: 'Rulers',     href: '/en/sasanian/rulers' },
       { label: 'Mints',      href: '/en/sasanian/mints' },
@@ -165,7 +165,7 @@ const TOP_NAV_ITEMS_DE: NavTopItem[] = [
     { isDivider: true, label: '' },
     { label: 'Osmanisches Reich', isComingSoon: true },
   ]},
-  { label: 'Antike Welt', children: [
+  { label: 'Alter Naher Osten', children: [
     { label: 'Sassanidisches Reich', href: '/de/sasanian', grandchildren: [
       { label: 'Herrscher',   href: '/de/sasanian/rulers' },
       { label: 'Münzstätten', href: '/de/sasanian/mints' },

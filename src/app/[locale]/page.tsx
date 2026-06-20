@@ -30,7 +30,7 @@ const ARAB_ISLAMIC_CARDS: CardEntry[] = [
   },
   {
     id: 'islamic',
-    titleAr: 'العملات الإسلامية الدينستية', titleEn: 'Islamic Dynastic Coins', titleDe: 'Islamische Dynastiemünzen',
+    titleAr: 'العملات الإسلامية', titleEn: 'Islamic Dynastic Coins', titleDe: 'Islamische Dynastiemünzen',
     subtitleAr: '47,303 عملة · 18 سلالة · 41–922هـ', subtitleEn: '47,303 coins · 18 dynasties · 41–922 AH', subtitleDe: '47.303 Münzen · 18 Dynastien · 41–922 AH',
     href: '/islamic', status: 'active',
   },
@@ -137,59 +137,42 @@ function CatalogueCard({ card, locale, isAr, isDe }: {
   const comingSoon   = isAr ? 'قريباً'  : isDe ? 'Demnächst' : 'Coming soon';
   const scrapingLabel = isAr ? 'في الإعداد · قريباً' : isDe ? 'In Vorbereitung · bald' : 'In preparation · launching soon';
 
-  const inner = (
-    <div className={`relative rounded-xl border h-full transition-all duration-200 p-4 ${
-      isActive
-        ? 'bg-white border-stone-200 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 cursor-pointer dark:bg-white/[0.08] dark:border-amber-700/[0.35] dark:hover:border-amber-500/60 dark:hover:bg-white/[0.12]'
-        : isScraping
-        ? 'bg-white border-stone-200 hover:border-amber-300 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer dark:bg-white/[0.04] dark:border-amber-700/[0.2]'
-        : 'bg-stone-50 border-dashed border-stone-300 cursor-default dark:bg-white/[0.02] dark:border-amber-900/[0.2]'
-    }`}>
+  const inner = isActive || isScraping ? (
+    <div className="relative rounded-xl border border-gray-200 dark:border-amber-700/35 h-full p-5 bg-gray-50 dark:bg-white/[0.08] hover:bg-white dark:hover:bg-white/[0.12] hover:border-amber-400 dark:hover:border-amber-500/60 hover:shadow-md transition-all duration-200 cursor-pointer">
 
       {isScraping && (
         <span className="absolute top-2 end-2 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-medium dark:bg-amber-900/40 dark:text-amber-400 dark:border-amber-700/40">
           {isAr ? 'في الإعداد' : 'Preparing'}
         </span>
       )}
-      {card.status === 'coming_soon' && (
-        <span className="absolute top-2 end-2 text-[10px] px-2 py-0.5 rounded-full bg-stone-100 text-stone-400 border border-stone-300 font-medium dark:bg-transparent dark:text-amber-700/50 dark:border-amber-900/30">
-          {comingSoon}
-        </span>
-      )}
 
-      <div className={`font-amiri text-[14px] leading-snug mb-1 ${
-        isActive
-          ? 'text-stone-900 dark:text-amber-100'
-          : isScraping
-          ? 'text-stone-600 dark:text-amber-200/70'
-          : 'text-stone-400 dark:text-amber-300/35'
+      <div className={`font-amiri text-[15px] leading-snug mb-1 ${
+        isActive ? 'text-gray-900 dark:text-amber-100' : 'text-gray-600 dark:text-amber-200/70'
       }`}>
         {title}
       </div>
-      <div className={`text-[10px] leading-relaxed ${
-        isActive
-          ? 'text-stone-500 dark:text-amber-300/60'
-          : isScraping
-          ? 'text-stone-400 dark:text-amber-300/40'
-          : 'text-stone-300 dark:text-amber-300/20'
+      <div className={`text-[12px] mb-3 ${
+        isActive ? 'text-gray-500 dark:text-amber-300/60' : 'text-gray-400 dark:text-amber-300/40'
       }`}>
         {subtitle}
       </div>
       {note && (
-        <div className={`mt-1 text-[9px] italic ${
-          isScraping || isActive
-            ? 'text-amber-600/70 dark:text-amber-500/60'
-            : 'text-stone-300 dark:text-amber-300/20'
-        }`}>
-          {note}
-        </div>
+        <div className="text-[10px] italic text-amber-600/70 dark:text-amber-500/60 mb-2">{note}</div>
       )}
       {isActive && (
-        <div className="mt-3 text-[11px] text-amber-700 dark:text-amber-400 font-medium">{browseLabel}</div>
+        <div className="text-[13px] text-amber-700 dark:text-amber-400 hover:text-amber-600 font-medium">{browseLabel}</div>
       )}
       {isScraping && (
-        <div className="mt-3 text-[10px] text-amber-600/60 dark:text-amber-500/60 italic">{scrapingLabel}</div>
+        <div className="text-[12px] text-gray-400 dark:text-amber-500/60 italic">{scrapingLabel}</div>
       )}
+    </div>
+  ) : (
+    <div className="relative rounded-xl border border-dashed border-gray-200 dark:border-amber-900/20 h-full p-5 bg-gray-50 dark:bg-white/[0.04] opacity-60 cursor-not-allowed transition-all duration-200">
+      <span className="absolute top-2 end-2 text-[10px] px-2 py-0.5 rounded-full bg-white dark:bg-transparent text-gray-400 dark:text-amber-700/50 border border-gray-200 dark:border-amber-900/30 font-medium">
+        {comingSoon}
+      </span>
+      <div className="font-amiri text-[15px] leading-snug mb-1 text-gray-400 dark:text-amber-300/35">{title}</div>
+      <div className="text-[12px] text-gray-300 dark:text-amber-300/20">{subtitle}</div>
     </div>
   );
 
@@ -228,14 +211,14 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
       cards: ARAB_ISLAMIC_CARDS,
     },
     {
-      idAr: 'الشرق الأوسط القديم', idEn: 'Ancient Middle East', idDe: 'Antiker Naher Osten',
+      idAr: 'الشرق الأدنى القديم', idEn: 'Ancient Near East', idDe: 'Alter Naher Osten',
       noteAr: '', noteEn: '', noteDE: '',
       cards: ANCIENT_CARDS,
     },
   ];
 
   return (
-    <main className="min-h-screen bg-[#FAF6EE]" dir={isAr ? 'rtl' : 'ltr'}>
+    <main className="min-h-screen bg-white" dir={isAr ? 'rtl' : 'ltr'}>
       <SiteHeader locale={locale} />
 
       {/* ── HERO ────────────────────────────────────────────────────────── */}
@@ -260,8 +243,8 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
           </p>
           <p className="text-amber-300/70 text-[13px] md:text-[15px] max-w-lg mb-8">
             {t(
-              'استكشف عملات العالم العربي والتاريخ الإسلامي والشرق الأوسط القديم',
-              'Explore coins from across the Arab world, Islamic history, and the ancient Middle East',
+              'استكشف عملات العالم العربي والتاريخ الإسلامي والشرق الأدنى القديم',
+              'Explore coins from across the Arab world, Islamic history, and the ancient Near East',
               'Erkunde Münzen aus der arabischen Welt, der islamischen Geschichte und dem alten Nahen Osten'
             )}
           </p>
@@ -313,21 +296,21 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
       )}
 
       {/* ── CATALOGUE INDEX ─────────────────────────────────────────────── */}
-      <div className="catalogue-section bg-stone-100 dark:bg-[#2d1f0e] transition-colors duration-300">
+      <div className="catalogue-section bg-white dark:bg-[#2d1f0e] transition-colors duration-300">
         <div className="max-w-[1440px] mx-auto px-4 py-10">
-          <h2 className="text-[11px] text-stone-500 dark:text-amber-300/50 uppercase tracking-widest font-medium mb-7">
+          <h2 className="text-[11px] text-gray-400 dark:text-amber-300/50 uppercase tracking-widest font-medium mb-7 pb-2 border-b border-gray-200 dark:border-amber-900/30">
             {t('الكتالوجات', 'Catalogues', 'Kataloge')}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {GROUPS.map(g => (
               <div key={g.idEn}>
-                <div className="mb-3 pb-2 border-b border-stone-300 dark:border-amber-900/30">
-                  <h3 className="text-[15px] font-semibold text-stone-900 dark:text-amber-100 mb-1">
+                <div className="mb-4">
+                  <h3 className="font-amiri text-[17px] font-semibold text-gray-900 dark:text-amber-100 mb-1">
                     {isAr ? g.idAr : isDe ? g.idDe : g.idEn}
                   </h3>
                   {(isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn) && (
-                    <p className="text-[12px] text-stone-500 dark:text-amber-300/40 italic">
+                    <p className="text-[12px] text-gray-500 dark:text-amber-300/50 italic mb-3">
                       {isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn}
                     </p>
                   )}

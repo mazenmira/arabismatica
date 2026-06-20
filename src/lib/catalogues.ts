@@ -13,12 +13,12 @@ export const CATALOGUE_GROUPS = [
   },
   {
     id: 'ancient' as CatalogueGroup,
-    labelAr: 'الشرق الأوسط القديم',
-    labelEn: 'Ancient Middle East',
-    labelDe: 'Antiker Naher Osten',
-    descAr:  'عملات الحضارات القديمة في منطقة الشرق الأوسط وشمال أفريقيا',
-    descEn:  'Coins of ancient civilisations across the Middle East and North Africa',
-    descDe:  'Münzen antiker Zivilisationen im Nahen Osten und Nordafrika',
+    labelAr: 'الشرق الأدنى القديم',
+    labelEn: 'Ancient Near East',
+    labelDe: 'Alter Naher Osten',
+    descAr:  'حضارات الشرق الأدنى القديم قبل الإسلام',
+    descEn:  'Civilisations of the ancient Near East',
+    descDe:  'Zivilisationen des alten Nahen Ostens',
   },
 ] as const;
 
@@ -52,7 +52,7 @@ export const CATALOGUES = [
     id: 'islamic',
     slug: 'islamic',
     group: 'arab_islamic_world' as CatalogueGroup,
-    title: { ar: 'العملات الإسلامية الدينستية', en: 'Islamic Dynastic Coins', de: 'Islamische Dynastiemünzen' },
+    title: { ar: 'العملات الإسلامية', en: 'Islamic Dynastic Coins', de: 'Islamische Dynastiemünzen' },
     subtitle: {
       ar: '47,303 عملة · 18 سلالة · 41–922هـ',
       en: '47,303 coins · 18 dynasties · 41–922 AH',
