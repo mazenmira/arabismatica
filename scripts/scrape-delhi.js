@@ -33,10 +33,9 @@ const BATCH_SIZE       = 500;
 const LOG_EVERY        = 50;
 const TEST_LIMIT       = 5;
 
-// Delhi Sultanate category on Zeno.ru
-// If wrong, run with --discover to find the correct cat ID
+// Delhi Sultanate category on Zeno.ru  (confirmed: cat=3265 under Medieval India - Islamic dynasties > cat=1053)
 const DEFAULT_CAT = {
-  id:      380,
+  id:      3265,
   name:    'Delhi Sultanate',
   name_ar: 'سلطنة دلهي',
   cc:      'DS',
@@ -379,7 +378,7 @@ async function main() {
   if (!TEST_MODE && !FULL_RUN && !RESUME_MODE && !CUSTOM_LIMIT && !DISCOVER && !CUSTOM_CAT) {
     console.log('Delhi Sultanate coin scraper');
     console.log('\nUsage:');
-    console.log('  node scripts/scrape-delhi.js --test           # 5 coins from cat=380');
+    console.log('  node scripts/scrape-delhi.js --test           # 5 coins from cat=3265');
     console.log('  node scripts/scrape-delhi.js --cat 375 --test # 5 coins from specific cat');
     console.log('  node scripts/scrape-delhi.js --discover       # find correct category IDs');
     console.log('  node scripts/scrape-delhi.js --run            # full scrape');

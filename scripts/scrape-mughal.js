@@ -33,10 +33,9 @@ const BATCH_SIZE       = 500;
 const LOG_EVERY        = 50;
 const TEST_LIMIT       = 5;
 
-// Mughal Empire category on Zeno.ru
-// If wrong, run with --discover to find the correct cat ID
+// Mughal Empire category on Zeno.ru  (confirmed: cat=585 under India > cat=861)
 const DEFAULT_CAT = {
-  id:      385,
+  id:      585,
   name:    'Mughal Empire',
   name_ar: 'الإمبراطورية المغولية',
   cc:      'MG',
@@ -385,7 +384,7 @@ async function main() {
   if (!TEST_MODE && !FULL_RUN && !RESUME_MODE && !CUSTOM_LIMIT && !DISCOVER && !CUSTOM_CAT) {
     console.log('Mughal Empire coin scraper');
     console.log('\nUsage:');
-    console.log('  node scripts/scrape-mughal.js --test           # 5 coins from cat=385');
+    console.log('  node scripts/scrape-mughal.js --test           # 5 coins from cat=585');
     console.log('  node scripts/scrape-mughal.js --cat 392 --test # 5 coins from specific cat');
     console.log('  node scripts/scrape-mughal.js --discover       # find correct category IDs');
     console.log('  node scripts/scrape-mughal.js --run            # full scrape');
