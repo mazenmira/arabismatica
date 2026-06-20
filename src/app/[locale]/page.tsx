@@ -1,5 +1,7 @@
-// v8.0 — dark catalogue section, coin-of-day repositioned, Ottoman/Parthian/Seleucid/Phoenician added
+// v9.0 — light/dark mode catalogue section with Tailwind dark: variants
 'use client';
+
+export const revalidate = 3600;
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -138,51 +140,57 @@ function CatalogueCard({ card, locale, isAr, isDe }: {
   const scrapingLabel = isAr ? 'في الإعداد · قريباً' : isDe ? 'In Vorbereitung · bald' : 'In preparation · launching soon';
 
   const inner = (
-    <div className={`relative rounded-lg border h-full transition-all duration-200 p-4 ${
+    <div className={`relative rounded-xl border h-full transition-all duration-200 p-4 ${
       isActive
-        ? 'hover:border-amber-500/60 hover:shadow-md hover:-translate-y-0.5 cursor-pointer'
+        ? 'bg-white border-stone-200 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 cursor-pointer dark:bg-white/[0.08] dark:border-amber-700/[0.35] dark:hover:border-amber-500/60 dark:hover:bg-white/[0.12]'
         : isScraping
-        ? 'hover:border-amber-600/40 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer'
-        : 'cursor-default'
-    }`} style={
-      isActive
-        ? { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(139,109,46,0.3)' }
-        : isScraping
-        ? { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(139,109,46,0.2)' }
-        : { background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(139,109,46,0.15)' }
-    }>
+        ? 'bg-white border-stone-200 hover:border-amber-300 hover:shadow-sm hover:-translate-y-0.5 cursor-pointer dark:bg-white/[0.04] dark:border-amber-700/[0.2]'
+        : 'bg-stone-50 border-dashed border-stone-300 cursor-default dark:bg-white/[0.02] dark:border-amber-900/[0.2]'
+    }`}>
 
       {isScraping && (
-        <span className="absolute top-2 end-2 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-400 border border-amber-700/40 font-medium">
+        <span className="absolute top-2 end-2 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-medium dark:bg-amber-900/40 dark:text-amber-400 dark:border-amber-700/40">
           {isAr ? 'في الإعداد' : 'Preparing'}
         </span>
       )}
       {card.status === 'coming_soon' && (
-        <span className="absolute top-2 end-2 text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-amber-200/30 font-medium">
+        <span className="absolute top-2 end-2 text-[10px] px-2 py-0.5 rounded-full bg-stone-100 text-stone-400 border border-stone-300 font-medium dark:bg-transparent dark:text-amber-700/50 dark:border-amber-900/30">
           {comingSoon}
         </span>
       )}
 
       <div className={`font-amiri text-[14px] leading-snug mb-1 ${
-        isActive ? 'text-amber-100' : isScraping ? 'text-amber-200/70' : 'text-amber-200/25'
+        isActive
+          ? 'text-stone-900 dark:text-amber-100'
+          : isScraping
+          ? 'text-stone-600 dark:text-amber-200/70'
+          : 'text-stone-400 dark:text-amber-300/35'
       }`}>
         {title}
       </div>
       <div className={`text-[10px] leading-relaxed ${
-        isActive ? 'text-amber-300/60' : isScraping ? 'text-amber-300/40' : 'text-amber-300/20'
+        isActive
+          ? 'text-stone-500 dark:text-amber-300/60'
+          : isScraping
+          ? 'text-stone-400 dark:text-amber-300/40'
+          : 'text-stone-300 dark:text-amber-300/20'
       }`}>
         {subtitle}
       </div>
       {note && (
-        <div className={`mt-1 text-[9px] italic ${isScraping || isActive ? 'text-amber-500/60' : 'text-amber-300/20'}`}>
+        <div className={`mt-1 text-[9px] italic ${
+          isScraping || isActive
+            ? 'text-amber-600/70 dark:text-amber-500/60'
+            : 'text-stone-300 dark:text-amber-300/20'
+        }`}>
           {note}
         </div>
       )}
       {isActive && (
-        <div className="mt-3 text-[11px] text-amber-400 font-medium">{browseLabel}</div>
+        <div className="mt-3 text-[11px] text-amber-700 dark:text-amber-400 font-medium">{browseLabel}</div>
       )}
       {isScraping && (
-        <div className="mt-3 text-[10px] text-amber-500/60 italic">{scrapingLabel}</div>
+        <div className="mt-3 text-[10px] text-amber-600/60 dark:text-amber-500/60 italic">{scrapingLabel}</div>
       )}
     </div>
   );
@@ -307,21 +315,21 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
       )}
 
       {/* ── CATALOGUE INDEX ─────────────────────────────────────────────── */}
-      <div style={{ background: '#1a0e05' }}>
+      <div className="catalogue-section bg-stone-100 dark:bg-[#2d1f0e] transition-colors duration-300">
         <div className="max-w-[1440px] mx-auto px-4 py-10">
-          <h2 className="text-[11px] text-amber-300/40 uppercase tracking-widest font-medium mb-7">
+          <h2 className="text-[11px] text-stone-500 dark:text-amber-300/50 uppercase tracking-widest font-medium mb-7">
             {t('الكتالوجات', 'Catalogues', 'Kataloge')}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {GROUPS.map(g => (
               <div key={g.idEn}>
-                <div className="mb-3 pb-2" style={{ borderBottom: '1px solid rgba(139,109,46,0.2)' }}>
-                  <h3 className="text-[15px] font-semibold text-amber-200/80 mb-1">
+                <div className="mb-3 pb-2 border-b border-stone-300 dark:border-amber-900/30">
+                  <h3 className="text-[15px] font-semibold text-stone-900 dark:text-amber-100 mb-1">
                     {isAr ? g.idAr : isDe ? g.idDe : g.idEn}
                   </h3>
                   {(isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn) && (
-                    <p className="text-[12px] text-amber-300/40 italic">
+                    <p className="text-[12px] text-stone-500 dark:text-amber-300/40 italic">
                       {isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn}
                     </p>
                   )}

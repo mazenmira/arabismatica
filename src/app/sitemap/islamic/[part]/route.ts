@@ -1,4 +1,6 @@
 // src/app/sitemap/islamic/[part]/route.ts
+export const dynamic = 'force-dynamic';
+
 import COINS_RAW from '@/data/coins.json';
 import type { Coin } from '@/types/coin';
 

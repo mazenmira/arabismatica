@@ -45,6 +45,12 @@ html.dark [style*="background-image"] {
   filter: invert(1) hue-rotate(180deg);
 }
 
+/* Catalogue section — cancel the body invert filter so Tailwind dark: variants
+   render with their specified colors rather than being doubly-inverted */
+html.dark .catalogue-section {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 /* RTL-aware margin/padding overrides */
 [dir="rtl"] .rtl\:mr-auto { margin-right: auto; }
 [dir="ltr"] .ltr\:ml-auto { margin-left: auto; }

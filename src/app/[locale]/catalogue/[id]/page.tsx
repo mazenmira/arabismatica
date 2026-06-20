@@ -1,4 +1,7 @@
 // src/app/[locale]/catalogue/[id]/page.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
+
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import COINS_RAW from '@/data/coins.json';
@@ -9,14 +12,6 @@ const ALL_COINS = COINS_RAW as unknown as Coin[];
 
 interface Props {
   params: { locale: string; id: string };
-}
-
-// ── Static params: pre-build all 4,737 coin pages at deploy time ──────────────
-export async function generateStaticParams() {
-  const locales = ['ar', 'en'];
-  return locales.flatMap(locale =>
-    ALL_COINS.map(coin => ({ locale, id: coin.id }))
-  );
 }
 
 // ── Dynamic metadata per coin ─────────────────────────────────────────────────

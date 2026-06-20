@@ -1,23 +1,18 @@
 // src/app/[locale]/country/[slug]/page.tsx
+export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
+
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import COINS_RAW from '@/data/coins.json';
 import type { Coin } from '@/types/coin';
-import { COUNTRY_META_BY_SLUG, COUNTRY_META } from '@/lib/countries';
+import { COUNTRY_META_BY_SLUG } from '@/lib/countries';
 import CountryPage from '@/components/country/CountryPage';
 
 const ALL_COINS = COINS_RAW as unknown as Coin[];
 
 interface Props {
   params: { locale: string; slug: string };
-}
-
-// ── Pre-build all 19 country pages × 2 locales at deploy time ──────────────
-export async function generateStaticParams() {
-  const locales = ['ar', 'en'];
-  return locales.flatMap(locale =>
-    COUNTRY_META.map(c => ({ locale, slug: c.slug }))
-  );
 }
 
 // ── SEO metadata per country ───────────────────────────────────────────────

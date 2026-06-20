@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import type { Metadata } from 'next';
 import IslamicPage from '@/components/islamic/IslamicPage';
 
