@@ -113,7 +113,7 @@ function CoinImage({
         onError={() => setError(true)}
         className="w-[70px] h-[70px] rounded-full object-cover transition-transform duration-300 group-hover:scale-105"
         style={{
-          border: '2.5px solid #FAF6EE',
+          border: '2.5px solid #FFFFFF',
           outline: '1.5px solid #8B6D2E',
           boxShadow: '0 2px 8px rgba(80,50,10,.15)',
         }}

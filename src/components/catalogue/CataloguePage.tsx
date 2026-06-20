@@ -148,8 +148,8 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
       }
     }
 
-    // Exclude Islamic coins from main Arab catalogue
-    if (!apiFilters.cc && !apiFilters.ccIn) apiFilters.excludeCC = 'IS';
+    // Exclude Islamic (IS) and Sasanian (SS) from Arab catalogue — keeps count at ~5,505
+    if (!apiFilters.cc && !apiFilters.ccIn) apiFilters.excludeCCs = ['IS', 'SS'];
 
     getCoins(apiFilters, page, PER_PAGE_SUP).then(({ data, count }) => {
       if (!cancelled) {

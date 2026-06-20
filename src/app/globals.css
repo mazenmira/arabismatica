@@ -9,9 +9,9 @@
   --gold-light: #E8C97A;
   --gold-dark: #8B6D2E;
   --ink: #16100A;
-  --parch: #FAF6EE;
-  --parch-dark: #F0E8D4;
-  --cream: #FDF9F2;
+  --parch: #FFFFFF;
+  --parch-dark: #F0F0F0;
+  --cream: #FAFAFA;
 }
 
 * { box-sizing: border-box; }

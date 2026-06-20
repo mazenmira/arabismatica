@@ -41,7 +41,7 @@ export const CATALOGUES = [
       de: 'Umfassender Katalog moderner arabischer Münzen aus 20 Ländern vom Osmanischen Reich bis heute',
     },
     coinCount: 5505,
-    ccFilter: { exclude: ['IS'] },
+    ccFilter: { exclude: ['IS', 'SS'] },
     navPath: '/',
     status: 'active' as CatalogueStatus,
     seoKeywords: {
@@ -84,6 +84,7 @@ export const CATALOGUES = [
       en: 'Coins of the Mughal Empire — from Babur to Aurangzeb, bearing Arabic Islamic inscriptions',
       de: 'Münzen des Mogulreichs — von Babur bis Aurangzeb, mit arabischen islamischen Inschriften',
     },
+    ccFilter: { include: ['MG'] },
     status: 'coming_soon' as CatalogueStatus,
   },
   {
@@ -97,6 +98,7 @@ export const CATALOGUES = [
       en: 'Coins of the Delhi Sultanate — the early Islamic states of the Indian subcontinent 1206–1526 CE',
       de: 'Münzen des Delhi-Sultanats — die frühen islamischen Staaten des indischen Subkontinents 1206–1526 n.Chr.',
     },
+    ccFilter: { include: ['DS'] },
     status: 'coming_soon' as CatalogueStatus,
   },
 

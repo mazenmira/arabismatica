@@ -40,7 +40,7 @@ export default function CatalogueShell({
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#FAF6EE]" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-white" dir={isAr ? 'rtl' : 'ltr'}>
       <SiteHeader locale={locale} />
 
       {/* ── BREADCRUMB BAR ──────────────────────────────────────────────── */}
@@ -76,7 +76,7 @@ export default function CatalogueShell({
       </div>
 
       {/* ── ACADEMIC HEADER ─────────────────────────────────────────────── */}
-      <div className="border-b border-amber-200/60 bg-[#FAF6EE]">
+      <div className="border-b border-amber-200/60 bg-white">
         <div className="max-w-[1440px] mx-auto px-4 py-6 md:py-8">
           <div className="flex items-start gap-3 flex-wrap justify-between">
             <div>

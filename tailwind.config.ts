@@ -19,7 +19,7 @@ const config: Config = {
           600: '#A8872D', 700: '#8B6D2E', 800: '#6B5020', 900: '#4A3510',
         },
         ink: { DEFAULT: '#16100A', light: '#1E1508', muted: '#2C1E08' },
-        parch: { DEFAULT: '#FAF6EE', dark: '#F0E8D4', cream: '#FDF9F2' },
+        parch: { DEFAULT: '#FFFFFF', dark: '#F0F0F0', cream: '#FAFAFA' },
       },
       animation: {
         'slide-in-right': 'slideInRight 0.3s ease-out',

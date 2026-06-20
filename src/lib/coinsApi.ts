@@ -89,6 +89,8 @@ export interface CoinFilters {
   cc?:       string | string[];
   /** Exclude a single country code — e.g. 'IS' to show only non-Islamic coins */
   excludeCC?: string;
+  /** Exclude multiple country codes — e.g. ['IS','SS'] for Arab-only catalogue */
+  excludeCCs?: string[];
   /** Dynasty name (Arabic) — exact or partial */
   dyn?:      string;
   /** Metal — exact match (case-insensitive handled by ilike) */
@@ -125,7 +127,7 @@ function applyFilters(
   qb: any,
   filters: CoinFilters,
 ) {
-  const { cc, excludeCC, ccIn, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query } = filters;
+  const { cc, excludeCC, excludeCCs, ccIn, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query } = filters;
   const mint   = (filters as CoinFilters).mint;
   const ruler  = (filters as CoinFilters).ruler;
 
@@ -137,7 +139,8 @@ function applyFilters(
     }
   }
   if (ccIn) qb = qb.in('cc', ccIn);
-  if (excludeCC) qb = qb.neq('cc', excludeCC);
+  if (excludeCC)  qb = qb.neq('cc', excludeCC);
+  if (excludeCCs) for (const code of excludeCCs) qb = qb.neq('cc', code);
 
   if (dyn)          qb = qb.ilike('dyn',         `%${dyn}%`);
   if (metal)        qb = qb.ilike('metal',        `%${metal}%`);
