@@ -50,8 +50,14 @@ const TOP_NAV_ITEMS_AR: NavTopItem[] = [
     { label: 'العملات الأخمينية (قريباً)',  href: '' },
   ]},
   { label: 'الإسلام الهندي', children: [
-    { label: 'العملات المغولية (قريباً)', href: '' },
-    { label: 'سلطنة دلهي (قريباً)',       href: '' },
+    { label: 'العملات المغولية', href: '/ar/mughal', grandchildren: [
+      { label: 'الحكام',    href: '/ar/mughal/rulers' },
+      { label: 'دور الضرب', href: '/ar/mughal/mints' },
+    ]},
+    { label: 'سلطنة دلهي', href: '/ar/delhi', grandchildren: [
+      { label: 'الحكام',    href: '/ar/delhi/rulers' },
+      { label: 'دور الضرب', href: '/ar/delhi/mints' },
+    ]},
   ]},
   { label: 'الأدوات', isTools: true, children: [
     { label: 'محول الهجري ↔ الميلادي', isHijriTool: true },
@@ -91,8 +97,14 @@ const TOP_NAV_ITEMS_EN: NavTopItem[] = [
     { label: 'Achaemenid Coins (soon)',      href: '' },
   ]},
   { label: 'Islamic India', children: [
-    { label: 'Mughal Coins (soon)',    href: '' },
-    { label: 'Delhi Sultanate (soon)', href: '' },
+    { label: 'Mughal Coins', href: '/en/mughal', grandchildren: [
+      { label: 'Rulers', href: '/en/mughal/rulers' },
+      { label: 'Mints',  href: '/en/mughal/mints' },
+    ]},
+    { label: 'Delhi Sultanate', href: '/en/delhi', grandchildren: [
+      { label: 'Rulers', href: '/en/delhi/rulers' },
+      { label: 'Mints',  href: '/en/delhi/mints' },
+    ]},
   ]},
   { label: 'Tools', isTools: true, children: [
     { label: 'Hijri ↔ Gregorian Converter', isHijriTool: true },
@@ -141,8 +153,14 @@ const TOP_NAV_ITEMS_DE: NavTopItem[] = [
     { label: 'Achämenidische Münzen (bald)',      href: '' },
   ]},
   { label: 'Islam. Indien', children: [
-    { label: 'Mogulmünzen (bald)',    href: '' },
-    { label: 'Delhi-Sultanat (bald)', href: '' },
+    { label: 'Mogulreichmünzen', href: '/de/mughal', grandchildren: [
+      { label: 'Herrscher',   href: '/de/mughal/rulers' },
+      { label: 'Münzstätten', href: '/de/mughal/mints' },
+    ]},
+    { label: 'Delhi-Sultanat', href: '/de/delhi', grandchildren: [
+      { label: 'Herrscher',   href: '/de/delhi/rulers' },
+      { label: 'Münzstätten', href: '/de/delhi/mints' },
+    ]},
   ]},
   { label: 'Tools', isTools: true, children: [
     { label: 'Hidschra ↔ Gregorian',  isHijriTool: true },

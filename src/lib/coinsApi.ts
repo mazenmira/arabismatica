@@ -624,3 +624,177 @@ export async function getSasanianFilters(): Promise<SasanianFilters> {
 
   return { mints, rulers, metals };
 }
+
+// ── Mughal-specific types & functions ─────────────────────────────────────────
+
+export interface MughalCoinFilters extends CoinFilters {
+  yce_from?: number;
+  yce_to?:   number;
+}
+
+export interface MughalFilters {
+  rulers: { en: string; ar: string | null; count: number }[];
+  mints:  { en: string; ar: string | null; count: number }[];
+  metals: string[];
+}
+
+export async function getMughalCoins(
+  filters:  MughalCoinFilters = {},
+  page:     number            = 1,
+  pageSize: number            = 48,
+): Promise<{ data: CoinRow[]; count: number }> {
+  const from = (page - 1) * pageSize;
+  const to   = from + pageSize - 1;
+
+  let qb = db
+    .from('coins')
+    .select('*', { count: 'exact' })
+    .eq('cc', 'MG')
+    .order('id')
+    .range(from, to);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { cc: _cc, yce_from: _yf, yce_to: _yt, ...rest } = filters;
+  void _cc; void _yf; void _yt;
+  qb = applyFilters(qb, rest);
+
+  if (filters.yce_from != null) {
+    qb = qb.filter('yce', 'gte', String(filters.yce_from));
+    qb = qb.not('yce', 'eq', '');
+  }
+  if (filters.yce_to != null) {
+    qb = qb.filter('yce', 'lte', String(filters.yce_to));
+    qb = qb.not('yce', 'eq', '');
+  }
+
+  const { data, count, error } = await qb;
+  if (error) throw new Error(`getMughalCoins: ${error.message}`);
+  return { data: (data ?? []) as CoinRow[], count: count ?? 0 };
+}
+
+export async function getMughalFilters(): Promise<MughalFilters> {
+  const [mintData, rulerData, metalData] = await Promise.all([
+    db.from('coins').select('mint,mint_ar').eq('cc', 'MG').neq('mint', '').limit(10000),
+    db.from('coins').select('ruler,ruler_ar').eq('cc', 'MG').neq('ruler', '').limit(10000),
+    db.from('coins').select('metal').eq('cc', 'MG').limit(10000),
+  ]);
+
+  const mintMap = new Map<string, { ar: string | null; count: number }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (mintData.data ?? []).forEach((r: any) => {
+    if (r.mint) {
+      const entry = mintMap.get(r.mint) ?? { ar: r.mint_ar || null, count: 0 };
+      entry.count++;
+      mintMap.set(r.mint, entry);
+    }
+  });
+  const mints = Array.from(mintMap.entries())
+    .map(([en, { ar, count }]) => ({ en, ar, count }))
+    .sort((a, b) => b.count - a.count);
+
+  const rulerMap = new Map<string, { ar: string | null; count: number }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (rulerData.data ?? []).forEach((r: any) => {
+    if (r.ruler) {
+      const entry = rulerMap.get(r.ruler) ?? { ar: r.ruler_ar || null, count: 0 };
+      entry.count++;
+      rulerMap.set(r.ruler, entry);
+    }
+  });
+  const rulers = Array.from(rulerMap.entries())
+    .map(([en, { ar, count }]) => ({ en, ar, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const metalSet = new Set<string>((metalData.data ?? []).map((r: any) => r.metal).filter(Boolean));
+  const metals = Array.from(metalSet).sort();
+
+  return { mints, rulers, metals };
+}
+
+// ── Delhi-specific types & functions ──────────────────────────────────────────
+
+export interface DelhiCoinFilters extends CoinFilters {
+  yce_from?: number;
+  yce_to?:   number;
+}
+
+export interface DelhiFilters {
+  rulers: { en: string; ar: string | null; count: number }[];
+  mints:  { en: string; ar: string | null; count: number }[];
+  metals: string[];
+}
+
+export async function getDelhiCoins(
+  filters:  DelhiCoinFilters = {},
+  page:     number           = 1,
+  pageSize: number           = 48,
+): Promise<{ data: CoinRow[]; count: number }> {
+  const from = (page - 1) * pageSize;
+  const to   = from + pageSize - 1;
+
+  let qb = db
+    .from('coins')
+    .select('*', { count: 'exact' })
+    .eq('cc', 'DS')
+    .order('id')
+    .range(from, to);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { cc: _cc, yce_from: _yf, yce_to: _yt, ...rest } = filters;
+  void _cc; void _yf; void _yt;
+  qb = applyFilters(qb, rest);
+
+  if (filters.yce_from != null) {
+    qb = qb.filter('yce', 'gte', String(filters.yce_from));
+    qb = qb.not('yce', 'eq', '');
+  }
+  if (filters.yce_to != null) {
+    qb = qb.filter('yce', 'lte', String(filters.yce_to));
+    qb = qb.not('yce', 'eq', '');
+  }
+
+  const { data, count, error } = await qb;
+  if (error) throw new Error(`getDelhiCoins: ${error.message}`);
+  return { data: (data ?? []) as CoinRow[], count: count ?? 0 };
+}
+
+export async function getDelhiFilters(): Promise<DelhiFilters> {
+  const [mintData, rulerData, metalData] = await Promise.all([
+    db.from('coins').select('mint,mint_ar').eq('cc', 'DS').neq('mint', '').limit(10000),
+    db.from('coins').select('ruler,ruler_ar').eq('cc', 'DS').neq('ruler', '').limit(10000),
+    db.from('coins').select('metal').eq('cc', 'DS').limit(10000),
+  ]);
+
+  const mintMap = new Map<string, { ar: string | null; count: number }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (mintData.data ?? []).forEach((r: any) => {
+    if (r.mint) {
+      const entry = mintMap.get(r.mint) ?? { ar: r.mint_ar || null, count: 0 };
+      entry.count++;
+      mintMap.set(r.mint, entry);
+    }
+  });
+  const mints = Array.from(mintMap.entries())
+    .map(([en, { ar, count }]) => ({ en, ar, count }))
+    .sort((a, b) => b.count - a.count);
+
+  const rulerMap = new Map<string, { ar: string | null; count: number }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (rulerData.data ?? []).forEach((r: any) => {
+    if (r.ruler) {
+      const entry = rulerMap.get(r.ruler) ?? { ar: r.ruler_ar || null, count: 0 };
+      entry.count++;
+      rulerMap.set(r.ruler, entry);
+    }
+  });
+  const rulers = Array.from(rulerMap.entries())
+    .map(([en, { ar, count }]) => ({ en, ar, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const metalSet = new Set<string>((metalData.data ?? []).map((r: any) => r.metal).filter(Boolean));
+  const metals = Array.from(metalSet).sort();
+
+  return { mints, rulers, metals };
+}

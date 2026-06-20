@@ -78,28 +78,38 @@ export const CATALOGUES = [
     slug: 'mughal',
     group: 'arab_islamic' as CatalogueGroup,
     title: { ar: 'العملات المغولية', en: 'Mughal Empire', de: 'Mogulreich' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
+    subtitle: {
+      ar: '1526–1857م · الهند الإسلامية',
+      en: '1526–1857 CE · Islamic India',
+      de: '1526–1857 n.Chr. · Islamisches Indien',
+    },
     description: {
       ar: 'عملات الإمبراطورية المغولية في الهند — من بابر إلى أورنكزيب. حملت نقوشاً عربية إسلامية',
       en: 'Coins of the Mughal Empire — from Babur to Aurangzeb, bearing Arabic Islamic inscriptions',
       de: 'Münzen des Mogulreichs — von Babur bis Aurangzeb, mit arabischen islamischen Inschriften',
     },
+    navPath: '/mughal',
     ccFilter: { include: ['MG'] },
-    status: 'coming_soon' as CatalogueStatus,
+    status: 'active' as CatalogueStatus,
   },
   {
     id: 'delhi',
     slug: 'delhi',
     group: 'arab_islamic' as CatalogueGroup,
     title: { ar: 'سلطنة دلهي', en: 'Delhi Sultanate', de: 'Delhi-Sultanat' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
+    subtitle: {
+      ar: '1206–1526م · الهند الإسلامية',
+      en: '1206–1526 CE · Islamic India',
+      de: '1206–1526 n.Chr. · Islamisches Indien',
+    },
     description: {
       ar: 'عملات سلطنة دلهي — الدول الإسلامية الأولى في شبه القارة الهندية 1206–1526م',
       en: 'Coins of the Delhi Sultanate — the early Islamic states of the Indian subcontinent 1206–1526 CE',
       de: 'Münzen des Delhi-Sultanats — die frühen islamischen Staaten des indischen Subkontinents 1206–1526 n.Chr.',
     },
+    navPath: '/delhi',
     ccFilter: { include: ['DS'] },
-    status: 'coming_soon' as CatalogueStatus,
+    status: 'active' as CatalogueStatus,
   },
 
   // ── Ancient Middle East ─────────────────────────────────────────────────
