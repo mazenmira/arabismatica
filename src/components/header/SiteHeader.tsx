@@ -188,7 +188,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
   const isAr = locale === 'ar';
   const TOP_NAV_ITEMS: NavTopItem[] = locale === 'ar' ? TOP_NAV_ITEMS_AR : locale === 'de' ? TOP_NAV_ITEMS_DE : TOP_NAV_ITEMS_EN;
 
-  const { user, setAuthOpen, setDashOpen, setAdminOpen } = useAuth();
+  const { user, isAdmin, setAuthOpen, setDashOpen, setAdminOpen } = useAuth();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const pathname = usePathname();
 
@@ -385,15 +385,17 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                 {darkMode ? <Sun size={13} /> : <Moon size={13} />}
               </button>
 
-              {/* Admin Panel */}
-              <button
-                onClick={() => setAdminOpen(true)}
-                className="hidden md:flex items-center gap-1.5 px-3 py-1 text-[11px] rounded-full border border-amber-300 text-amber-700/80 hover:border-amber-500 hover:text-amber-950 transition-colors"
-                title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}
-              >
-                <Settings size={12} />
-                <span className="hidden lg:block">{isAr ? 'الإدارة' : 'Admin'}</span>
-              </button>
+              {/* Admin Panel — only shown to the admin user */}
+              {isAdmin && (
+                <button
+                  onClick={() => setAdminOpen(true)}
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1 text-[11px] rounded-full border border-amber-300 text-amber-700/80 hover:border-amber-500 hover:text-amber-950 transition-colors"
+                  title={isAr ? 'لوحة الإدارة' : 'Admin Panel'}
+                >
+                  <Settings size={12} />
+                  <span className="hidden lg:block">{isAr ? 'الإدارة' : 'Admin'}</span>
+                </button>
+              )}
 
               {/* Auth button */}
               {user ? (

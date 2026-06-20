@@ -1,4 +1,4 @@
-export type CatalogueStatus = 'active' | 'coming_soon';
+export type CatalogueStatus = 'active' | 'scraping' | 'coming_soon';
 export type CatalogueGroup = 'arab_islamic' | 'ancient';
 
 export const CATALOGUE_GROUPS: Record<CatalogueGroup, {
@@ -90,7 +90,7 @@ export const CATALOGUES = [
     },
     navPath: '/mughal',
     ccFilter: { include: ['MG'] },
-    status: 'active' as CatalogueStatus,
+    status: 'scraping' as CatalogueStatus,
   },
   {
     id: 'delhi',
@@ -109,7 +109,7 @@ export const CATALOGUES = [
     },
     navPath: '/delhi',
     ccFilter: { include: ['DS'] },
-    status: 'active' as CatalogueStatus,
+    status: 'scraping' as CatalogueStatus,
   },
 
   // ── Ancient Middle East ─────────────────────────────────────────────────
