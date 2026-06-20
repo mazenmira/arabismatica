@@ -1,8 +1,6 @@
 // v9.0 — light/dark mode catalogue section with Tailwind dark: variants
 'use client';
 
-export const revalidate = 3600;
-
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
