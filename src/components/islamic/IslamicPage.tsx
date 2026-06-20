@@ -105,7 +105,7 @@ export default function IslamicPage({ locale }: { locale: string }) {
   // ── Data state ──────────────────────────────────────────────────────────
   const [coins,        setCoins]        = useState<CoinRow[]>([]);
   const [total,        setTotal]        = useState(47303);
-  const [loading,      setLoading]      = useState(false);
+  const [loading,      setLoading]      = useState(true);
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const metals = ['Gold', 'Silver', 'Bronze', 'Billon', 'Lead', 'Copper'];
   const queryRef = useRef<NodeJS.Timeout>();

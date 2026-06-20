@@ -264,7 +264,7 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
         {/* Mint */}
         {mint_en && (
           <div className="text-[9px] text-ink/35 truncate">
-            🏛 {isAr && mint_ar_val ? mint_ar_val : mint_en}
+            {isAr && mint_ar_val ? mint_ar_val : mint_en}
           </div>
         )}
 

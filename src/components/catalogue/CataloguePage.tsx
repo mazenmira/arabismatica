@@ -40,14 +40,14 @@ interface EraOption {
   ccOnly?: string[];
 }
 const ERA_OPTIONS: EraOption[] = [
-  { value: 'ottoman',         label_ar: '🌙 العهد العثماني',       label_en: '🌙 Ottoman Era',          label_de: '🌙 Osmanische Zeit',       yceFrom: 1299, yceTo: 1918 },
-  { value: 'muhammad_ali',    label_ar: '👑 أسرة محمد علي',        label_en: '👑 Muhammad Ali Dynasty',  label_de: '👑 Muhammad-Ali-Dynastie', yceFrom: 1805, yceTo: 1882, ccOnly: ['EG'] },
-  { value: 'hejaz_najd',      label_ar: '⚔️ الحجاز ونجد',          label_en: '⚔️ Hejaz & Najd',          label_de: '⚔️ Hedschas & Nadschd',    yceFrom: 1916, yceTo: 1931, ccOnly: ['SA'] },
-  { value: 'french_colonial', label_ar: '🇫🇷 الحماية الفرنسية',    label_en: '🇫🇷 French Colonial',       label_de: '🇫🇷 Französisches Mandat',  yceFrom: 1830, yceTo: 1962, ccOnly: ['MA','TN','DZ','LB','SY'] },
-  { value: 'arab_kingdoms',   label_ar: '👑 الممالك العربية',       label_en: '👑 Arab Kingdoms',          label_de: '👑 Arabische Königreiche',  yceFrom: 1920, yceTo: 1969, ccOnly: ['EG','IQ','LY','JO','SA','MA'] },
-  { value: 'republic_era',    label_ar: '🏛️ عهد الجمهوريات',       label_en: '🏛️ Republic Era',           label_de: '🏛️ Republikanische Zeit',   yceFrom: 1952, yceTo: 2026 },
-  { value: 'gulf_states',     label_ar: '🛢️ دول الخليج',           label_en: '🛢️ Gulf States',            label_de: '🛢️ Golfstaaten',            yceFrom: 1960, yceTo: 2026, ccOnly: ['AE','KW','QA','OM','QD'] },
-  { value: 'imamate',         label_ar: '📜 الإمامة',              label_en: '📜 Imamate',                label_de: '📜 Imamat',                 yceFrom: 1800, yceTo: 1970, ccOnly: ['YE','OM'] },
+  { value: 'ottoman',         label_ar: 'العهد العثماني',     label_en: 'Ottoman Era',          label_de: 'Osmanische Zeit',       yceFrom: 1299, yceTo: 1918 },
+  { value: 'muhammad_ali',    label_ar: 'أسرة محمد علي',      label_en: 'Muhammad Ali Dynasty',  label_de: 'Muhammad-Ali-Dynastie', yceFrom: 1805, yceTo: 1882, ccOnly: ['EG'] },
+  { value: 'hejaz_najd',      label_ar: 'الحجاز ونجد',        label_en: 'Hejaz & Najd',          label_de: 'Hedschas & Nadschd',    yceFrom: 1916, yceTo: 1931, ccOnly: ['SA'] },
+  { value: 'french_colonial', label_ar: 'الحماية الفرنسية',   label_en: 'French Colonial',       label_de: 'Französisches Mandat',  yceFrom: 1830, yceTo: 1962, ccOnly: ['MA','TN','DZ','LB','SY'] },
+  { value: 'arab_kingdoms',   label_ar: 'الممالك العربية',    label_en: 'Arab Kingdoms',          label_de: 'Arabische Königreiche', yceFrom: 1920, yceTo: 1969, ccOnly: ['EG','IQ','LY','JO','SA','MA'] },
+  { value: 'republic_era',    label_ar: 'عهد الجمهوريات',     label_en: 'Republic Era',           label_de: 'Republikanische Zeit',  yceFrom: 1952, yceTo: 2026 },
+  { value: 'gulf_states',     label_ar: 'دول الخليج',         label_en: 'Gulf States',            label_de: 'Golfstaaten',           yceFrom: 1960, yceTo: 2026, ccOnly: ['AE','KW','QA','OM','QD'] },
+  { value: 'imamate',         label_ar: 'الإمامة',            label_en: 'Imamate',                label_de: 'Imamat',                yceFrom: 1800, yceTo: 1970, ccOnly: ['YE','OM'] },
 ];
 
 
@@ -88,7 +88,7 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
   // ── Supabase data state ──────────────────────────────────
   const [coins,       setCoins]       = useState<Coin[]>([]);
   const [totalCount,  setTotalCount]  = useState(5505);
-  const [loading,     setLoading]     = useState(false);
+  const [loading,     setLoading]     = useState(true);
   const PER_PAGE_SUP = 60;
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
@@ -391,7 +391,7 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
                 ${filters.type === tp ? 'bg-gold-500 border-gold-500 text-ink font-semibold' : 'border-gold-700/25 text-ink/50 hover:border-gold-500/50 hover:text-ink/70'}`}>
               {tp === 'Circulation' ? t('filters.circulation')
                : tp === 'Commemorative' ? t('filters.commemorative')
-               : '📊 ' + t('filters.withMintage')}
+               : t('filters.withMintage')}
             </button>
           ))}
 
@@ -468,7 +468,7 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
           </div>
         ) : paged.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-16 h-16 rounded-full bg-parch-dark flex items-center justify-center mx-auto mb-4 text-2xl">🔍</div>
+            <div className="w-16 h-16 rounded-full bg-parch-dark flex items-center justify-center mx-auto mb-4 text-2xl text-ink/30">?</div>
             <h3 className="font-amiri text-xl text-ink/60 mb-2">{t('search.noResults')}</h3>
             <p className="text-[13px] text-ink/40">{t('search.noResultsHint')}</p>
           </div>

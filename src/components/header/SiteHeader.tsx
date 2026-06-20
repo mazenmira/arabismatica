@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Globe, ChevronDown, ChevronRight, Wrench, Settings, Moon, Sun } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, ChevronRight, Wrench, Settings, Moon, Sun, Search, User } from 'lucide-react';
 import { FacebookIcon, TwitterIcon, LinkedinIcon, YoutubeIcon, InstagramIcon, RssIcon } from './SocialIcons';
 import ToolsSidebar from '@/components/sidebar/ToolsSidebar';
 import IdentifyModal from '@/components/modals/IdentifyModal';
@@ -403,7 +403,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
               <button onClick={() => setIdentifyOpen(true)}
                 className="hidden md:flex items-center gap-1.5 px-3 py-1 text-[11px] rounded-full border border-amber-400/60 text-amber-700 hover:text-amber-950 hover:border-amber-600 transition-colors"
                 title={isAr ? 'تحديد العملة بالصورة' : 'Identify coin by image'}>
-                <span>🔍</span>
+                <Search size={11} />
                 {isAr ? 'تحديد بالصورة' : 'Identify'}
               </button>
 
@@ -430,7 +430,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
               {user ? (
                 <button onClick={() => setDashOpen(true)}
                   className="hidden md:flex items-center gap-1.5 px-3 py-1 text-[11px] rounded-full bg-amber-100 border border-amber-300 text-amber-800 hover:bg-amber-200 transition-colors">
-                  <span>👤</span>
+                  <User size={11} />
                   <span className="max-w-[80px] truncate">{user.email.split('@')[0]}</span>
                 </button>
               ) : (
@@ -567,7 +567,7 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
               {user ? (
                 <button onClick={() => { setDashOpen(true); setMobileOpen(false); }}
                   className="flex-1 py-2 text-[12px] rounded-full bg-amber-100 border border-amber-300 text-amber-800 text-center">
-                  👤 {user.email.split('@')[0]}
+                  {user.email.split('@')[0]}
                 </button>
               ) : (
                 <button onClick={() => { setAuthOpen(true); setMobileOpen(false); }}

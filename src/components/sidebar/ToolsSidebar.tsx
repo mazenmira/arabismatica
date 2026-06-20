@@ -17,21 +17,21 @@ interface Tool {
 
 const TOOLS: Record<string, Tool[]> = {
   encyclopedias: [
-    { key: 'glossary',    icon: '📖', href: `${WP}/knowledge-portal/` },
-    { key: 'islamicEnc',  icon: '🌙', href: `${WP}/numismatics/islamic-coins/` },
-    { key: 'errorsEnc',   icon: '🔬', href: `${WP}/knowledge-portal/` },
+    { key: 'glossary',    icon: 'A', href: `${WP}/knowledge-portal/` },
+    { key: 'islamicEnc',  icon: 'I', href: `${WP}/numismatics/islamic-coins/` },
+    { key: 'errorsEnc',   icon: 'E', href: `${WP}/knowledge-portal/` },
   ],
   analysis: [
-    { key: 'hijriConverter', icon: '📅', component: 'hijri', isNew: true },
-    { key: 'coinParts',      icon: '🪙', href: `${WP}/knowledge-portal/` },
-    { key: 'coinInspection', icon: '🔍', href: `${WP}/knowledge-portal/` },
-    { key: 'gradingGuide',   icon: '⭐', href: `${WP}/grading-tools/` },
-    { key: 'gradingSites',   icon: '🏛️', href: `${WP}/grading-tools/` },
+    { key: 'hijriConverter', icon: 'H', component: 'hijri', isNew: true },
+    { key: 'coinParts',      icon: 'C', href: `${WP}/knowledge-portal/` },
+    { key: 'coinInspection', icon: 'Q', href: `${WP}/knowledge-portal/` },
+    { key: 'gradingGuide',   icon: 'G', href: `${WP}/grading-tools/` },
+    { key: 'gradingSites',   icon: 'S', href: `${WP}/grading-tools/` },
   ],
   value: [
-    { key: 'metalCalc',   icon: '⚖️', href: `${WP}/knowledge-portal/` },
-    { key: 'arabPrices',  icon: '💰', href: `${WP}/knowledge-portal/` },
-    { key: 'sellGuide',   icon: '🏷️', href: `${WP}/10-نصائح-لبيع-العملات-المعدنية-القديمة/` },
+    { key: 'metalCalc',   icon: 'M', href: `${WP}/knowledge-portal/` },
+    { key: 'arabPrices',  icon: 'P', href: `${WP}/knowledge-portal/` },
+    { key: 'sellGuide',   icon: 'V', href: `${WP}/10-نصائح-لبيع-العملات-المعدنية-القديمة/` },
   ],
 };
 
@@ -51,7 +51,6 @@ function HijriConverter({ locale }: { locale: string }) {
   return (
     <div className="bg-parch-dark/60 rounded-xl p-4 border border-gold-700/30">
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-lg">📅</span>
         <h3 className="font-semibold text-[13px] text-ink">
           {isAr ? 'محول التاريخ الهجري للعملات' : 'Hijri Date Converter'}
         </h3>

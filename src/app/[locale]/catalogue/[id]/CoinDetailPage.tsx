@@ -47,7 +47,7 @@ function CoinImage({ src, alt, size = 160 }: { src: string; alt: string; size?: 
     return (
       <div className="rounded-full bg-amber-50 border-2 border-amber-200 flex items-center justify-center text-amber-400 font-bold text-2xl"
         style={{ width: size, height: size }}>
-        🪙
+        —
       </div>
     );
   }
@@ -289,7 +289,7 @@ export default function CoinDetailPage({ coin, locale }: Props) {
 
                   {mintageData.some(d => d.Mintmark && d.Mintmark !== 'None') && (
                     <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3 text-[12px] text-amber-800">
-                      ⚠️ {isAr ? 'يحتوي على إصدارات بعلامات ضرب مختلفة — تحقق قبل التقييم' : 'Contains mintmark varieties — verify before pricing'}
+                      {isAr ? 'يحتوي على إصدارات بعلامات ضرب مختلفة — تحقق قبل التقييم' : 'Contains mintmark varieties — verify before pricing'}
                     </div>
                   )}
 
@@ -338,7 +338,7 @@ export default function CoinDetailPage({ coin, locale }: Props) {
               {/* Legacy single mintage */}
               {mintageData.length === 0 && coin.mint && (
                 <div className="flex items-center gap-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mb-6">
-                  <span className="text-2xl">📊</span>
+                  <span className="text-[10px] font-mono text-amber-600/60 uppercase tracking-wider">#</span>
                   <div>
                     <div className="text-[9px] text-amber-600/60 uppercase tracking-wider">{isAr ? 'المضروب' : 'Mintage'}</div>
                     <div className="text-lg font-bold text-amber-900 font-amiri">{formatMintage(coin.mint, locale)}</div>
@@ -402,7 +402,7 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                                 style={{ border: '2px solid #F0E8D4', outline: '1px solid #8B6D2E' }}
                               />
                             ) : (
-                              <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-lg border-2 border-amber-200">🪙</div>
+                              <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-lg border-2 border-amber-200 text-amber-400 font-bold">—</div>
                             )}
                             <span className="text-[9px] text-gray-700 text-center leading-tight line-clamp-2 font-amiri">{rcName}</span>
                             {rcYear && <span className="text-[8px] text-gray-400">{rcYear}</span>}

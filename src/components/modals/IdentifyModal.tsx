@@ -100,7 +100,7 @@ function CoinResult({ coin, locale, uploadedPreview }: { coin: ScoredCoin; local
             // eslint-disable-next-line @next/next/no-img-element
             <img src={coin.o} alt={name} className="w-10 h-10 rounded-full object-cover" style={{ border:'1.5px solid #F0E8D4', outline:'1px solid #8B6D2E' }} />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-base">🪙</div>
+            <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-base text-amber-400 font-bold">—</div>
           )}
         </div>
         <div className="flex-1 min-w-0">
@@ -218,7 +218,7 @@ export default function IdentifyModal({ open, onClose, locale }: { open:boolean;
                 <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-amber-100">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={preview} alt="coin" className="w-14 h-14 rounded-full object-cover shrink-0" style={{ border:'2px solid #F0E8D4', outline:'1.5px solid #8B6D2E' }} />
-                  <p className="flex-1 text-[12px] text-amber-700">{isAr ? 'تم تحميل الصورة ✓ — أضف تفاصيل للبحث' : 'Image uploaded ✓ — add details to search'}</p>
+                  <p className="flex-1 text-[12px] text-amber-700">{isAr ? 'تم تحميل الصورة — أضف تفاصيل للبحث' : 'Image uploaded — add details to search'}</p>
                   <button onClick={() => { setPreview(null); setStep('upload'); }}><RotateCcw size={12} className="text-amber-400" /></button>
                 </div>
               )}

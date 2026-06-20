@@ -74,7 +74,7 @@ function MintageTable({ data, locale }: { data: MintageEntry[]; locale: string }
   return (
     <div className="mb-4 rounded-xl border border-gold-700/20 overflow-hidden">
       <div className="bg-gold-500/10 px-4 py-2 flex items-center gap-2 border-b border-gold-700/15">
-        <span className="text-base">📊</span>
+        <span className="text-[10px] font-mono text-ink/40 uppercase">#</span>
         <span className="text-[11px] font-semibold text-ink/60 uppercase tracking-wider">
           {isAr ? 'تواريخ الإصدار والكميات' : 'Issue dates & mintage'} · {data.length} {isAr ? 'إصدار' : 'issues'}
         </span>

@@ -691,7 +691,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                   : 'bg-gold-600 hover:bg-gold-500 text-ink cursor-pointer'}`}>
               <Save size={15} />
               {saved
-                ? (isAr ? '✓ تم الحفظ' : '✓ Saved')
+                ? (isAr ? 'تم الحفظ' : 'Saved')
                 : (isAr ? 'حفظ العملة' : 'Save Coin')}
             </button>
             <p className="text-[10px] text-ink/30 text-center">
@@ -845,7 +845,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
 
                   <button onClick={saveEdit} disabled={editSaving}
                     className="w-full py-2.5 rounded-xl bg-gold-600 hover:bg-gold-500 text-white font-semibold text-[13px] transition-colors disabled:opacity-50">
-                    {editSaving ? (isAr ? 'جارٍ الحفظ...' : 'Saving...') : editSaved ? (isAr ? '✓ تم الحفظ' : '✓ Saved!') : (isAr ? 'حفظ التعديلات' : 'Save Changes')}
+                    {editSaving ? (isAr ? 'جارٍ الحفظ...' : 'Saving...') : editSaved ? (isAr ? 'تم الحفظ' : 'Saved!') : (isAr ? 'حفظ التعديلات' : 'Save Changes')}
                   </button>
                   <p className="text-[10px] text-ink/40 text-center">
                     {isAr ? 'التعديلات تُرسَل للمراجعة قبل النشر الرسمي' : 'Edits are queued for review before being published to the live catalogue'}
@@ -964,7 +964,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                   className={`w-full py-3 rounded-xl font-semibold text-[14px] transition-all flex items-center justify-center gap-2
                     ${priceSaved ? 'bg-emerald-600 text-white' : 'bg-gold-600 hover:bg-gold-500 text-ink cursor-pointer'}`}>
                   <Save size={15} />
-                  {priceSaved ? (isAr ? '✓ تم حفظ السعر' : '✓ Price saved') : (isAr ? 'حفظ السعر' : 'Save Price')}
+                  {priceSaved ? (isAr ? 'تم حفظ السعر' : 'Price saved') : (isAr ? 'حفظ السعر' : 'Save Price')}
                 </button>
               </>
             )}
@@ -1012,7 +1012,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                       <div className="flex gap-2">
                         <button onClick={() => approveSubmission(s.id, s.coin_id, s.sheldon, s.price, s.currency)}
                           className="flex-1 py-1.5 text-[11px] rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-500 transition-colors">
-                          {isAr ? '✓ قبول' : '✓ Approve'}
+                          {isAr ? 'قبول' : 'Approve'}
                         </button>
                         <button onClick={() => rejectSubmission(s.id)}
                           className="flex-1 py-1.5 text-[11px] rounded-lg bg-red-500 text-white font-medium hover:bg-red-400 transition-colors">
@@ -1052,7 +1052,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
                   className={`w-full py-2.5 rounded-xl font-semibold text-[13px] transition-colors flex items-center justify-center gap-2
                     ${teamSaved ? 'bg-emerald-600 text-white' : 'bg-gold-600 hover:bg-gold-500 text-ink'}`}>
                   <Plus size={14} />
-                  {teamSaved ? (isAr ? '✓ تمت الإضافة' : '✓ Added') : (isAr ? 'إضافة مسؤول' : 'Add Admin')}
+                  {teamSaved ? (isAr ? 'تمت الإضافة' : 'Added') : (isAr ? 'إضافة مسؤول' : 'Add Admin')}
                 </button>
                 <p className="text-[10px] text-ink/30">
                   {isAr
@@ -1143,7 +1143,7 @@ export default function AdminPanel({ onClose, locale, onCoinAdded }: AdminPanelP
 
             {dqMerged && (
               <p className="text-[11px] text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                ✓ {isAr ? 'تم الدمج إلى:' : 'Merged to:'} <strong>{dqMerged}</strong>
+                {isAr ? 'تم الدمج إلى:' : 'Merged to:'} <strong>{dqMerged}</strong>
               </p>
             )}
 

@@ -144,10 +144,10 @@ function MiniCoinCard({ coin, locale }: { coin: Coin; locale: string }) {
         />
       ) : (
         <div
-          className="w-14 h-14 rounded-full flex items-center justify-center text-xl"
+          className="w-14 h-14 rounded-full flex items-center justify-center text-xl text-amber-700 font-bold"
           style={{ background: DISC_GRADIENTS[coin.metal] ?? DISC_GRADIENTS.Other }}
         >
-          🪙
+          —
         </div>
       )}
       <div className="w-full text-center">
@@ -180,7 +180,7 @@ function CoinRow({ coin, locale }: { coin: Coin; locale: string }) {
           style={{ border: '1.5px solid #F0E8D4', outline: '1px solid #8B6D2E' }}
         />
       ) : (
-        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-base shrink-0">🪙</div>
+        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-base shrink-0 text-amber-400 font-bold">—</div>
       )}
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-amiri text-amber-900 truncate">{name}</div>

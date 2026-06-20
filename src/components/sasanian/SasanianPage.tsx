@@ -55,7 +55,7 @@ export default function SasanianPage({ locale }: { locale: string }) {
 
   const [coins,        setCoins]        = useState<CoinRow[]>([]);
   const [total,        setTotal]        = useState(7995);
-  const [loading,      setLoading]      = useState(false);
+  const [loading,      setLoading]      = useState(true);
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [metals,       setMetals]       = useState<string[]>([]);
   const queryRef   = useRef<NodeJS.Timeout>();
