@@ -3,10 +3,11 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 86400;
 
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import COINS_RAW from '@/data/coins.json';
 import type { Coin } from '@/types/coin';
 import CoinDetailPage from './CoinDetailPage';
+import { getCoinById } from '@/lib/coinsApi';
 
 const ALL_COINS = COINS_RAW as unknown as Coin[];
 
@@ -55,8 +56,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // ── Page component ─────────────────────────────────────────────────────────────
-export default function CoinPage({ params }: Props) {
+export default async function CoinPage({ params }: Props) {
   const coin = ALL_COINS.find(c => c.id === params.id);
-  if (!coin) notFound();
-  return <CoinDetailPage coin={coin} locale={params.locale} />;
+  if (coin) return <CoinDetailPage coin={coin} locale={params.locale} />;
+
+  // Not in static JSON — check Supabase (covers MG, DS, IS, SS coins)
+  const row = await getCoinById(params.id);
+  if (!row) notFound();
+
+  if (row.cc === 'MG') redirect(`/${params.locale}/mughal/${params.id}`);
+  if (row.cc === 'DS') redirect(`/${params.locale}/delhi/${params.id}`);
+
+  // Islamic / Sasanian coins already linked correctly; if we get here, 404
+  notFound();
 }
