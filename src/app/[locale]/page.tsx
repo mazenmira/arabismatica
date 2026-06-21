@@ -90,8 +90,8 @@ function IslamicBlock({ locale, isAr, counts, dedicatedChips }: {
 }
 
 // ── Group Card ─────────────────────────────────────────────────────────────────
-function GroupCard({ group, locale, isAr, isDe, counts }: {
-  group: AcademicGroup; locale: string; isAr: boolean; isDe: boolean; counts: LiveCounts;
+function GroupCard({ group, locale, isAr, counts }: {
+  group: AcademicGroup; locale: string; isAr: boolean; counts: LiveCounts;
 }) {
   const title = isAr ? group.title_ar : group.title_en;
   const desc  = isAr ? group.desc_ar  : group.desc_en;
@@ -292,7 +292,6 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
                 group={group}
                 locale={locale}
                 isAr={isAr}
-                isDe={isDe}
                 counts={liveCounts}
               />
             ))}
