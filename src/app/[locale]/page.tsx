@@ -20,6 +20,18 @@ const HERO_STATS = [
 
 type LiveCounts = Record<string, number>;
 
+const GROUP_BG: Record<string, string> = {
+  modern_arab_states:  'bg-[#FDF8F0]',
+  ottoman_empire:      'bg-[#F5F0E8]',
+  islamic_dynasties:   'bg-[#F0EEE8]',
+  pre_islamic_persia:  'bg-[#F2EDE4]',
+  hellenistic_ancient: 'bg-[#EEF0E8]',
+  rome_arab_world:     'bg-[#F0ECEC]',
+  byzantine_crusader:  'bg-[#EAF0F0]',
+  phoenician_levant:   'bg-[#F5F0E4]',
+  reference_tools:     'bg-[#F0F0EE]',
+};
+
 // ── Live Chip ──────────────────────────────────────────────────────────────────
 function LiveChip({ chip, locale, isAr, counts }: {
   chip: CatalogueChip; locale: string; isAr: boolean; counts: LiveCounts;
@@ -29,7 +41,7 @@ function LiveChip({ chip, locale, isAr, counts }: {
 
   if (chip.status === 'coming_soon') {
     return (
-      <span className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-400 text-[11px] italic cursor-default select-none">
+      <span className="inline-flex items-center bg-white/50 border border-gray-200 text-gray-400 text-sm italic rounded-full px-4 py-1.5 cursor-default select-none">
         {label}
       </span>
     );
@@ -37,10 +49,10 @@ function LiveChip({ chip, locale, isAr, counts }: {
 
   return (
     <Link href={`/${locale}${chip.href}`}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 text-[11px] font-medium hover:bg-emerald-100 transition-colors">
+      className="inline-flex items-center gap-1.5 bg-white border border-emerald-300 text-emerald-800 text-sm rounded-full px-4 py-1.5 font-medium hover:bg-emerald-50 transition-colors">
       {label}
       {count != null && (
-        <span className="text-[10px] text-emerald-600 font-normal tabular-nums">
+        <span className="text-[12px] text-emerald-500 font-normal tabular-nums">
           · {count.toLocaleString(isAr ? 'ar-EG' : 'en-US')}
         </span>
       )}
@@ -52,38 +64,34 @@ function LiveChip({ chip, locale, isAr, counts }: {
 function IslamicBlock({ locale, isAr, counts, dedicatedChips }: {
   locale: string; isAr: boolean; counts: LiveCounts; dedicatedChips: CatalogueChip[];
 }) {
-  const dyLabel  = isAr ? 'تصفح حسب السلالة'    : 'Browse by dynasty';
-  const dedLabel = isAr ? 'كتالوجات مخصصة'       : 'Dedicated catalogues';
+  const dyLabel  = isAr ? 'تصفح حسب السلالة' : 'BROWSE BY DYNASTY';
+  const dedLabel = isAr ? 'كتالوجات مخصصة'   : 'DEDICATED CATALOGUES';
   const allLink  = isAr ? 'تصفح الكتالوج الإسلامي الكامل ←' : 'Browse full Islamic catalogue →';
 
   return (
-    <div className="space-y-4">
+    <div>
       {/* Dynasty chips */}
-      <div>
-        <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2 font-medium">{dyLabel}</p>
-        <div className="flex flex-wrap gap-1.5">
-          {ISLAMIC_DYNASTY_CHIPS.map(d => (
-            <Link key={d.dyn}
-              href={`/${locale}/islamic?dynasty=${encodeURIComponent(d.dyn)}`}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 text-[11px] hover:bg-amber-100 transition-colors">
-              {isAr ? d.label_ar : d.label_en}
-              <span className="text-[10px] text-amber-500 tabular-nums">· {d.count.toLocaleString(isAr ? 'ar-EG' : 'en-US')}</span>
-            </Link>
-          ))}
-        </div>
-        <Link href={`/${locale}/islamic`}
-          className="inline-block mt-2 text-[11px] text-emerald-600 hover:text-emerald-800 hover:underline transition-colors">
-          {allLink}
-        </Link>
+      <p className="text-xs font-semibold tracking-widest text-gray-400 mb-3">{dyLabel}</p>
+      <div className="flex flex-wrap gap-2">
+        {ISLAMIC_DYNASTY_CHIPS.map(d => (
+          <Link key={d.dyn}
+            href={`/${locale}/islamic?dynasty=${encodeURIComponent(d.dyn)}`}
+            className="inline-flex items-center gap-1 bg-white border border-amber-300 text-amber-800 text-sm rounded-full px-4 py-1.5 hover:bg-amber-50 transition-colors">
+            {isAr ? d.label_ar : d.label_en}
+            <span className="text-[12px] text-amber-500 tabular-nums">· {d.count.toLocaleString(isAr ? 'ar-EG' : 'en-US')}</span>
+          </Link>
+        ))}
       </div>
+      <Link href={`/${locale}/islamic`}
+        className="text-sm text-amber-700 hover:underline mt-3 block">
+        {allLink}
+      </Link>
       {/* Dedicated catalogues */}
-      <div>
-        <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2 font-medium">{dedLabel}</p>
-        <div className="flex flex-wrap gap-1.5">
-          {dedicatedChips.map(chip => (
-            <LiveChip key={chip.id} chip={chip} locale={locale} isAr={isAr} counts={counts} />
-          ))}
-        </div>
+      <p className="text-xs font-semibold tracking-widest text-gray-400 mb-3 mt-6">{dedLabel}</p>
+      <div className="flex flex-wrap gap-2">
+        {dedicatedChips.map(chip => (
+          <LiveChip key={chip.id} chip={chip} locale={locale} isAr={isAr} counts={counts} />
+        ))}
       </div>
     </div>
   );
@@ -98,30 +106,28 @@ function GroupCard({ group, locale, isAr, counts }: {
   const isIslamicGroup = group.id === 'islamic_dynasties';
   const dedicatedChips = group.catalogues.filter(c => c.special !== 'islamic_dynasties');
   const islamicMain    = group.catalogues.find(c => c.special === 'islamic_dynasties');
+  const bg = GROUP_BG[group.id] ?? 'bg-white';
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6">
+    <div className={`rounded-2xl border border-[#E8E0D0] p-8 ${bg}`}>
       {/* Header row */}
-      <div className="flex items-baseline gap-3 mb-1">
-        <span className="text-[11px] font-mono text-gray-300 select-none shrink-0">
-          {String(group.num).padStart(2, '0')}
-        </span>
-        <h3 className="font-amiri text-[17px] leading-snug font-semibold text-gray-900">
-          {title}
-        </h3>
-        {group.period && (
-          <span className="text-[11px] text-gray-400 shrink-0">{group.period}</span>
-        )}
+      <div className="flex items-center gap-3 flex-wrap mb-1">
+        <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
         {group.ottoman && (
-          <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full shrink-0">
+          <span className="text-xs bg-white/60 border border-gray-200 text-gray-400 rounded-full px-2 py-0.5">
             {isAr ? 'في الإعداد' : 'In preparation'}
+          </span>
+        )}
+        {group.period && (
+          <span className="text-xs text-gray-400 bg-white/60 border border-gray-200 rounded-full px-3 py-0.5">
+            {group.period}
           </span>
         )}
       </div>
       {/* Description */}
-      <p className="text-[12px] text-gray-500 mb-4 leading-relaxed">{desc}</p>
+      <p className="text-sm text-gray-500 mt-1 mb-5 leading-relaxed">{desc}</p>
       {/* Divider */}
-      <div className="border-t border-gray-100 mb-4" />
+      <div className="border-t border-[#E8E0D0] mb-5" />
       {/* Chips */}
       {isIslamicGroup && islamicMain ? (
         <IslamicBlock locale={locale} isAr={isAr} counts={counts} dedicatedChips={dedicatedChips} />
@@ -259,13 +265,13 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
       )}
 
       {/* ── CATALOGUE INDEX ─────────────────────────────────────────────── */}
-      <div className="catalogue-section bg-white">
+      <div className="catalogue-section bg-[#F7F4EF]">
         <div className="max-w-[1440px] mx-auto px-4 py-10">
-          <h2 className="text-[11px] text-gray-400 uppercase tracking-widest font-medium mb-7 pb-2 border-b border-gray-200">
-            {t('الكتالوجات الأكاديمية', 'Academic Catalogues', 'Akademische Kataloge')}
+          <h2 className="text-2xl font-semibold text-gray-800 mb-8">
+            {t('الكتالوجات', 'Catalogues', 'Kataloge')}
           </h2>
 
-          <div className="space-y-4">
+          <div className="flex flex-col gap-5">
             {ACADEMIC_GROUPS.map(group => (
               <GroupCard
                 key={group.id}

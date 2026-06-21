@@ -141,7 +141,7 @@ export default function DelhiPage({ locale }: { locale: string }) {
             <input
               value={query}
               onChange={e => { setQuery(e.target.value); setPage(1); }}
-              placeholder={isAr ? 'ابحث بالاسم، الحاكم، دار الضرب...' : 'Search by name, ruler, mint...'}
+              placeholder={isAr ? 'ابحث عن عملة...' : 'Search coins...'}
               className="w-full text-[14px] ps-11 pe-4 py-3 rounded-xl border border-gold-700/25 bg-parch-cream outline-none focus:border-gold-500 shadow-sm font-cairo"
             />
           </div>
@@ -152,14 +152,14 @@ export default function DelhiPage({ locale }: { locale: string }) {
           <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-2 flex-wrap">
 
             <ComboFilter
-              placeholder={isAr ? 'كل الحكام' : 'All Rulers'}
+              placeholder={isAr ? 'الحاكم' : 'Ruler'}
               value={ruler}
               onChange={v => { setRuler(v); setPage(1); }}
               loadOptions={loadRulers}
             />
 
             <ComboFilter
-              placeholder={isAr ? 'كل دور الضرب' : 'All Mints'}
+              placeholder={isAr ? 'دار الضرب' : 'Mint'}
               value={mint}
               onChange={v => { setMint(v); setPage(1); }}
               loadOptions={loadMints}
@@ -167,7 +167,7 @@ export default function DelhiPage({ locale }: { locale: string }) {
 
             <select value={metal} onChange={e => { setMetal(e.target.value); setPage(1); }}
               className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
-              <option value="">{isAr ? 'كل المعادن' : 'All Metals'}</option>
+              <option value="">{isAr ? 'المعدن' : 'Metal'}</option>
               {metals.map(m => <option key={m} value={m}>{isAr ? (METALS_AR[m] ?? m) : m}</option>)}
             </select>
 

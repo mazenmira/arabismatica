@@ -22,6 +22,7 @@ type NavChild = {
   isToolsSidebar?: boolean;
   isDivider?: boolean;
   isComingSoon?: boolean;
+  isInPrep?: boolean;
 };
 type NavTopItem = { label: string; isTools?: boolean; children: NavChild[] };
 
@@ -60,10 +61,10 @@ const TOP_NAV_ITEMS_AR: NavTopItem[] = [
     { label: 'صقلية النورمانية',       isComingSoon: true },
   ]},
   { label: 'الدولة العثمانية', children: [
-    { label: 'الدولة العثمانية 1299–1922', isComingSoon: true },
+    { label: 'الدولة العثمانية 1299–1922', isInPrep: true },
   ]},
   { label: 'العالم القديم', children: [
-    { label: 'فارس ما قبل الإسلام', isComingSoon: false, href: undefined },
+    { label: 'فارس ما قبل الإسلام', href: undefined },
     { label: 'الإمبراطورية الساسانية', href: '/ar/sasanian', grandchildren: [
       { label: 'الحكام',       href: '/ar/sasanian/rulers' },
       { label: 'دور الضرب',    href: '/ar/sasanian/mints' },
@@ -72,29 +73,29 @@ const TOP_NAV_ITEMS_AR: NavTopItem[] = [
     { label: 'الإمبراطورية الفرثية',   isComingSoon: true },
     { label: 'الإمبراطورية الأخمينية', isComingSoon: true },
     { isDivider: true, label: '' },
-    { label: 'الهلنستيون والشرق الأدنى', isComingSoon: false, href: undefined },
+    { label: 'الهلنستيون والشرق الأدنى', href: undefined },
     { label: 'الإمبراطورية السلوقية',  isComingSoon: true },
     { label: 'المملكة البطلمية',        isComingSoon: true },
     { label: 'المملكة النبطية',         isComingSoon: true },
     { isDivider: true, label: '' },
-    { label: 'روما والبيزنطيون والصليبيون', isComingSoon: false, href: undefined },
+    { label: 'روما في العالم العربي', href: undefined },
     { label: 'المقاطعات الرومانية الشرقية', isComingSoon: true },
-    { label: 'الإمبراطورية البيزنطية',      isComingSoon: true },
-    { label: 'الممالك الصليبية',            isComingSoon: true },
+    { label: 'الإسكندرية الرومانية',        isComingSoon: true },
     { isDivider: true, label: '' },
-    { label: 'الفينيقيون والجزيرة القديمة', isComingSoon: false, href: undefined },
-    { label: 'المدن الفينيقية',  isComingSoon: true },
-    { label: 'الجزيرة العربية القديمة', isComingSoon: true },
-    { label: 'مملكة حمير',      isComingSoon: true },
+    { label: 'البيزنطيون والصليبيون', href: undefined },
+    { label: 'الإمبراطورية البيزنطية', isComingSoon: true },
+    { label: 'الممالك الصليبية',       isComingSoon: true },
+    { isDivider: true, label: '' },
+    { label: 'الفينيقيون والجزيرة القديمة', href: undefined },
+    { label: 'المدن الفينيقية',             isComingSoon: true },
+    { label: 'الجزيرة العربية القديمة',     isComingSoon: true },
+    { label: 'مملكة حمير',                  isComingSoon: true },
   ]},
   { label: 'الأدوات', isTools: true, children: [
-    { label: 'محول الهجري ↔ الميلادي', isHijriTool: true },
-    { label: 'باقي الأدوات الداخلية',  isToolsSidebar: true },
-    { label: 'بوابة المعرفة',           href: `${WP}/knowledge-portal/` },
-    { label: 'أدوات التقييم',           href: `${WP}/grading-tools/` },
-    { label: 'مختبر المقتني الصغير',    href: `${WP}/young-collector-lab/` },
-    { label: 'أكاديمية المقتني',        href: `${WP}/ac-academy/` },
-    { label: 'المكتبة الإلكترونية',     href: 'https://library.arabcollector.com/' },
+    { label: 'دليل دور الضرب',       isComingSoon: true },
+    { label: 'فهرس الحكام',          isComingSoon: true },
+    { label: 'محول الهجري–الميلادي', isComingSoon: true },
+    { label: 'دليل الخط العربي',     isComingSoon: true },
   ]},
 ];
 
@@ -109,7 +110,7 @@ const TOP_NAV_ITEMS_EN: NavTopItem[] = [
     ]},
     { label: 'Arab Medals & Orders', isComingSoon: true },
   ]},
-  { label: 'Islamic Dynasties', children: [
+  { label: 'Islamic', children: [
     { label: 'Islamic Dynastic Coins', href: '/en/islamic', grandchildren: [
       { label: 'Dynasties',  href: '/en/islamic/dynasties' },
       { label: 'Mints',      href: '/en/islamic/mints' },
@@ -133,10 +134,10 @@ const TOP_NAV_ITEMS_EN: NavTopItem[] = [
     { label: 'Norman Sicily',      isComingSoon: true },
   ]},
   { label: 'Ottoman', children: [
-    { label: 'Ottoman Empire 1299–1922', isComingSoon: true },
+    { label: 'Ottoman Empire 1299–1922', isInPrep: true },
   ]},
   { label: 'Ancient World', children: [
-    { label: 'Pre-Islamic Persia', isComingSoon: false, href: undefined },
+    { label: 'Pre-Islamic Persia', href: undefined },
     { label: 'Sasanian Empire', href: '/en/sasanian', grandchildren: [
       { label: 'Rulers',     href: '/en/sasanian/rulers' },
       { label: 'Mints',      href: '/en/sasanian/mints' },
@@ -145,29 +146,29 @@ const TOP_NAV_ITEMS_EN: NavTopItem[] = [
     { label: 'Parthian Empire',    isComingSoon: true },
     { label: 'Achaemenid Persia',  isComingSoon: true },
     { isDivider: true, label: '' },
-    { label: 'Hellenistic & Ancient', isComingSoon: false, href: undefined },
+    { label: 'Hellenistic & Ancient', href: undefined },
     { label: 'Seleucid Empire',    isComingSoon: true },
     { label: 'Ptolemaic Kingdom',  isComingSoon: true },
     { label: 'Nabataean Kingdom',  isComingSoon: true },
     { isDivider: true, label: '' },
-    { label: 'Rome, Byzantium & Crusaders', isComingSoon: false, href: undefined },
+    { label: 'Rome in the Arab World', href: undefined },
     { label: 'Roman Provincial Eastern', isComingSoon: true },
-    { label: 'Byzantine Empire',         isComingSoon: true },
-    { label: 'Crusader States',          isComingSoon: true },
+    { label: 'Roman Egypt Alexandrian',  isComingSoon: true },
     { isDivider: true, label: '' },
-    { label: 'Phoenician & Ancient Levant', isComingSoon: false, href: undefined },
+    { label: 'Byzantine & Crusader', href: undefined },
+    { label: 'Byzantine Empire',   isComingSoon: true },
+    { label: 'Crusader States',    isComingSoon: true },
+    { isDivider: true, label: '' },
+    { label: 'Phoenician & Ancient Levant', href: undefined },
     { label: 'Phoenician Cities', isComingSoon: true },
     { label: 'Ancient Arabia',    isComingSoon: true },
     { label: 'Himyarite Kingdom', isComingSoon: true },
   ]},
   { label: 'Tools', isTools: true, children: [
-    { label: 'Hijri ↔ Gregorian Converter', isHijriTool: true },
-    { label: 'More Built-in Tools',          isToolsSidebar: true },
-    { label: 'Knowledge Portal',        href: `${WP}/knowledge-portal/` },
-    { label: 'Grading Tools',           href: `${WP}/grading-tools/` },
-    { label: 'Young Collector Lab',     href: `${WP}/young-collector-lab/` },
-    { label: 'Arab Collector Academy',  href: `${WP}/ac-academy/` },
-    { label: 'Digital Library',         href: 'https://library.arabcollector.com/' },
+    { label: 'Mint Gazetteer',      isComingSoon: true },
+    { label: 'Ruler Index',         isComingSoon: true },
+    { label: 'Hijri–CE Converter',  isComingSoon: true },
+    { label: 'Arabic Script Guide', isComingSoon: true },
   ]},
 ];
 
@@ -191,7 +192,7 @@ const TOP_NAV_ITEMS_DE: NavTopItem[] = [
     ]},
     { label: 'Arabische Orden & Medaillen', isComingSoon: true },
   ]},
-  { label: 'Islamische Dynastien', children: [
+  { label: 'Islamisch', children: [
     { label: 'Islamische Dynastiemünzen', href: '/de/islamic', grandchildren: [
       { label: 'Dynastien',   href: '/de/islamic/dynasties' },
       { label: 'Münzstätten', href: '/de/islamic/mints' },
@@ -215,10 +216,10 @@ const TOP_NAV_ITEMS_DE: NavTopItem[] = [
     { label: 'Normannisches Sizilien',isComingSoon: true },
   ]},
   { label: 'Osmanisch', children: [
-    { label: 'Osmanisches Reich 1299–1922', isComingSoon: true },
+    { label: 'Osmanisches Reich 1299–1922', isInPrep: true },
   ]},
   { label: 'Alte Welt', children: [
-    { label: 'Vorislamisches Persien', isComingSoon: false, href: undefined },
+    { label: 'Vorislamisches Persien', href: undefined },
     { label: 'Sassanidisches Reich', href: '/de/sasanian', grandchildren: [
       { label: 'Herrscher',   href: '/de/sasanian/rulers' },
       { label: 'Münzstätten', href: '/de/sasanian/mints' },
@@ -227,29 +228,29 @@ const TOP_NAV_ITEMS_DE: NavTopItem[] = [
     { label: 'Partherreich',              isComingSoon: true },
     { label: 'Achämenidisches Persien',   isComingSoon: true },
     { isDivider: true, label: '' },
-    { label: 'Hellenistisch & Antik', isComingSoon: false, href: undefined },
+    { label: 'Hellenistisch & Antik', href: undefined },
     { label: 'Seleukidenreich',           isComingSoon: true },
     { label: 'Ptolemäisches Königreich',  isComingSoon: true },
     { label: 'Nabatäisches Königreich',   isComingSoon: true },
     { isDivider: true, label: '' },
-    { label: 'Rom, Byzanz & Kreuzfahrer', isComingSoon: false, href: undefined },
+    { label: 'Rom in der arabischen Welt', href: undefined },
     { label: 'Römische Ostprovinzen',     isComingSoon: true },
+    { label: 'Römisches Ägypten',         isComingSoon: true },
+    { isDivider: true, label: '' },
+    { label: 'Byzantinisch & Kreuzfahrer', href: undefined },
     { label: 'Byzantinisches Reich',      isComingSoon: true },
     { label: 'Kreuzfahrerstaaten',        isComingSoon: true },
     { isDivider: true, label: '' },
-    { label: 'Phönizier & antike Levante', isComingSoon: false, href: undefined },
-    { label: 'Phönizische Städte',    isComingSoon: true },
-    { label: 'Antikes Arabien',       isComingSoon: true },
-    { label: 'Himyaritisches Königreich', isComingSoon: true },
+    { label: 'Phönizier & antike Levante', href: undefined },
+    { label: 'Phönizische Städte',         isComingSoon: true },
+    { label: 'Antikes Arabien',            isComingSoon: true },
+    { label: 'Himyaritisches Königreich',  isComingSoon: true },
   ]},
   { label: 'Tools', isTools: true, children: [
-    { label: 'Hidschra ↔ Gregorian',  isHijriTool: true },
-    { label: 'Weitere Tools',          isToolsSidebar: true },
-    { label: 'Wissensportal',           href: `${WP}/knowledge-portal/` },
-    { label: 'Bewertungstools',         href: `${WP}/grading-tools/` },
-    { label: 'Junger Sammler Lab',      href: `${WP}/young-collector-lab/` },
-    { label: 'Arab Collector Akademie', href: `${WP}/ac-academy/` },
-    { label: 'Digitale Bibliothek',     href: 'https://library.arabcollector.com/' },
+    { label: 'Münzstättenverzeichnis',     isComingSoon: true },
+    { label: 'Herrscherindex',             isComingSoon: true },
+    { label: 'Hijri-Gregorianisch',        isComingSoon: true },
+    { label: 'Arabischer Schriftführer',   isComingSoon: true },
   ]},
 ];
 
@@ -413,6 +414,17 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                             </span>
                           );
                         }
+                        if (child.isInPrep) {
+                          return (
+                            <span key={child.label}
+                              className="text-[12px] text-gray-400 cursor-default flex items-center justify-between px-4 py-2.5 select-none border-b border-amber-100 last:border-0">
+                              {child.label}
+                              <span className="text-[10px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full">
+                                {isAr ? 'في الإعداد' : 'In preparation'}
+                              </span>
+                            </span>
+                          );
+                        }
                         if (!child.href) {
                           return (
                             <span key={child.label}
@@ -553,6 +565,17 @@ export default function SiteHeader({ locale }: SiteHeaderProps) {
                             className="flex items-center justify-between px-8 py-2.5 text-[12px] text-amber-300 border-b border-amber-100 last:border-0 cursor-not-allowed select-none">
                             {child.label}
                             <span className="text-[10px] bg-amber-100 text-amber-400 px-1.5 py-0.5 rounded-full font-medium">Soon</span>
+                          </span>
+                        );
+                      }
+                      if (child.isInPrep) {
+                        return (
+                          <span key={child.label}
+                            className="flex items-center justify-between px-8 py-2.5 text-[12px] text-gray-400 border-b border-amber-100 last:border-0 cursor-default select-none">
+                            {child.label}
+                            <span className="text-[10px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full">
+                              {isAr ? 'في الإعداد' : 'In preparation'}
+                            </span>
                           </span>
                         );
                       }
