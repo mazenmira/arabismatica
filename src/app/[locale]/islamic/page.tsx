@@ -1,6 +1,7 @@
 export const revalidate = 3600;
 
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import IslamicPage from '@/components/islamic/IslamicPage';
 
 const BASE_URL = 'https://arabismatica.arabcollector.com';
@@ -45,5 +46,9 @@ export async function generateMetadata(
 }
 
 export default function Page({ params }: { params: { locale: string } }) {
-  return <IslamicPage locale={params.locale} />;
+  return (
+    <Suspense fallback={null}>
+      <IslamicPage locale={params.locale} />
+    </Suspense>
+  );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Search, X, ChevronDown, ChevronUp, SlidersHorizontal, FileDown } from 'lucide-react';
 import { getIslamicCoins, getMintStats, getRulerStats } from '@/lib/coinsApi';
@@ -87,11 +88,14 @@ function SkeletonCard() {
 export default function IslamicPage({ locale }: { locale: string }) {
   const isAr = locale === 'ar';
   const { darkMode } = useDarkMode();
+  const searchParams = useSearchParams();
 
   // ── Filter state ────────────────────────────────────────────────────────
   const [query,       setQuery]       = useState('');
   const [denomination,setDenomination]= useState('');
-  const [dynasty,     setDynasty]     = useState('');
+  const [dynasty,     setDynasty]     = useState(
+    () => searchParams.get('dynasty') ?? ''
+  );
   const [metal,       setMetal]       = useState('');
   const [mint,        setMint]        = useState('');
   const [ruler,       setRuler]       = useState('');

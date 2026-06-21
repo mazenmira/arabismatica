@@ -36,7 +36,7 @@ const TOP_NAV_ITEMS_AR: NavTopItem[] = [
     ]},
     { label: 'الأوسمة والنياشين العربية', isComingSoon: true },
   ]},
-  { label: 'الأسرات الإسلامية', children: [
+  { label: 'العصور الإسلامية', children: [
     { label: 'العملات الإسلامية', href: '/ar/islamic', grandchildren: [
       { label: 'السلالات',        href: '/ar/islamic/dynasties' },
       { label: 'دور الضرب',       href: '/ar/islamic/mints' },

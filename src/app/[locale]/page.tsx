@@ -29,16 +29,15 @@ function LiveChip({ chip, locale, isAr, counts }: {
 
   if (chip.status === 'coming_soon') {
     return (
-      <span className="inline-flex items-center px-3 py-1.5 rounded-full border border-dashed border-gray-200 text-gray-400 text-[11px] italic cursor-default select-none">
+      <span className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-400 text-[11px] italic cursor-default select-none">
         {label}
       </span>
     );
   }
 
-  // active
   return (
     <Link href={`/${locale}${chip.href}`}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-emerald-300 bg-emerald-50 text-emerald-800 text-[11px] font-medium hover:bg-emerald-100 hover:border-emerald-400 transition-colors">
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 text-[11px] font-medium hover:bg-emerald-100 transition-colors">
       {label}
       {count != null && (
         <span className="text-[10px] text-emerald-600 font-normal tabular-nums">
@@ -53,30 +52,31 @@ function LiveChip({ chip, locale, isAr, counts }: {
 function IslamicBlock({ locale, isAr, counts, dedicatedChips }: {
   locale: string; isAr: boolean; counts: LiveCounts; dedicatedChips: CatalogueChip[];
 }) {
-  const dyLabel  = isAr ? 'تصفح حسب السلالة' : 'Browse by dynasty';
-  const dedLabel = isAr ? 'كتالوجات مخصصة'   : 'Dedicated catalogues';
+  const dyLabel  = isAr ? 'تصفح حسب السلالة'    : 'Browse by dynasty';
+  const dedLabel = isAr ? 'كتالوجات مخصصة'       : 'Dedicated catalogues';
+  const allLink  = isAr ? 'تصفح الكتالوج الإسلامي الكامل ←' : 'Browse full Islamic catalogue →';
 
   return (
-    <div className="space-y-3">
-      {/* Dynasty row */}
+    <div className="space-y-4">
+      {/* Dynasty chips */}
       <div>
         <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2 font-medium">{dyLabel}</p>
         <div className="flex flex-wrap gap-1.5">
           {ISLAMIC_DYNASTY_CHIPS.map(d => (
-            <Link key={d.dynasty}
-              href={`/${locale}/islamic?dynasty=${encodeURIComponent(d.dynasty)}`}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-amber-300 bg-amber-50 text-amber-800 text-[11px] hover:bg-amber-100 hover:border-amber-400 transition-colors">
+            <Link key={d.dyn}
+              href={`/${locale}/islamic?dynasty=${encodeURIComponent(d.dyn)}`}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-200 bg-amber-50 text-amber-800 text-[11px] hover:bg-amber-100 transition-colors">
               {isAr ? d.label_ar : d.label_en}
-              <span className="text-[10px] text-amber-600 tabular-nums">· {d.count.toLocaleString(isAr ? 'ar-EG' : 'en-US')}</span>
+              <span className="text-[10px] text-amber-500 tabular-nums">· {d.count.toLocaleString(isAr ? 'ar-EG' : 'en-US')}</span>
             </Link>
           ))}
-          <Link href={`/${locale}/islamic`}
-            className="inline-flex items-center px-2.5 py-1 rounded-full border border-amber-400 bg-amber-100 text-amber-800 text-[11px] font-semibold hover:bg-amber-200 transition-colors">
-            {isAr ? 'عرض الكل ←' : 'View all →'}
-          </Link>
         </div>
+        <Link href={`/${locale}/islamic`}
+          className="inline-block mt-2 text-[11px] text-emerald-600 hover:text-emerald-800 hover:underline transition-colors">
+          {allLink}
+        </Link>
       </div>
-      {/* Dedicated catalogues row */}
+      {/* Dedicated catalogues */}
       <div>
         <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2 font-medium">{dedLabel}</p>
         <div className="flex flex-wrap gap-1.5">
@@ -95,63 +95,43 @@ function GroupCard({ group, locale, isAr, counts }: {
 }) {
   const title = isAr ? group.title_ar : group.title_en;
   const desc  = isAr ? group.desc_ar  : group.desc_en;
-
-  const borderClass = group.ottoman
-    ? 'border border-blue-200 bg-blue-50/30'
-    : 'border border-gray-200 bg-white';
-
   const isIslamicGroup = group.id === 'islamic_dynasties';
-
-  // For the islamic group, split chips: the one with special='islamic_dynasties' vs the rest (dedicated)
-  const islamicMain      = group.catalogues.find(c => c.special === 'islamic_dynasties');
-  const dedicatedChips   = group.catalogues.filter(c => c.special !== 'islamic_dynasties');
+  const dedicatedChips = group.catalogues.filter(c => c.special !== 'islamic_dynasties');
+  const islamicMain    = group.catalogues.find(c => c.special === 'islamic_dynasties');
 
   return (
-    <div className={`rounded-xl ${borderClass} p-5 md:p-6`}>
-      {group.ottoman && (
-        <div className="mb-3 flex items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-blue-500 border border-blue-300 rounded-full px-2.5 py-0.5">
-            {isAr ? 'الكتالوج القادم' : 'Next Major Catalogue'}
+    <div className="rounded-xl border border-gray-200 bg-white p-6">
+      {/* Header row */}
+      <div className="flex items-baseline gap-3 mb-1">
+        <span className="text-[11px] font-mono text-gray-300 select-none shrink-0">
+          {String(group.num).padStart(2, '0')}
+        </span>
+        <h3 className="font-amiri text-[17px] leading-snug font-semibold text-gray-900">
+          {title}
+        </h3>
+        {group.period && (
+          <span className="text-[11px] text-gray-400 shrink-0">{group.period}</span>
+        )}
+        {group.ottoman && (
+          <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full shrink-0">
+            {isAr ? 'في الإعداد' : 'In preparation'}
           </span>
-          <span className="text-[11px] text-blue-400">
-            {isAr ? '50,000+ عملة في الإعداد' : '50,000+ coins in preparation'}
-          </span>
+        )}
+      </div>
+      {/* Description */}
+      <p className="text-[12px] text-gray-500 mb-4 leading-relaxed">{desc}</p>
+      {/* Divider */}
+      <div className="border-t border-gray-100 mb-4" />
+      {/* Chips */}
+      {isIslamicGroup && islamicMain ? (
+        <IslamicBlock locale={locale} isAr={isAr} counts={counts} dedicatedChips={dedicatedChips} />
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {group.catalogues.map(chip => (
+            <LiveChip key={chip.id} chip={chip} locale={locale} isAr={isAr} counts={counts} />
+          ))}
         </div>
       )}
-
-      <div className="flex flex-col md:flex-row md:gap-8">
-        {/* Left: group meta */}
-        <div className="md:w-56 shrink-0 mb-4 md:mb-0">
-          <span className="text-[11px] font-mono text-gray-300 select-none">
-            {String(group.num).padStart(2, '0')}
-          </span>
-          <h3 className={`font-amiri text-[18px] leading-snug font-semibold mt-0.5 mb-1 ${
-            group.ottoman ? 'text-blue-800' : 'text-gray-900'
-          }`}>
-            {title}
-          </h3>
-          {group.period && (
-            <p className="text-[11px] text-gray-400 mb-2">{group.period}</p>
-          )}
-          <p className="text-[12px] text-gray-500 leading-relaxed">{desc}</p>
-        </div>
-
-        {/* Right: chips */}
-        <div className="flex-1">
-          {isIslamicGroup && islamicMain ? (
-            <IslamicBlock
-              locale={locale} isAr={isAr} counts={counts}
-              dedicatedChips={dedicatedChips}
-            />
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {group.catalogues.map(chip => (
-                <LiveChip key={chip.id} chip={chip} locale={locale} isAr={isAr} counts={counts} />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }

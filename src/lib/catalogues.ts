@@ -43,7 +43,7 @@ export const ACADEMIC_GROUPS: AcademicGroup[] = [
     title_ar: 'الإمبراطورية العثمانية',
     period: '1299–1922 CE',
     desc_en: 'Bridges Islamic dynasties and modern Arab states · entire Arab world simultaneously · next major catalogue · 50,000+ coins in preparation',
-    desc_ar: 'تجسر بين الأسرات الإسلامية والدول العربية الحديثة · العالم العربي بأكمله في آنٍ واحد · الكتالوج الكبير القادم · 50,000+ عملة في الإعداد',
+    desc_ar: 'تجسر بين العصور الإسلامية والدول العربية الحديثة · العالم العربي بأكمله في آنٍ واحد · الكتالوج الكبير القادم · 50,000+ عملة في الإعداد',
     ottoman: true,
     catalogues: [
       { id: 'ottoman', title_en: 'Ottoman Empire', title_ar: 'الدولة العثمانية', status: 'coming_soon' },
@@ -53,7 +53,7 @@ export const ACADEMIC_GROUPS: AcademicGroup[] = [
     id: 'islamic_dynasties',
     num: 3,
     title_en: 'Islamic Dynasties',
-    title_ar: 'الأسرات الإسلامية',
+    title_ar: 'العصور الإسلامية',
     period: '622–1299 CE',
     desc_en: 'United by Arabic Quranic inscriptions · from Spain to Central Asia',
     desc_ar: 'متحدة بالنقوش القرآنية العربية · من الأندلس إلى آسيا الوسطى',
@@ -160,16 +160,18 @@ export const ACADEMIC_GROUPS: AcademicGroup[] = [
   },
 ];
 
-// Dynasty chips for the Islamic special-case rendering
+// Dynasty chips for the Islamic special-case rendering.
+// dyn values are EXACT strings from coins.dyn column — verified via full Supabase scan.
+// Counts are live DB totals as of 2026-06.
 export const ISLAMIC_DYNASTY_CHIPS = [
-  { dynasty: 'Abbasid',   label_en: 'Abbasid Caliphate',  label_ar: 'الخلافة العباسية',  count: 8247 },
-  { dynasty: 'Samanid',   label_en: 'Samanid Dynasty',    label_ar: 'الأسرة السامانية',  count: 7658 },
-  { dynasty: 'Ilkhanid',  label_en: 'Ilkhanid Dynasty',   label_ar: 'أسرة الإيلخانية',   count: 7029 },
-  { dynasty: 'Umayyad',   label_en: 'Umayyad Caliphate',  label_ar: 'الخلافة الأموية',   count: 5232 },
-  { dynasty: 'Ayyubid',   label_en: 'Ayyubid Dynasty',    label_ar: 'الأسرة الأيوبية',   count: 3906 },
-  { dynasty: 'Artuqid',   label_en: 'Artuqid Dynasty',    label_ar: 'الأسرة الأرتقية',   count: 1348 },
-  { dynasty: 'Buyid',     label_en: 'Buyid Dynasty',      label_ar: 'الأسرة البويهية',   count: 831  },
-  { dynasty: 'Zangid',    label_en: 'Zangid Dynasty',     label_ar: 'الأسرة الزنكية',    count: 688  },
-  { dynasty: 'Fatimid',   label_en: 'Fatimid Caliphate',  label_ar: 'الخلافة الفاطمية',  count: 596  },
-  { dynasty: 'Hamdanid',  label_en: 'Hamdanid Dynasty',   label_ar: 'الأسرة الحمدانية',  count: 226  },
+  { dyn: 'الإيلخانيون',      label_en: 'Ilkhanid Dynasty',   label_ar: 'الإيلخانيون',      count: 11848 },
+  { dyn: 'السامانيون',        label_en: 'Samanid Dynasty',    label_ar: 'السامانيون',        count: 10090 },
+  { dyn: 'الخلافة العباسية', label_en: 'Abbasid Caliphate',  label_ar: 'الخلافة العباسية', count:  4966 },
+  { dyn: 'المماليك',          label_en: 'Mamluk Sultanate',   label_ar: 'المماليك',          count:  4943 },
+  { dyn: 'الدولة الأموية',   label_en: 'Umayyad Caliphate',  label_ar: 'الدولة الأموية',   count:  3353 },
+  { dyn: 'الأيوبيون',         label_en: 'Ayyubid Dynasty',    label_ar: 'الأيوبيون',         count:  3172 },
+  { dyn: 'الأرتقيون',         label_en: 'Artuqid Dynasty',    label_ar: 'الأرتقيون',         count:  1895 },
+  { dyn: 'الزنكيون',          label_en: 'Zangid Dynasty',     label_ar: 'الزنكيون',          count:  1715 },
+  { dyn: 'البويهيون',         label_en: 'Buyid Dynasty',      label_ar: 'البويهيون',         count:  1174 },
+  { dyn: 'الحمدانيون',        label_en: 'Hamdanid Dynasty',   label_ar: 'الحمدانيون',        count:   449 },
 ] as const;
