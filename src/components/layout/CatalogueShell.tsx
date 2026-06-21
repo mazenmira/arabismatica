@@ -19,7 +19,6 @@ interface CatalogueShellProps {
   heroTitle: string;
   heroSubtitle?: string;
   heroCoinCount?: number;
-  heroIcon?: string;
   navItems: ShellNavItem[];
   children: React.ReactNode;
 }
@@ -30,11 +29,9 @@ export default function CatalogueShell({
   heroTitle,
   heroSubtitle,
   heroCoinCount,
-  heroIcon,
   navItems,
   children,
 }: CatalogueShellProps) {
-  const icon = heroIcon ?? '';
   const isAr = locale === 'ar';
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
