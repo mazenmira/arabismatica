@@ -1,271 +1,175 @@
-export type CatalogueStatus = 'active' | 'scraping' | 'coming_soon';
-export type CatalogueGroup = 'arab_islamic_world' | 'ancient';
+export type ChipStatus = 'active' | 'coming_soon';
 
-export const CATALOGUE_GROUPS = [
-  {
-    id: 'arab_islamic_world' as CatalogueGroup,
-    labelAr: 'المنطقة العربية والإسلامية',
-    labelEn: 'Arab & Islamic World',
-    labelDe: 'Arabische & Islamische Welt',
-    descAr:  'عملات العالم العربي والتراث الإسلامي عبر القارات',
-    descEn:  'Coins of the Arab world and Islamic tradition across continents',
-    descDe:  'Münzen der arabischen Welt und der islamischen Tradition über Kontinente',
-  },
-  {
-    id: 'ancient' as CatalogueGroup,
-    labelAr: 'الشرق الأدنى القديم',
-    labelEn: 'Ancient Near East',
-    labelDe: 'Alter Naher Osten',
-    descAr:  'حضارات الشرق الأدنى القديم قبل الإسلام',
-    descEn:  'Civilisations of the ancient Near East',
-    descDe:  'Zivilisationen des alten Nahen Ostens',
-  },
-] as const;
+export interface CatalogueChip {
+  id: string;
+  title_en: string;
+  title_ar: string;
+  status: ChipStatus;
+  href?: string;      // route suffix, e.g. '/catalogue' — joined with locale prefix
+  countKey?: string;  // key into live count map: 'arab' | 'IS' | 'MG' | 'DS' | 'SS'
+  special?: 'islamic_dynasties';
+}
 
-export const CATALOGUES = [
-  // ── Arab & Islamic World ────────────────────────────────────────────────
-  {
-    id: 'arab',
-    slug: 'catalogue',
-    group: 'arab_islamic_world' as CatalogueGroup,
-    title: { ar: 'العملات العربية الحديثة', en: 'Modern Arab Coins', de: 'Moderne arabische Münzen' },
-    subtitle: {
-      ar: '5,505 عملة · 20 دولة · 1500–2026م',
-      en: '5,505 coins · 20 countries · 1500–2026 CE',
-      de: '5.505 Münzen · 20 Länder · 1500–2026 n. Chr.',
-    },
-    description: {
-      ar: 'كتالوج شامل للعملات العربية الحديثة من 20 دولة عربية يمتد من العهد العثماني حتى اليوم',
-      en: 'Comprehensive catalogue of modern Arab coins from 20 countries spanning the Ottoman era to present day',
-      de: 'Umfassender Katalog moderner arabischer Münzen aus 20 Ländern vom Osmanischen Reich bis heute',
-    },
-    coinCount: 5505,
-    ccFilter: { exclude: ['IS', 'SS'] },
-    navPath: '/',
-    status: 'active' as CatalogueStatus,
-    seoKeywords: {
-      en: ['Arab coins', 'Arabic coins', 'Arab numismatics', 'Egyptian coins', 'Saudi coins'],
-      ar: ['عملات عربية', 'نقود عربية', 'كتالوج عملات', 'عملات مصرية', 'عملات سعودية'],
-    },
-  },
-  {
-    id: 'islamic',
-    slug: 'islamic',
-    group: 'arab_islamic_world' as CatalogueGroup,
-    title: { ar: 'العملات الإسلامية', en: 'Islamic Dynastic Coins', de: 'Islamische Dynastiemünzen' },
-    subtitle: {
-      ar: '47,303 عملة · 18 سلالة · 41–922هـ',
-      en: '47,303 coins · 18 dynasties · 41–922 AH',
-      de: '47.303 Münzen · 18 Dynastien · 41–922 AH',
-    },
-    description: {
-      ar: 'أكبر قاعدة بيانات للعملات الإسلامية على الإنترنت تشمل الأمويين والعباسيين والفاطميين والمماليك',
-      en: 'The largest online Islamic coin database covering Umayyad, Abbasid, Fatimid, Ayyubid and Mamluk dynasties',
-      de: 'Die größte Online-Datenbank islamischer Münzen: Umayyaden, Abbasiden, Fatimiden, Ayyubiden und Mamluken',
-    },
-    coinCount: 47303,
-    ccFilter: { include: ['IS'] },
-    navPath: '/islamic',
-    status: 'active' as CatalogueStatus,
-    seoKeywords: {
-      en: ['Islamic coins', 'Umayyad coins', 'Abbasid coins', 'Fatimid coins', 'Mamluk coins'],
-      ar: ['عملات إسلامية', 'دراهم أموية', 'دنانير عباسية', 'عملات فاطمية', 'عملات مملوكية'],
-    },
-  },
-  {
-    id: 'mughal',
-    slug: 'mughal',
-    group: 'arab_islamic_world' as CatalogueGroup,
-    title: { ar: 'العملات المغولية', en: 'Mughal Empire', de: 'Mogulreich' },
-    subtitle: {
-      ar: '1526–1857م · الهند الإسلامية',
-      en: '1526–1857 CE · Islamic India',
-      de: '1526–1857 n.Chr. · Islamisches Indien',
-    },
-    description: {
-      ar: 'عملات الإمبراطورية المغولية في الهند — من بابر إلى أورنكزيب. حملت نقوشاً عربية إسلامية',
-      en: 'Coins of the Mughal Empire — from Babur to Aurangzeb, bearing Arabic Islamic inscriptions',
-      de: 'Münzen des Mogulreichs — von Babur bis Aurangzeb, mit arabischen islamischen Inschriften',
-    },
-    coinCount: 11033,
-    navPath: '/mughal',
-    ccFilter: { include: ['MG'] },
-    status: 'active' as CatalogueStatus,
-  },
-  {
-    id: 'delhi',
-    slug: 'delhi',
-    group: 'arab_islamic_world' as CatalogueGroup,
-    title: { ar: 'سلطنة دلهي', en: 'Delhi Sultanate', de: 'Delhi-Sultanat' },
-    subtitle: {
-      ar: '1206–1526م · الهند الإسلامية',
-      en: '1206–1526 CE · Islamic India',
-      de: '1206–1526 n.Chr. · Islamisches Indien',
-    },
-    description: {
-      ar: 'عملات سلطنة دلهي — الدول الإسلامية الأولى في شبه القارة الهندية 1206–1526م',
-      en: 'Coins of the Delhi Sultanate — the early Islamic states of the Indian subcontinent 1206–1526 CE',
-      de: 'Münzen des Delhi-Sultanats — die frühen islamischen Staaten des indischen Subkontinents 1206–1526 n.Chr.',
-    },
-    navPath: '/delhi',
-    ccFilter: { include: ['DS'] },
-    status: 'scraping' as CatalogueStatus,
-  },
+export interface AcademicGroup {
+  id: string;
+  num: number;
+  title_en: string;
+  title_ar: string;
+  period?: string;
+  desc_en: string;
+  desc_ar: string;
+  ottoman?: boolean;    // special blue-border styling
+  catalogues: CatalogueChip[];
+}
 
+export const ACADEMIC_GROUPS: AcademicGroup[] = [
   {
-    id: 'ottoman',
-    slug: 'ottoman',
-    group: 'arab_islamic_world' as CatalogueGroup,
-    title: { ar: 'الدولة العثمانية', en: 'Ottoman Empire', de: 'Osmanisches Reich' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'عملات الدولة العثمانية العريقة التي حكمت على مدار ستة قرون',
-      en: 'Coins of the Ottoman Empire, which ruled for six centuries across three continents',
-      de: 'Münzen des Osmanischen Reichs, das sechs Jahrhunderte lang drei Kontinente regierte',
-    },
-    status: 'coming_soon' as CatalogueStatus,
+    id: 'modern_arab_states',
+    num: 1,
+    title_en: 'Modern Arab States',
+    title_ar: 'الدول العربية الحديثة',
+    period: '1916–present',
+    desc_en: 'Post-Ottoman state coinage · 20 Arab nations including Palestine · modern mints',
+    desc_ar: 'عملات الدول العربية بعد العهد العثماني · 20 دولة عربية شاملة فلسطين · دور الضرب الحديثة',
+    catalogues: [
+      { id: 'arab', title_en: 'Modern Arab Coins',    title_ar: 'العملات العربية الحديثة', status: 'active',     href: '/catalogue', countKey: 'arab' },
+      { id: 'medals', title_en: 'Arab Medals & Orders', title_ar: 'الأوسمة والنياشين العربية', status: 'coming_soon' },
+    ],
   },
+  {
+    id: 'ottoman_empire',
+    num: 2,
+    title_en: 'Ottoman Empire',
+    title_ar: 'الإمبراطورية العثمانية',
+    period: '1299–1922 CE',
+    desc_en: 'Bridges Islamic dynasties and modern Arab states · entire Arab world simultaneously · next major catalogue · 50,000+ coins in preparation',
+    desc_ar: 'تجسر بين الأسرات الإسلامية والدول العربية الحديثة · العالم العربي بأكمله في آنٍ واحد · الكتالوج الكبير القادم · 50,000+ عملة في الإعداد',
+    ottoman: true,
+    catalogues: [
+      { id: 'ottoman', title_en: 'Ottoman Empire', title_ar: 'الدولة العثمانية', status: 'coming_soon' },
+    ],
+  },
+  {
+    id: 'islamic_dynasties',
+    num: 3,
+    title_en: 'Islamic Dynasties',
+    title_ar: 'الأسرات الإسلامية',
+    period: '622–1299 CE',
+    desc_en: 'United by Arabic Quranic inscriptions · from Spain to Central Asia',
+    desc_ar: 'متحدة بالنقوش القرآنية العربية · من الأندلس إلى آسيا الوسطى',
+    catalogues: [
+      { id: 'islamic',        title_en: 'Islamic Dynastic Coins', title_ar: 'العملات الإسلامية',      status: 'active',     href: '/islamic',  countKey: 'IS', special: 'islamic_dynasties' },
+      { id: 'mughal',         title_en: 'Mughal Empire',          title_ar: 'الإمبراطورية المغولية', status: 'active',     href: '/mughal',   countKey: 'MG' },
+      { id: 'delhi',          title_en: 'Delhi Sultanate',        title_ar: 'سلطنة دلهي',            status: 'active',     href: '/delhi',    countKey: 'DS' },
+      { id: 'mamluk',         title_en: 'Mamluk Sultanate',       title_ar: 'سلطنة المماليك',         status: 'coming_soon' },
+      { id: 'timurid',        title_en: 'Timurid Empire',         title_ar: 'الإمبراطورية التيمورية', status: 'coming_soon' },
+      { id: 'ghaznavid',      title_en: 'Ghaznavid Empire',       title_ar: 'الإمبراطورية الغزنوية', status: 'coming_soon' },
+      { id: 'safavid',        title_en: 'Safavid Persia',         title_ar: 'فارس الصفوية',          status: 'coming_soon' },
+      { id: 'seljuk',         title_en: 'Seljuk Empire',          title_ar: 'الإمبراطورية السلجوقية', status: 'coming_soon' },
+      { id: 'norman_sicily',  title_en: 'Norman Sicily',          title_ar: 'صقلية النورمانية',      status: 'coming_soon' },
+    ],
+  },
+  {
+    id: 'pre_islamic_persia',
+    num: 4,
+    title_en: 'Pre-Islamic Persia',
+    title_ar: 'فارس ما قبل الإسلام',
+    period: '550 BCE–651 CE',
+    desc_en: 'Persian imperial dynasties · direct predecessors to Islamic coinage',
+    desc_ar: 'السلالات الإمبراطورية الفارسية · الأسلاف المباشرون لعملة الإسلام',
+    catalogues: [
+      { id: 'sasanian',   title_en: 'Sasanian Empire',    title_ar: 'الإمبراطورية الساسانية', status: 'active',     href: '/sasanian', countKey: 'SS' },
+      { id: 'parthian',   title_en: 'Parthian Empire',    title_ar: 'الإمبراطورية الفرثية',   status: 'coming_soon' },
+      { id: 'achaemenid', title_en: 'Achaemenid Persia',  title_ar: 'الإمبراطورية الأخمينية', status: 'coming_soon' },
+    ],
+  },
+  {
+    id: 'hellenistic_ancient',
+    num: 5,
+    title_en: 'Hellenistic & Ancient Near East',
+    title_ar: 'العصر الهلنستي والشرق الأدنى القديم',
+    period: '336–31 BCE',
+    desc_en: 'Greek successor kingdoms ruling Arab and Persian lands',
+    desc_ar: 'الممالك اليونانية الخلف التي حكمت الأراضي العربية والفارسية',
+    catalogues: [
+      { id: 'seleucid',  title_en: 'Seleucid Empire',    title_ar: 'الإمبراطورية السلوقية', status: 'coming_soon' },
+      { id: 'ptolemaic', title_en: 'Ptolemaic Kingdom',  title_ar: 'المملكة البطلمية',      status: 'coming_soon' },
+      { id: 'nabataean', title_en: 'Nabataean Kingdom',  title_ar: 'المملكة النبطية',       status: 'coming_soon' },
+      { id: 'pontus',    title_en: 'Kingdom of Pontus',  title_ar: 'مملكة بونتوس',          status: 'coming_soon' },
+      { id: 'bactrian',  title_en: 'Bactrian Kingdom',   title_ar: 'المملكة الباكترية',     status: 'coming_soon' },
+    ],
+  },
+  {
+    id: 'rome_arab_world',
+    num: 6,
+    title_en: 'Rome in the Arab World',
+    title_ar: 'روما في العالم العربي',
+    period: '64 BCE–395 CE',
+    desc_en: 'Eastern provincial mints only · Antioch · Alexandria · Tyre · Caesarea',
+    desc_ar: 'دور الضرب الإقليمية الشرقية فقط · أنطاكية · الإسكندرية · صور · قيصرية',
+    catalogues: [
+      { id: 'roman_provincial', title_en: 'Roman Provincial Eastern',  title_ar: 'المقاطعات الرومانية الشرقية', status: 'coming_soon' },
+      { id: 'roman_egypt',      title_en: 'Roman Egypt Alexandrian',   title_ar: 'الإسكندرية الرومانية',        status: 'coming_soon' },
+      { id: 'late_roman',       title_en: 'Late Roman Levant',         title_ar: 'الشام الروماني المتأخر',      status: 'coming_soon' },
+    ],
+  },
+  {
+    id: 'byzantine_crusader',
+    num: 7,
+    title_en: 'Byzantine & Crusader',
+    title_ar: 'البيزنطيون والصليبيون',
+    period: '395–1291 CE',
+    desc_en: 'Christian empires whose coinage circulated across the Islamic world',
+    desc_ar: 'الإمبراطوريات المسيحية التي تداولت عملتها في العالم الإسلامي',
+    catalogues: [
+      { id: 'byzantine',   title_en: 'Byzantine Empire',       title_ar: 'الإمبراطورية البيزنطية', status: 'coming_soon' },
+      { id: 'crusader',    title_en: 'Crusader States',        title_ar: 'الممالك الصليبية',       status: 'coming_soon' },
+      { id: 'jerusalem',   title_en: 'Kingdom of Jerusalem',   title_ar: 'مملكة القدس',            status: 'coming_soon' },
+      { id: 'tripoli',     title_en: 'County of Tripoli',      title_ar: 'إمارة طرابلس',           status: 'coming_soon' },
+    ],
+  },
+  {
+    id: 'phoenician_levant',
+    num: 8,
+    title_en: 'Phoenician & Ancient Levant',
+    title_ar: 'الفينيقيون وبلاد الشام القديمة',
+    period: '1200–64 BCE',
+    desc_en: 'City-states of the Levantine coast · earliest coinage of the Arab world',
+    desc_ar: 'المدن الفينيقية على ساحل الشام · أقدم عملة في العالم العربي',
+    catalogues: [
+      { id: 'phoenician', title_en: 'Phoenician Cities',  title_ar: 'المدن الفينيقية',     status: 'coming_soon' },
+      { id: 'anc_arabia', title_en: 'Ancient Arabia',     title_ar: 'الجزيرة العربية القديمة', status: 'coming_soon' },
+      { id: 'himyarite',  title_en: 'Himyarite Kingdom',  title_ar: 'مملكة حمير',          status: 'coming_soon' },
+      { id: 'lihyanite',  title_en: 'Lihyanite Kingdom',  title_ar: 'مملكة ليحيان',        status: 'coming_soon' },
+    ],
+  },
+  {
+    id: 'reference_tools',
+    num: 9,
+    title_en: 'Reference & Tools',
+    title_ar: 'المراجع والأدوات',
+    desc_en: 'Academic resources for the Arab and Islamic numismatist',
+    desc_ar: 'مصادر أكاديمية لعالم المسكوكات العربية والإسلامية',
+    catalogues: [
+      { id: 'mint_gaz',      title_en: 'Mint Gazetteer',           title_ar: 'دليل دور الضرب',          status: 'coming_soon' },
+      { id: 'ruler_index',   title_en: 'Ruler Index',              title_ar: 'فهرس الحكام',             status: 'coming_soon' },
+      { id: 'hijri_conv',    title_en: 'Hijri–CE Converter',       title_ar: 'محول الهجري — الميلادي',  status: 'coming_soon' },
+      { id: 'wt_standards',  title_en: 'Weight & Metal Standards', title_ar: 'معايير الوزن والمعادن',   status: 'coming_soon' },
+      { id: 'arabic_script', title_en: 'Arabic Script Guide',      title_ar: 'دليل الخط العربي',        status: 'coming_soon' },
+    ],
+  },
+];
 
-  // ── Ancient Middle East ─────────────────────────────────────────────────
-  {
-    id: 'sasanian',
-    slug: 'sasanian',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'العملات الساسانية', en: 'Sasanian Empire', de: 'Sassanidisches Reich' },
-    subtitle: {
-      ar: '7,995 عملة · 224–651م · فارس والعراق',
-      en: '7,995 coins · 224–651 CE · Persia & Iraq',
-      de: '7.995 Münzen · 224–651 n.Chr. · Persien & Irak',
-    },
-    description: {
-      ar: 'العملات الساسانية — إمبراطورية فارس العظيمة التي حكمت من 224 إلى 651م',
-      en: 'Sasanian coins — the Persian dynasty that ruled 224–651 CE, leaving an exceptional numismatic legacy',
-      de: 'Sassanidische Münzen — die persische Dynastie, die 224–651 n.Chr. regierte',
-    },
-    coinCount: 7995,
-    ccFilter: { include: ['SS'] },
-    navPath: '/sasanian',
-    status: 'active' as CatalogueStatus,
-    seoKeywords: {
-      en: ['Sasanian coins', 'Persian coins', 'Sassanid coins', 'ancient Persian numismatics'],
-      ar: ['عملات ساسانية', 'عملات فارسية', 'نمسماتيا ساسانية'],
-    },
-  },
-  {
-    id: 'nabataean',
-    slug: 'nabataean',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'العملات النبطية', en: 'Nabataean Kingdom', de: 'Nabatäerreich' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'عملات مملكة الأنباط — الحضارة العربية القديمة في البتراء والجزيرة العربية',
-      en: 'Coins of the Nabataean Kingdom — the ancient Arab civilisation centred at Petra',
-      de: 'Münzen des Nabatäerreichs — die antike arabische Zivilisation mit Zentrum in Petra',
-    },
-    status: 'coming_soon' as CatalogueStatus,
-  },
-  {
-    id: 'byzantine',
-    slug: 'byzantine',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'العملات البيزنطية', en: 'Byzantine Empire', de: 'Byzantinisches Reich' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'العملات البيزنطية — من القسطنطينية إلى الأراضي العربية',
-      en: 'Byzantine coins — all issues across the Eastern Roman Empire and Arab lands',
-      de: 'Byzantinische Münzen — alle Emissionen im Oströmischen Reich und in arabischen Gebieten',
-    },
-    status: 'coming_soon' as CatalogueStatus,
-  },
-  {
-    id: 'roman',
-    slug: 'roman',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'العملات الرومانية', en: 'Roman Empire', de: 'Römisches Reich' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'العملات الرومانية المتعلقة بالشرق الأوسط وشمال أفريقيا',
-      en: 'Roman coins relevant to the Middle East and North Africa',
-      de: 'Römische Münzen mit Bezug zum Nahen Osten und Nordafrika',
-    },
-    status: 'coming_soon' as CatalogueStatus,
-  },
-  {
-    id: 'ptolemaic',
-    slug: 'ptolemaic',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'العملات البطلمية', en: 'Ptolemaic Kingdom', de: 'Ptolemäisches Reich' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'عملات المملكة البطلمية في مصر — من الإسكندر الأكبر حتى كليوباترا السابعة',
-      en: 'Coins of the Ptolemaic Kingdom of Egypt — from Alexander the Great to Cleopatra VII',
-      de: 'Münzen des ptolemäischen Königreichs Ägypten — von Alexander dem Großen bis Kleopatra VII',
-    },
-    status: 'coming_soon' as CatalogueStatus,
-  },
-  {
-    id: 'crusader',
-    slug: 'crusader',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'عملات الحروب الصليبية', en: 'Crusader States', de: 'Kreuzfahrerstaaten' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'عملات الممالك الصليبية في بلاد الشام وفلسطين والأراضي المقدسة',
-      en: 'Coins of the Crusader states in the Levant, Palestine and the Holy Land',
-      de: 'Münzen der Kreuzfahrerstaaten in der Levante, Palästina und dem Heiligen Land',
-    },
-    status: 'coming_soon' as CatalogueStatus,
-  },
-  {
-    id: 'achaemenid',
-    slug: 'achaemenid',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'العملات الأخمينية', en: 'Achaemenid Persia', de: 'Achämenidisches Persien' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'عملات الإمبراطورية الأخمينية الفارسية — من قورش الكبير حتى دارا الثالث',
-      en: 'Coins of the Achaemenid Persian Empire — from Cyrus the Great to Darius III',
-      de: 'Münzen des achämenidischen Perserreichs — von Kyros dem Großen bis Dareios III',
-    },
-    status: 'coming_soon' as CatalogueStatus,
-  },
-  {
-    id: 'parthian',
-    slug: 'parthian',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'الإمبراطورية الفرثية', en: 'Parthian Empire', de: 'Partherreich' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'عملات الإمبراطورية الفرثية — الحضارة الإيرانية التي حكمت الشرق الأوسط قرونًا',
-      en: 'Coins of the Parthian Empire — the Iranian dynasty that rivalled Rome for centuries',
-      de: 'Münzen des Partherreichs — die iranische Dynastie, die Roms Rivale war',
-    },
-    status: 'coming_soon' as CatalogueStatus,
-  },
-  {
-    id: 'seleucid',
-    slug: 'seleucid',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'الإمبراطورية السلوقية', en: 'Seleucid Empire', de: 'Seleukidenreich' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'عملات الإمبراطورية السلوقية — خلفاء الإسكندر في الشرق',
-      en: 'Coins of the Seleucid Empire — Alexander\'s successors in the East',
-      de: 'Münzen des Seleukidenreichs — Alexanders Nachfolger im Osten',
-    },
-    status: 'coming_soon' as CatalogueStatus,
-  },
-  {
-    id: 'phoenician',
-    slug: 'phoenician',
-    group: 'ancient' as CatalogueGroup,
-    title: { ar: 'المدن الفينيقية', en: 'Phoenician Cities', de: 'Phönizische Städte' },
-    subtitle: { ar: 'قريباً', en: 'Coming soon', de: 'Demnächst' },
-    description: {
-      ar: 'عملات المدن الفينيقية — صور وصيدا وبيبلوس على ساحل لبنان',
-      en: 'Coins of the Phoenician cities — Tyre, Sidon and Byblos on the Lebanese coast',
-      de: 'Münzen der phönizischen Städte — Tyros, Sidon und Byblos an der libanesischen Küste',
-    },
-    status: 'coming_soon' as CatalogueStatus,
-  },
+// Dynasty chips for the Islamic special-case rendering
+export const ISLAMIC_DYNASTY_CHIPS = [
+  { dynasty: 'Abbasid',   label_en: 'Abbasid Caliphate',  label_ar: 'الخلافة العباسية',  count: 8247 },
+  { dynasty: 'Samanid',   label_en: 'Samanid Dynasty',    label_ar: 'الأسرة السامانية',  count: 7658 },
+  { dynasty: 'Ilkhanid',  label_en: 'Ilkhanid Dynasty',   label_ar: 'أسرة الإيلخانية',   count: 7029 },
+  { dynasty: 'Umayyad',   label_en: 'Umayyad Caliphate',  label_ar: 'الخلافة الأموية',   count: 5232 },
+  { dynasty: 'Ayyubid',   label_en: 'Ayyubid Dynasty',    label_ar: 'الأسرة الأيوبية',   count: 3906 },
+  { dynasty: 'Artuqid',   label_en: 'Artuqid Dynasty',    label_ar: 'الأسرة الأرتقية',   count: 1348 },
+  { dynasty: 'Buyid',     label_en: 'Buyid Dynasty',      label_ar: 'الأسرة البويهية',   count: 831  },
+  { dynasty: 'Zangid',    label_en: 'Zangid Dynasty',     label_ar: 'الأسرة الزنكية',    count: 688  },
+  { dynasty: 'Fatimid',   label_en: 'Fatimid Caliphate',  label_ar: 'الخلافة الفاطمية',  count: 596  },
+  { dynasty: 'Hamdanid',  label_en: 'Hamdanid Dynasty',   label_ar: 'الأسرة الحمدانية',  count: 226  },
 ] as const;

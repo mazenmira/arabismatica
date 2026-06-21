@@ -1,4 +1,4 @@
-// v9.0 — light/dark mode catalogue section with Tailwind dark: variants
+// v10.0 — 9-group academic catalogue structure
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,181 +7,156 @@ import Image from 'next/image';
 import { CalendarDays } from 'lucide-react';
 import SiteHeader from '@/components/header/SiteHeader';
 import { supabase } from '@/lib/supabase';
+import { ACADEMIC_GROUPS, ISLAMIC_DYNASTY_CHIPS } from '@/lib/catalogues';
+import type { AcademicGroup, CatalogueChip } from '@/lib/catalogues';
 
 const HERO_IMG = 'https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2026/05/Arabismatica-Hero.jpg';
 
-type CardStatus = 'active' | 'scraping' | 'coming_soon';
-
-type CardEntry = {
-  id: string;
-  titleAr: string; titleEn: string; titleDe: string;
-  subtitleAr: string; subtitleEn: string; subtitleDe: string;
-  href: string;
-  status: CardStatus;
-  noteAr?: string; noteEn?: string;
-};
-
-const ARAB_ISLAMIC_CARDS: CardEntry[] = [
-  {
-    id: 'arab',
-    titleAr: 'العملات العربية الحديثة', titleEn: 'Modern Arab Coins', titleDe: 'Moderne arabische Münzen',
-    subtitleAr: '5,505 عملة · 20 دولة · 1500–2026م', subtitleEn: '5,505 coins · 20 countries · 1500–2026 CE', subtitleDe: '5.505 Münzen · 20 Länder · 1500–2026 n. Chr.',
-    href: '/catalogue', status: 'active',
-  },
-  {
-    id: 'islamic',
-    titleAr: 'العملات الإسلامية', titleEn: 'Islamic Dynastic Coins', titleDe: 'Islamische Dynastiemünzen',
-    subtitleAr: '47,303 عملة · 18 سلالة · 41–922هـ', subtitleEn: '47,303 coins · 18 dynasties · 41–922 AH', subtitleDe: '47.303 Münzen · 18 Dynastien · 41–922 AH',
-    href: '/islamic', status: 'active',
-  },
-  {
-    id: 'mughal',
-    titleAr: 'الإمبراطورية المغولية', titleEn: 'Mughal Empire', titleDe: 'Mogulreich',
-    subtitleAr: '11,033 عملة · 1526–1857م · الهند الإسلامية', subtitleEn: '11,033 coins · 1526–1857 CE · Islamic India', subtitleDe: '11.033 Münzen · 1526–1857 n.Chr.',
-    noteAr: 'نقوش عربية إسلامية', noteEn: 'Arabic Islamic inscriptions',
-    href: '/mughal', status: 'active',
-  },
-  {
-    id: 'delhi',
-    titleAr: 'سلطنة دلهي', titleEn: 'Delhi Sultanate', titleDe: 'Delhi-Sultanat',
-    subtitleAr: '1206–1526م · الهند الإسلامية', subtitleEn: '1206–1526 CE · Islamic India', subtitleDe: '1206–1526 n.Chr. · Islamisches Indien',
-    href: '/delhi', status: 'scraping',
-  },
-  {
-    id: 'ottoman',
-    titleAr: 'الدولة العثمانية', titleEn: 'Ottoman Empire', titleDe: 'Osmanisches Reich',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-];
-
-const ANCIENT_CARDS: CardEntry[] = [
-  {
-    id: 'sasanian',
-    titleAr: 'الإمبراطورية الساسانية', titleEn: 'Sasanian Empire', titleDe: 'Sassanidisches Reich',
-    subtitleAr: '7,995 عملة · 224–651م · فارس والعراق', subtitleEn: '7,995 coins · 224–651 CE · Persia & Iraq', subtitleDe: '7.995 Münzen · 224–651 n.Chr.',
-    href: '/sasanian', status: 'active',
-  },
-  {
-    id: 'nabataean',
-    titleAr: 'المملكة النبطية', titleEn: 'Nabataean Kingdom', titleDe: 'Nabatäerreich',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-  {
-    id: 'byzantine',
-    titleAr: 'الإمبراطورية البيزنطية', titleEn: 'Byzantine Empire', titleDe: 'Byzantinisches Reich',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-  {
-    id: 'roman',
-    titleAr: 'الإمبراطورية الرومانية', titleEn: 'Roman Empire', titleDe: 'Römisches Reich',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-  {
-    id: 'ptolemaic',
-    titleAr: 'المملكة البطلمية', titleEn: 'Ptolemaic Kingdom', titleDe: 'Ptolemäisches Reich',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-  {
-    id: 'crusader',
-    titleAr: 'الممالك الصليبية', titleEn: 'Crusader States', titleDe: 'Kreuzfahrerstaaten',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-  {
-    id: 'achaemenid',
-    titleAr: 'الإمبراطورية الأخمينية', titleEn: 'Achaemenid Persia', titleDe: 'Achämenidisches Persien',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-  {
-    id: 'parthian',
-    titleAr: 'الإمبراطورية الفرثية', titleEn: 'Parthian Empire', titleDe: 'Partherreich',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-  {
-    id: 'seleucid',
-    titleAr: 'الإمبراطورية السلوقية', titleEn: 'Seleucid Empire', titleDe: 'Seleukidenreich',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-  {
-    id: 'phoenician',
-    titleAr: 'المدن الفينيقية', titleEn: 'Phoenician Cities', titleDe: 'Phönizische Städte',
-    subtitleAr: 'قريباً', subtitleEn: 'Coming soon', subtitleDe: 'Demnächst',
-    href: '', status: 'coming_soon',
-  },
-];
-
 const HERO_STATS = [
   { numAr: '٧١٬٨٣٦', numEn: '71,836', numDe: '71.836',  labelAr: 'عملة مفهرسة',    labelEn: 'coins indexed',     labelDe: 'Münzen' },
-  { numAr: '٤',        numEn: '4',      numDe: '4',       labelAr: 'كتالوجات نشطة', labelEn: 'active catalogues',  labelDe: 'Kataloge' },
+  { numAr: '٥',        numEn: '5',      numDe: '5',       labelAr: 'كتالوجات نشطة', labelEn: 'active catalogues',  labelDe: 'Kataloge' },
   { numAr: '٢٠+',     numEn: '20+',   numDe: '20+',     labelAr: 'دولة وإمارة',   labelEn: 'countries',          labelDe: 'Länder' },
 ];
 
-function CatalogueCard({ card, locale, isAr, isDe }: {
-  card: CardEntry; locale: string; isAr: boolean; isDe: boolean;
+type LiveCounts = Record<string, number>;
+
+// ── Live Chip ──────────────────────────────────────────────────────────────────
+function LiveChip({ chip, locale, isAr, counts }: {
+  chip: CatalogueChip; locale: string; isAr: boolean; counts: LiveCounts;
 }) {
-  const isActive   = card.status === 'active';
-  const isScraping = card.status === 'scraping';
-  const title    = isAr ? card.titleAr    : isDe ? card.titleDe    : card.titleEn;
-  const subtitle = isAr ? card.subtitleAr : isDe ? card.subtitleDe : card.subtitleEn;
-  const note     = isAr ? card.noteAr     : card.noteEn;
+  const label = isAr ? chip.title_ar : chip.title_en;
+  const count = chip.countKey ? counts[chip.countKey] : undefined;
 
-  const browseLabel  = isAr ? '← تصفح' : isDe ? 'Ansehen →' : 'Browse →';
-  const comingSoon   = isAr ? 'قريباً'  : isDe ? 'Demnächst' : 'Coming soon';
-  const scrapingLabel = isAr ? 'في الإعداد · قريباً' : isDe ? 'In Vorbereitung · bald' : 'In preparation · launching soon';
+  if (chip.status === 'coming_soon') {
+    return (
+      <span className="inline-flex items-center px-3 py-1.5 rounded-full border border-dashed border-gray-200 text-gray-400 text-[11px] italic cursor-default select-none">
+        {label}
+      </span>
+    );
+  }
 
-  const inner = isActive || isScraping ? (
-    <div className="relative rounded-xl border border-gray-200 dark:border-amber-700/35 h-full p-5 bg-gray-50 dark:bg-white/[0.08] hover:bg-white dark:hover:bg-white/[0.12] hover:border-amber-400 dark:hover:border-amber-500/60 hover:shadow-md transition-all duration-200 cursor-pointer">
-
-      {isScraping && (
-        <span className="absolute top-2 end-2 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 font-medium dark:bg-amber-900/40 dark:text-amber-400 dark:border-amber-700/40">
-          {isAr ? 'في الإعداد' : 'Preparing'}
+  // active
+  return (
+    <Link href={`/${locale}${chip.href}`}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-emerald-300 bg-emerald-50 text-emerald-800 text-[11px] font-medium hover:bg-emerald-100 hover:border-emerald-400 transition-colors">
+      {label}
+      {count != null && (
+        <span className="text-[10px] text-emerald-600 font-normal tabular-nums">
+          · {count.toLocaleString(isAr ? 'ar-EG' : 'en-US')}
         </span>
       )}
-
-      <div className={`font-amiri text-[15px] leading-snug mb-1 ${
-        isActive ? 'text-gray-900 dark:text-amber-100' : 'text-gray-600 dark:text-amber-200/70'
-      }`}>
-        {title}
-      </div>
-      <div className={`text-[12px] mb-3 ${
-        isActive ? 'text-gray-500 dark:text-amber-300/60' : 'text-gray-400 dark:text-amber-300/40'
-      }`}>
-        {subtitle}
-      </div>
-      {note && (
-        <div className="text-[10px] italic text-amber-600/70 dark:text-amber-500/60 mb-2">{note}</div>
-      )}
-      {isActive && (
-        <div className="text-[13px] text-amber-700 dark:text-amber-400 hover:text-amber-600 font-medium">{browseLabel}</div>
-      )}
-      {isScraping && (
-        <div className="text-[12px] text-gray-400 dark:text-amber-500/60 italic">{scrapingLabel}</div>
-      )}
-    </div>
-  ) : (
-    <div className="relative rounded-xl border border-dashed border-gray-200 dark:border-amber-900/20 h-full p-5 bg-gray-50 dark:bg-white/[0.04] opacity-60 cursor-not-allowed transition-all duration-200">
-      <span className="absolute top-2 end-2 text-[10px] px-2 py-0.5 rounded-full bg-white dark:bg-transparent text-gray-400 dark:text-amber-700/50 border border-gray-200 dark:border-amber-900/30 font-medium">
-        {comingSoon}
-      </span>
-      <div className="font-amiri text-[15px] leading-snug mb-1 text-gray-400 dark:text-amber-300/35">{title}</div>
-      <div className="text-[12px] text-gray-300 dark:text-amber-300/20">{subtitle}</div>
-    </div>
+    </Link>
   );
-
-  if ((isActive || isScraping) && card.href) {
-    return <Link href={`/${locale}${card.href}`} className="block h-full">{inner}</Link>;
-  }
-  return <div>{inner}</div>;
 }
 
+// ── Islamic special rendering ──────────────────────────────────────────────────
+function IslamicBlock({ locale, isAr, counts, dedicatedChips }: {
+  locale: string; isAr: boolean; counts: LiveCounts; dedicatedChips: CatalogueChip[];
+}) {
+  const dyLabel  = isAr ? 'تصفح حسب السلالة' : 'Browse by dynasty';
+  const dedLabel = isAr ? 'كتالوجات مخصصة'   : 'Dedicated catalogues';
+
+  return (
+    <div className="space-y-3">
+      {/* Dynasty row */}
+      <div>
+        <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2 font-medium">{dyLabel}</p>
+        <div className="flex flex-wrap gap-1.5">
+          {ISLAMIC_DYNASTY_CHIPS.map(d => (
+            <Link key={d.dynasty}
+              href={`/${locale}/islamic?dynasty=${encodeURIComponent(d.dynasty)}`}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-amber-300 bg-amber-50 text-amber-800 text-[11px] hover:bg-amber-100 hover:border-amber-400 transition-colors">
+              {isAr ? d.label_ar : d.label_en}
+              <span className="text-[10px] text-amber-600 tabular-nums">· {d.count.toLocaleString(isAr ? 'ar-EG' : 'en-US')}</span>
+            </Link>
+          ))}
+          <Link href={`/${locale}/islamic`}
+            className="inline-flex items-center px-2.5 py-1 rounded-full border border-amber-400 bg-amber-100 text-amber-800 text-[11px] font-semibold hover:bg-amber-200 transition-colors">
+            {isAr ? 'عرض الكل ←' : 'View all →'}
+          </Link>
+        </div>
+      </div>
+      {/* Dedicated catalogues row */}
+      <div>
+        <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2 font-medium">{dedLabel}</p>
+        <div className="flex flex-wrap gap-1.5">
+          {dedicatedChips.map(chip => (
+            <LiveChip key={chip.id} chip={chip} locale={locale} isAr={isAr} counts={counts} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Group Card ─────────────────────────────────────────────────────────────────
+function GroupCard({ group, locale, isAr, isDe, counts }: {
+  group: AcademicGroup; locale: string; isAr: boolean; isDe: boolean; counts: LiveCounts;
+}) {
+  const title = isAr ? group.title_ar : group.title_en;
+  const desc  = isAr ? group.desc_ar  : group.desc_en;
+
+  const borderClass = group.ottoman
+    ? 'border border-blue-200 bg-blue-50/30'
+    : 'border border-gray-200 bg-white';
+
+  const isIslamicGroup = group.id === 'islamic_dynasties';
+
+  // For the islamic group, split chips: the one with special='islamic_dynasties' vs the rest (dedicated)
+  const islamicMain      = group.catalogues.find(c => c.special === 'islamic_dynasties');
+  const dedicatedChips   = group.catalogues.filter(c => c.special !== 'islamic_dynasties');
+
+  return (
+    <div className={`rounded-xl ${borderClass} p-5 md:p-6`}>
+      {group.ottoman && (
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-blue-500 border border-blue-300 rounded-full px-2.5 py-0.5">
+            {isAr ? 'الكتالوج القادم' : 'Next Major Catalogue'}
+          </span>
+          <span className="text-[11px] text-blue-400">
+            {isAr ? '50,000+ عملة في الإعداد' : '50,000+ coins in preparation'}
+          </span>
+        </div>
+      )}
+
+      <div className="flex flex-col md:flex-row md:gap-8">
+        {/* Left: group meta */}
+        <div className="md:w-56 shrink-0 mb-4 md:mb-0">
+          <span className="text-[11px] font-mono text-gray-300 select-none">
+            {String(group.num).padStart(2, '0')}
+          </span>
+          <h3 className={`font-amiri text-[18px] leading-snug font-semibold mt-0.5 mb-1 ${
+            group.ottoman ? 'text-blue-800' : 'text-gray-900'
+          }`}>
+            {title}
+          </h3>
+          {group.period && (
+            <p className="text-[11px] text-gray-400 mb-2">{group.period}</p>
+          )}
+          <p className="text-[12px] text-gray-500 leading-relaxed">{desc}</p>
+        </div>
+
+        {/* Right: chips */}
+        <div className="flex-1">
+          {isIslamicGroup && islamicMain ? (
+            <IslamicBlock
+              locale={locale} isAr={isAr} counts={counts}
+              dedicatedChips={dedicatedChips}
+            />
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {group.catalogues.map(chip => (
+                <LiveChip key={chip.id} chip={chip} locale={locale} isAr={isAr} counts={counts} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Page ───────────────────────────────────────────────────────────────────────
 export default function LandingPage({ params: { locale } }: { params: { locale: string } }) {
   const isAr = locale === 'ar';
   const isDe = locale === 'de';
@@ -191,6 +166,9 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
     o?: string; cc?: string; co?: string; co_ar?: string;
   } | null>(null);
 
+  const [liveCounts, setLiveCounts] = useState<LiveCounts>({});
+
+  // Fetch coin of the day
   useEffect(() => {
     const today = new Date();
     const seed   = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
@@ -200,22 +178,28 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const t = (ar: string, en: string, de: string) => isAr ? ar : isDe ? de : en;
+  // Fetch live counts for all active catalogues
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const [arab, IS, MG, DS, SS] = await Promise.all([
+        supabase.from('coins').select('id', { count: 'exact', head: true }).not('cc', 'in', '(IS,SS,MG,DS)'),
+        supabase.from('coins').select('id', { count: 'exact', head: true }).eq('cc', 'IS'),
+        supabase.from('coins').select('id', { count: 'exact', head: true }).eq('cc', 'MG'),
+        supabase.from('coins').select('id', { count: 'exact', head: true }).eq('cc', 'DS'),
+        supabase.from('coins').select('id', { count: 'exact', head: true }).eq('cc', 'SS'),
+      ]);
+      setLiveCounts({
+        arab: arab.count ?? 0,
+        IS:   IS.count   ?? 0,
+        MG:   MG.count   ?? 0,
+        DS:   DS.count   ?? 0,
+        SS:   SS.count   ?? 0,
+      });
+    };
+    fetchCounts().catch(console.error);
+  }, []);
 
-  const GROUPS = [
-    {
-      idAr: 'المنطقة العربية والإسلامية', idEn: 'Arab & Islamic World', idDe: 'Arabische & Islamische Welt',
-      noteAr: 'تشمل العملات الإسلامية كل الحضارات التي حملت النقوش العربية',
-      noteEn: 'Islamic coins crossed all geographic boundaries — united by Arabic inscriptions',
-      noteDE: 'Islamische Münzen überschritten alle geografischen Grenzen — vereint durch arabische Inschriften',
-      cards: ARAB_ISLAMIC_CARDS,
-    },
-    {
-      idAr: 'الشرق الأدنى القديم', idEn: 'Ancient Near East', idDe: 'Alter Naher Osten',
-      noteAr: '', noteEn: '', noteDE: '',
-      cards: ANCIENT_CARDS,
-    },
-  ];
+  const t = (ar: string, en: string, de: string) => isAr ? ar : isDe ? de : en;
 
   return (
     <main className="min-h-screen bg-white" dir={isAr ? 'rtl' : 'ltr'}>
@@ -249,7 +233,6 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
             )}
           </p>
 
-          {/* Hero stats */}
           <div className="flex items-center gap-8 md:gap-12 flex-wrap justify-center">
             {HERO_STATS.map((s, i) => (
               <div key={i} className="text-center">
@@ -296,31 +279,22 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
       )}
 
       {/* ── CATALOGUE INDEX ─────────────────────────────────────────────── */}
-      <div className="catalogue-section bg-white dark:bg-[#2d1f0e] transition-colors duration-300">
+      <div className="catalogue-section bg-white">
         <div className="max-w-[1440px] mx-auto px-4 py-10">
-          <h2 className="text-[11px] text-gray-400 dark:text-amber-300/50 uppercase tracking-widest font-medium mb-7 pb-2 border-b border-gray-200 dark:border-amber-900/30">
-            {t('الكتالوجات', 'Catalogues', 'Kataloge')}
+          <h2 className="text-[11px] text-gray-400 uppercase tracking-widest font-medium mb-7 pb-2 border-b border-gray-200">
+            {t('الكتالوجات الأكاديمية', 'Academic Catalogues', 'Akademische Kataloge')}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {GROUPS.map(g => (
-              <div key={g.idEn}>
-                <div className="mb-4">
-                  <h3 className="font-amiri text-[17px] font-semibold text-gray-900 dark:text-amber-100 mb-1">
-                    {isAr ? g.idAr : isDe ? g.idDe : g.idEn}
-                  </h3>
-                  {(isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn) && (
-                    <p className="text-[12px] text-gray-500 dark:text-amber-300/50 italic mb-3">
-                      {isAr ? g.noteAr : isDe ? g.noteDE : g.noteEn}
-                    </p>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {g.cards.map(card => (
-                    <CatalogueCard key={card.id} card={card} locale={locale} isAr={isAr} isDe={isDe} />
-                  ))}
-                </div>
-              </div>
+          <div className="space-y-4">
+            {ACADEMIC_GROUPS.map(group => (
+              <GroupCard
+                key={group.id}
+                group={group}
+                locale={locale}
+                isAr={isAr}
+                isDe={isDe}
+                counts={liveCounts}
+              />
             ))}
           </div>
         </div>
