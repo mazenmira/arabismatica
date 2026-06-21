@@ -71,7 +71,6 @@ export default function SasanianPage({ locale }: { locale: string }) {
   const [fetchError,   setFetchError]   = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [metals,       setMetals]       = useState<string[]>([]);
-  const queryRef   = useRef<NodeJS.Timeout>();
   const ssFilters  = useRef<SasanianFilters | null>(null);
 
   useEffect(() => {
