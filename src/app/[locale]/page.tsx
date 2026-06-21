@@ -37,9 +37,9 @@ const ARAB_ISLAMIC_CARDS: CardEntry[] = [
   {
     id: 'mughal',
     titleAr: 'الإمبراطورية المغولية', titleEn: 'Mughal Empire', titleDe: 'Mogulreich',
-    subtitleAr: '1526–1857م · الهند الإسلامية', subtitleEn: '1526–1857 CE · Islamic India', subtitleDe: '1526–1857 n.Chr. · Islamisches Indien',
+    subtitleAr: '11,033 عملة · 1526–1857م · الهند الإسلامية', subtitleEn: '11,033 coins · 1526–1857 CE · Islamic India', subtitleDe: '11.033 Münzen · 1526–1857 n.Chr.',
     noteAr: 'نقوش عربية إسلامية', noteEn: 'Arabic Islamic inscriptions',
-    href: '/mughal', status: 'scraping',
+    href: '/mughal', status: 'active',
   },
   {
     id: 'delhi',
@@ -119,8 +119,8 @@ const ANCIENT_CARDS: CardEntry[] = [
 ];
 
 const HERO_STATS = [
-  { numAr: '٦٠٬٨٠٣', numEn: '60,803', numDe: '60.803',  labelAr: 'عملة مفهرسة',    labelEn: 'coins indexed',     labelDe: 'Münzen' },
-  { numAr: '٣',        numEn: '3',      numDe: '3',       labelAr: 'كتالوجات نشطة', labelEn: 'active catalogues',  labelDe: 'Kataloge' },
+  { numAr: '٧١٬٨٣٦', numEn: '71,836', numDe: '71.836',  labelAr: 'عملة مفهرسة',    labelEn: 'coins indexed',     labelDe: 'Münzen' },
+  { numAr: '٤',        numEn: '4',      numDe: '4',       labelAr: 'كتالوجات نشطة', labelEn: 'active catalogues',  labelDe: 'Kataloge' },
   { numAr: '٢٠+',     numEn: '20+',   numDe: '20+',     labelAr: 'دولة وإمارة',   labelEn: 'countries',          labelDe: 'Länder' },
 ];
 
@@ -194,7 +194,7 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
   useEffect(() => {
     const today = new Date();
     const seed   = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-    const offset = seed % 60803;
+    const offset = seed % 71836;
     supabase.from('coins').select('id,name,nar,yce,o,cc,co,co_ar').range(offset, offset)
       .then(({ data }) => { if (data && data.length > 0) setCoinOfDay(data[0] as typeof coinOfDay); });
   // eslint-disable-next-line react-hooks/exhaustive-deps

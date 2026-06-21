@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { ArrowRight, ExternalLink, ZoomIn, Copy, Check } from 'lucide-react';
+import { ArrowRight, ExternalLink, ZoomIn, Copy, Check, Printer } from 'lucide-react';
 import type { Coin, MintageEntry } from '@/types/coin';
 import {
   COUNTRY_FLAGS, formatMintage,
@@ -155,6 +155,12 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                 <p className="text-[12px] text-amber-400/70 mt-0.5 italic">{coin.name}</p>
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="flex items-center gap-1.5 text-[12px] text-amber-300/70 border border-amber-700/40 rounded-lg px-3 py-1.5 hover:border-amber-500 hover:text-amber-200 no-print transition-colors">
+                  <Printer size={13} />
+                  {isAr ? 'طباعة' : 'Print'}
+                </button>
                 <span className="text-2xl">{flag}</span>
                 <div className="text-right">
                   <div className="text-[12px] text-amber-300">{isAr ? coin.co_ar : coin.co}</div>

@@ -96,6 +96,12 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
   const [sortBy, setSortBy] = useState('default');
   const [yearFrom, setYearFrom] = useState('');
   const [yearTo, setYearTo] = useState('');
+  const [wtFrom,     setWtFrom]     = useState('');
+  const [wtTo,       setWtTo]       = useState('');
+  const [diaFrom,    setDiaFrom]    = useState('');
+  const [diaTo,      setDiaTo]      = useState('');
+  const [withImages, setWithImages] = useState(false);
+  const [bothImages, setBothImages] = useState(false);
   const autocompleteRef = useRef<HTMLDivElement>(null);
   // filtersOpen panel reserved for future use
   const searchRef = useRef<HTMLInputElement>(null);
@@ -137,8 +143,14 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
     if (filters.type === 'Circulation')   apiFilters.type = 'Circulation';
     if (filters.type === 'Commemorative') apiFilters.type = 'Commemorative';
     if (filters.query)  apiFilters.query = filters.query;
-    if (yearFrom) apiFilters.yceFrom = parseInt(yearFrom);
-    if (yearTo)   apiFilters.yceTo   = parseInt(yearTo);
+    if (yearFrom)   apiFilters.yceFrom    = parseInt(yearFrom);
+    if (yearTo)     apiFilters.yceTo      = parseInt(yearTo);
+    if (wtFrom)     apiFilters.wtFrom     = parseFloat(wtFrom);
+    if (wtTo)       apiFilters.wtTo       = parseFloat(wtTo);
+    if (diaFrom)    apiFilters.diaFrom    = parseFloat(diaFrom);
+    if (diaTo)      apiFilters.diaTo      = parseFloat(diaTo);
+    if (withImages) apiFilters.withImages = true;
+    if (bothImages) apiFilters.bothImages = true;
     if (filters.era) {
       const era = ERA_OPTIONS.find(e => e.value === filters.era);
       if (era) {
@@ -162,7 +174,7 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
     });
 
     return () => { cancelled = true; };
-  }, [filters, page, yearFrom, yearTo, sortBy]);
+  }, [filters, page, yearFrom, yearTo, wtFrom, wtTo, diaFrom, diaTo, withImages, bothImages, sortBy]);
 
   const handleToggleCollection = async (id: string) => {
     if (user) { await toggleCollectionDB(id); return; }
@@ -280,11 +292,12 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
   const totalPages = Math.max(1, Math.ceil(totalCount / PER_PAGE_SUP));
   const paged = coins;
 
-  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom !== '' || yearTo !== '' || sortBy !== 'default';
+  const hasActiveFilters = filters.country !== 'all' || filters.era || filters.metal || filters.type || filters.query || yearFrom !== '' || yearTo !== '' || wtFrom !== '' || wtTo !== '' || diaFrom !== '' || diaTo !== '' || withImages || bothImages || sortBy !== 'default';
 
   const clearFilters = () => {
     setFilters({ country: 'all', era: '', metal: '', type: '', query: '', yearFrom: 661, yearTo: 2026 });
     setYearFrom(''); setYearTo(''); setSortBy('default');
+    setWtFrom(''); setWtTo(''); setDiaFrom(''); setDiaTo(''); setWithImages(false); setBothImages(false);
     setPage(1);
   };
 
@@ -407,6 +420,44 @@ export default function CataloguePage({ locale }: CataloguePageProps) {
               className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500"
               min="661" max="2026" />
           </div>
+
+          {/* Weight range */}
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-ink/40 shrink-0">{isAr ? 'وزن:' : 'Wt:'}</span>
+            <input type="number" step="0.1" placeholder={isAr ? 'من' : 'From'} value={wtFrom}
+              onChange={e => { setWtFrom(e.target.value); setPage(1); }}
+              className="w-[62px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+            <span className="text-ink/30 text-[11px]">—</span>
+            <input type="number" step="0.1" placeholder={isAr ? 'إلى' : 'To'} value={wtTo}
+              onChange={e => { setWtTo(e.target.value); setPage(1); }}
+              className="w-[62px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+          </div>
+
+          {/* Diameter range */}
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-ink/40 shrink-0">{isAr ? 'قطر:' : 'Dia:'}</span>
+            <input type="number" step="0.5" placeholder={isAr ? 'من' : 'From'} value={diaFrom}
+              onChange={e => { setDiaFrom(e.target.value); setPage(1); }}
+              className="w-[62px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+            <span className="text-ink/30 text-[11px]">—</span>
+            <input type="number" step="0.5" placeholder={isAr ? 'إلى' : 'To'} value={diaTo}
+              onChange={e => { setDiaTo(e.target.value); setPage(1); }}
+              className="w-[62px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+          </div>
+
+          {/* Image pills */}
+          <button
+            onClick={() => { setWithImages(!withImages); if (bothImages && withImages) setBothImages(false); setPage(1); }}
+            className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-colors
+              ${withImages ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
+            {isAr ? 'مع صورة' : 'With image'}
+          </button>
+          <button
+            onClick={() => { setBothImages(!bothImages); if (!withImages) setWithImages(true); setPage(1); }}
+            className={`text-[11px] px-2.5 py-1.5 rounded-lg border transition-colors
+              ${bothImages ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
+            {isAr ? 'الوجهان' : 'Both sides'}
+          </button>
 
           {/* Sort */}
           <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }}

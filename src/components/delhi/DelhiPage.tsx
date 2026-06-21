@@ -43,13 +43,18 @@ export default function DelhiPage({ locale }: { locale: string }) {
   const [yceTo,       setYceTo]       = useState('');
   const [moreFilters, setMoreFilters] = useState(false);
   const [page,        setPage]        = useState(1);
+  const [wtFrom,      setWtFrom]      = useState('');
+  const [wtTo,        setWtTo]        = useState('');
+  const [diaFrom,     setDiaFrom]     = useState('');
+  const [diaTo,       setDiaTo]       = useState('');
+  const [withImages,  setWithImages]  = useState(false);
+  const [bothImages,  setBothImages]  = useState(false);
 
   const [coins,        setCoins]        = useState<CoinRow[]>([]);
   const [total,        setTotal]        = useState(0);
   const [loading,      setLoading]      = useState(true);
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const [metals,       setMetals]       = useState<string[]>([]);
-  const queryRef    = useRef<NodeJS.Timeout>();
   const dsFilters   = useRef<DelhiFilters | null>(null);
 
   useEffect(() => {
@@ -79,7 +84,8 @@ export default function DelhiPage({ locale }: { locale: string }) {
       .map(r => ({ value: r.en, label: isAr && r.ar ? r.ar : r.en }));
   }, [isAr]);
 
-  const doFetch = useCallback(() => {
+  useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     const f: DelhiCoinFilters = {};
     if (query.trim()) f.query    = query.trim();
@@ -88,27 +94,29 @@ export default function DelhiPage({ locale }: { locale: string }) {
     if (metal)        f.metal    = metal;
     if (yceFrom)      f.yce_from = parseInt(yceFrom);
     if (yceTo)        f.yce_to   = parseInt(yceTo);
-
-    getDelhiCoins(f, page, PER_PAGE).then(({ data, count }) => {
-      setCoins(data);
-      setTotal(count);
-      setLoading(false);
-    }).catch(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, ruler, mint, metal, yceFrom, yceTo, page]);
-
-  useEffect(() => {
-    clearTimeout(queryRef.current);
-    queryRef.current = setTimeout(doFetch, 300);
-    return () => clearTimeout(queryRef.current);
-  }, [doFetch]);
+    if (wtFrom)       f.wtFrom   = parseFloat(wtFrom);
+    if (wtTo)         f.wtTo     = parseFloat(wtTo);
+    if (diaFrom)      f.diaFrom  = parseFloat(diaFrom);
+    if (diaTo)        f.diaTo    = parseFloat(diaTo);
+    if (withImages)   f.withImages = true;
+    if (bothImages)   f.bothImages = true;
+    getDelhiCoins(f, page, PER_PAGE)
+      .then(({ data, count }) => {
+        if (cancelled) return;
+        setCoins(data); setTotal(count); setLoading(false);
+      })
+      .catch(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [query, ruler, mint, metal, yceFrom, yceTo, wtFrom, wtTo, diaFrom, diaTo, withImages, bothImages, page]);
 
   const clearAll = () => {
     setQuery(''); setRuler(''); setMint(''); setMetal('');
-    setYceFrom(''); setYceTo(''); setPage(1);
+    setYceFrom(''); setYceTo(''); setWtFrom(''); setWtTo('');
+    setDiaFrom(''); setDiaTo(''); setWithImages(false); setBothImages(false); setPage(1);
   };
 
-  const activeCount = [ruler, mint, metal, yceFrom, yceTo].filter(Boolean).length;
+  const activeCount = [ruler, mint, metal, yceFrom, yceTo, wtFrom, wtTo, diaFrom, diaTo].filter(Boolean).length
+    + (withImages ? 1 : 0) + (bothImages ? 1 : 0);
   const totalPages  = Math.ceil(total / PER_PAGE);
 
   const jsonLd = {
@@ -164,11 +172,24 @@ export default function DelhiPage({ locale }: { locale: string }) {
             </select>
 
             <button
+              onClick={() => { setWithImages(!withImages); if (bothImages && withImages) setBothImages(false); setPage(1); }}
+              className={`px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
+                ${withImages ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
+              {isAr ? 'مع صورة' : 'With image'}
+            </button>
+            <button
+              onClick={() => { setBothImages(!bothImages); if (!withImages) setWithImages(true); setPage(1); }}
+              className={`px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
+                ${bothImages ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
+              {isAr ? 'الوجهان' : 'Both sides'}
+            </button>
+
+            <button
               onClick={() => setMoreFilters(!moreFilters)}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
                 ${moreFilters ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
               <SlidersHorizontal size={12} />
-              {isAr ? 'التاريخ' : 'Date'}
+              {isAr ? 'المزيد' : 'More'}
               {moreFilters ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
 
@@ -188,19 +209,43 @@ export default function DelhiPage({ locale }: { locale: string }) {
           </div>
         </div>
 
-        {/* ── DATE EXPAND ─────────────────────────────────────────────────── */}
+        {/* ── MORE FILTERS EXPAND ─────────────────────────────────────────── */}
         {moreFilters && (
-          <div className="border-b border-gold-700/10 bg-parch-cream/60 px-4 py-3 flex items-center gap-3 flex-wrap">
-            <span className="text-[11px] text-ink/60 font-medium shrink-0">
-              {isAr ? 'السنة الميلادية:' : 'Year CE:'}
-            </span>
-            <input value={yceFrom} onChange={e => { setYceFrom(e.target.value); setPage(1); }}
-              type="number" placeholder={isAr ? 'من' : 'From'}
-              className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
-            <span className="text-ink/30 text-[11px]">—</span>
-            <input value={yceTo} onChange={e => { setYceTo(e.target.value); setPage(1); }}
-              type="number" placeholder={isAr ? 'إلى' : 'To'}
-              className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+          <div className="border-b border-gold-700/10 bg-parch-cream/60 px-4 py-3 flex flex-col gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-[11px] text-ink/60 font-medium shrink-0">
+                {isAr ? 'السنة الميلادية:' : 'Year CE:'}
+              </span>
+              <input value={yceFrom} onChange={e => { setYceFrom(e.target.value); setPage(1); }}
+                type="number" placeholder={isAr ? 'من' : 'From'}
+                className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+              <span className="text-ink/30 text-[11px]">—</span>
+              <input value={yceTo} onChange={e => { setYceTo(e.target.value); setPage(1); }}
+                type="number" placeholder={isAr ? 'إلى' : 'To'}
+                className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+            </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-[11px] text-ink/60 font-medium shrink-0">
+                {isAr ? 'الوزن (غ):' : 'Weight (g):'}
+              </span>
+              <input value={wtFrom} onChange={e => { setWtFrom(e.target.value); setPage(1); }}
+                type="number" step="0.1" placeholder={isAr ? 'من' : 'From'}
+                className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+              <span className="text-ink/30 text-[11px]">—</span>
+              <input value={wtTo} onChange={e => { setWtTo(e.target.value); setPage(1); }}
+                type="number" step="0.1" placeholder={isAr ? 'إلى' : 'To'}
+                className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+              <span className="text-[11px] text-ink/60 font-medium shrink-0 ms-4">
+                {isAr ? 'القطر (مم):' : 'Diameter (mm):'}
+              </span>
+              <input value={diaFrom} onChange={e => { setDiaFrom(e.target.value); setPage(1); }}
+                type="number" step="0.5" placeholder={isAr ? 'من' : 'From'}
+                className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+              <span className="text-ink/30 text-[11px]">—</span>
+              <input value={diaTo} onChange={e => { setDiaTo(e.target.value); setPage(1); }}
+                type="number" step="0.5" placeholder={isAr ? 'إلى' : 'To'}
+                className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+            </div>
           </div>
         )}
 

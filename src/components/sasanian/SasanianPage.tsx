@@ -61,6 +61,12 @@ export default function SasanianPage({ locale }: { locale: string }) {
   const [denomination, setDenomination] = useState('');
   const [yceFrom,      setYceFrom]      = useState('');
   const [yceTo,        setYceTo]        = useState('');
+  const [wtFrom,       setWtFrom]       = useState('');
+  const [wtTo,         setWtTo]         = useState('');
+  const [diaFrom,      setDiaFrom]      = useState('');
+  const [diaTo,        setDiaTo]        = useState('');
+  const [withImages,   setWithImages]   = useState(false);
+  const [bothImages,   setBothImages]   = useState(false);
   const [moreFilters,  setMoreFilters]  = useState(false);
   const [page,         setPage]         = useState(1);
   const [view,         setView]         = useState<'grid' | 'list'>('grid');
@@ -103,39 +109,47 @@ export default function SasanianPage({ locale }: { locale: string }) {
 
   // ── Fetch ───────────────────────────────────────────────────────────────
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     setFetchError(false);
     const f: SasanianCoinFilters = {};
-    if (query.trim()) f.query       = query.trim();
-    if (ruler)        f.ruler       = ruler;
-    if (mint)         f.mint        = mint;
-    if (metal)        f.metal       = metal;
+    if (query.trim()) f.query        = query.trim();
+    if (ruler)        f.ruler        = ruler;
+    if (mint)         f.mint         = mint;
+    if (metal)        f.metal        = metal;
     if (denomination) f.denomination = denomination;
-    if (yceFrom)      f.yce_from   = parseInt(yceFrom);
-    if (yceTo)        f.yce_to     = parseInt(yceTo);
+    if (yceFrom)      f.yce_from    = parseInt(yceFrom);
+    if (yceTo)        f.yce_to      = parseInt(yceTo);
+    if (wtFrom)       f.wtFrom      = parseFloat(wtFrom);
+    if (wtTo)         f.wtTo        = parseFloat(wtTo);
+    if (diaFrom)      f.diaFrom     = parseFloat(diaFrom);
+    if (diaTo)        f.diaTo       = parseFloat(diaTo);
+    if (withImages)   f.withImages  = true;
+    if (bothImages)   f.bothImages  = true;
 
-    const timer = setTimeout(() => {
-      getSasanianCoins(f, page, PER_PAGE).then(({ data, count }) => {
-        setCoins(data);
-        setTotal(count);
-        setLoading(false);
-      }).catch(err => {
+    getSasanianCoins(f, page, PER_PAGE)
+      .then(({ data, count }) => {
+        if (cancelled) return;
+        setCoins(data); setTotal(count); setLoading(false);
+      })
+      .catch(err => {
+        if (cancelled) return;
         console.error('[Sasanian fetch]', err);
-        setFetchError(true);
-        setLoading(false);
+        setFetchError(true); setLoading(false);
       });
-    }, 300);
-    return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, ruler, mint, metal, denomination, yceFrom, yceTo, page]);
+    return () => { cancelled = true; };
+  }, [query, ruler, mint, metal, denomination, yceFrom, yceTo, wtFrom, wtTo, diaFrom, diaTo, withImages, bothImages, page]);
 
   const clearAll = () => {
     setQuery(''); setRuler(''); setMint(''); setMetal('');
-    setDenomination(''); setYceFrom(''); setYceTo(''); setPage(1);
-    setFetchError(false);
+    setDenomination(''); setYceFrom(''); setYceTo('');
+    setWtFrom(''); setWtTo(''); setDiaFrom(''); setDiaTo('');
+    setWithImages(false); setBothImages(false);
+    setPage(1); setFetchError(false);
   };
 
-  const activeCount = [ruler, mint, metal, denomination, yceFrom, yceTo].filter(Boolean).length;
+  const activeCount = [ruler, mint, metal, denomination, yceFrom, yceTo, wtFrom, wtTo, diaFrom, diaTo].filter(Boolean).length
+    + (withImages ? 1 : 0) + (bothImages ? 1 : 0);
 
   const downloadPDF = () => {
     const METALS_AR_LOCAL: Record<string, string> = { Gold: 'ذهب', Silver: 'فضة', Bronze: 'برونز', Billon: 'بليون', Lead: 'رصاص', Copper: 'نحاس' };
@@ -221,13 +235,27 @@ export default function SasanianPage({ locale }: { locale: string }) {
               {DENOMINATIONS.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
 
-            {/* Date toggle */}
+            {/* Image pills */}
+            <button
+              onClick={() => { setBothImages(false); setWithImages(!withImages); setPage(1); }}
+              className={`text-[11px] px-3 py-1.5 rounded-full border transition-all
+                ${withImages ? 'bg-amber-50 border-amber-400 text-amber-700 font-medium' : 'border-gray-200 text-gray-500 hover:border-amber-300'}`}>
+              {isAr ? 'مع صورة' : 'With image'}
+            </button>
+            <button
+              onClick={() => { setWithImages(false); setBothImages(!bothImages); setPage(1); }}
+              className={`text-[11px] px-3 py-1.5 rounded-full border transition-all
+                ${bothImages ? 'bg-amber-50 border-amber-400 text-amber-700 font-medium' : 'border-gray-200 text-gray-500 hover:border-amber-300'}`}>
+              {isAr ? 'وجه وظهر' : 'Both sides'}
+            </button>
+
+            {/* Date / more filters toggle */}
             <button
               onClick={() => setMoreFilters(!moreFilters)}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-lg border transition-colors
                 ${moreFilters ? 'border-gold-500 bg-parch-dark text-ink' : 'border-gold-700/30 bg-parch-cream text-ink/70 hover:border-gold-500'}`}>
               <SlidersHorizontal size={12} />
-              {isAr ? 'التاريخ' : 'Date'}
+              {isAr ? 'المزيد' : 'More'}
               {moreFilters ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
 
@@ -278,6 +306,20 @@ export default function SasanianPage({ locale }: { locale: string }) {
               <input value={yceTo} onChange={e => { setYceTo(e.target.value); setPage(1); }}
                 type="number" placeholder={isAr ? 'إلى' : 'To'}
                 className="w-[70px] text-[11px] px-2 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500" />
+            </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-[11px] text-ink/60 font-medium shrink-0">{isAr ? 'الوزن (غ):' : 'Weight (g):'}</span>
+              <input value={wtFrom} onChange={e => { setWtFrom(e.target.value); setPage(1); }} type="number" placeholder="Min" step="0.1" min="0"
+                className="w-16 text-[12px] border border-gray-200 rounded-md px-2 py-1.5 focus:border-amber-400 outline-none" />
+              <span className="text-gray-300">—</span>
+              <input value={wtTo} onChange={e => { setWtTo(e.target.value); setPage(1); }} type="number" placeholder="Max" step="0.1" min="0"
+                className="w-16 text-[12px] border border-gray-200 rounded-md px-2 py-1.5 focus:border-amber-400 outline-none" />
+              <span className="text-[11px] text-ink/60 font-medium ms-3 shrink-0">{isAr ? 'القطر (مم):' : 'Diameter (mm):'}</span>
+              <input value={diaFrom} onChange={e => { setDiaFrom(e.target.value); setPage(1); }} type="number" placeholder="Min" step="0.5" min="0"
+                className="w-16 text-[12px] border border-gray-200 rounded-md px-2 py-1.5 focus:border-amber-400 outline-none" />
+              <span className="text-gray-300">—</span>
+              <input value={diaTo} onChange={e => { setDiaTo(e.target.value); setPage(1); }} type="number" placeholder="Max" step="0.5" min="0"
+                className="w-16 text-[12px] border border-gray-200 rounded-md px-2 py-1.5 focus:border-amber-400 outline-none" />
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] text-ink/60 font-medium shrink-0">

@@ -118,6 +118,16 @@ export interface CoinFilters {
   ccIn?:     string[];
   /** Free-text search across name, nar, km, nref, ruler, mint */
   query?:    string;
+  /** Weight range (grams) */
+  wtFrom?: number;
+  wtTo?: number;
+  /** Diameter range (mm) */
+  diaFrom?: number;
+  diaTo?: number;
+  /** Only coins that have an obverse image */
+  withImages?: boolean;
+  /** Only coins that have both obverse and reverse images */
+  bothImages?: boolean;
 }
 
 // ── Internal: apply filters to a Supabase query builder ───────────────────────
@@ -127,7 +137,8 @@ function applyFilters(
   qb: any,
   filters: CoinFilters,
 ) {
-  const { cc, excludeCC, excludeCCs, ccIn, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query } = filters;
+  const { cc, excludeCC, excludeCCs, ccIn, dyn, metal, type, denomination, mint_ar, ruler_ar, yah, yceFrom, yceTo, query,
+          wtFrom, wtTo, diaFrom, diaTo, withImages, bothImages } = filters;
   const mint   = (filters as CoinFilters).mint;
   const ruler  = (filters as CoinFilters).ruler;
 
@@ -167,6 +178,16 @@ function applyFilters(
   if (query && query.trim()) {
     qb = qb.textSearch('search_vector', query.trim(), { type: 'websearch' });
   }
+
+  // Physical dimensions
+  if (wtFrom  != null) qb = qb.gte('wt',  wtFrom).not('wt',  'is', null);
+  if (wtTo    != null) qb = qb.lte('wt',  wtTo).not('wt',    'is', null);
+  if (diaFrom != null) qb = qb.gte('dia', diaFrom).not('dia', 'is', null);
+  if (diaTo   != null) qb = qb.lte('dia', diaTo).not('dia',   'is', null);
+
+  // Image availability
+  if (withImages || bothImages) { qb = qb.not('o', 'is', null).neq('o', ''); }
+  if (bothImages)               { qb = qb.not('r', 'is', null).neq('r', ''); }
 
   return qb;
 }

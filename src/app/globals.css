@@ -88,3 +88,45 @@ input[type="range"]::-moz-range-thumb {
 
 /* Transitions */
 .transition-all { transition: all 0.2s ease; }
+
+@media print {
+  .site-header,
+  .catalogue-shell-header,
+  .filter-bar,
+  .section-nav,
+  .pagination,
+  .related-coins-section,
+  .back-button,
+  .no-print,
+  footer,
+  nav { display: none !important; }
+
+  body { background: white !important; color: black !important; }
+
+  .coin-detail-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .coin-header-dark {
+    background: #1a0e05 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .coin-spec-grid { grid-template-columns: 1fr 1fr !important; }
+
+  @page { margin: 1.5cm; }
+
+  .coin-detail-container::after {
+    content: "Arabismatica — arabismatica.arabcollector.com — أرابيزماتيكا";
+    display: block;
+    margin-top: 24px;
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+    font-size: 9px;
+    color: #999;
+    text-align: center;
+  }
+}
