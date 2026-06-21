@@ -87,9 +87,10 @@ export const CATALOGUES = [
       en: 'Coins of the Mughal Empire — from Babur to Aurangzeb, bearing Arabic Islamic inscriptions',
       de: 'Münzen des Mogulreichs — von Babur bis Aurangzeb, mit arabischen islamischen Inschriften',
     },
+    coinCount: 11033,
     navPath: '/mughal',
     ccFilter: { include: ['MG'] },
-    status: 'scraping' as CatalogueStatus,
+    status: 'active' as CatalogueStatus,
   },
   {
     id: 'delhi',

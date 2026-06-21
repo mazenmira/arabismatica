@@ -106,6 +106,7 @@ export default function IslamicPage({ locale }: { locale: string }) {
   const [coins,        setCoins]        = useState<CoinRow[]>([]);
   const [total,        setTotal]        = useState(47303);
   const [loading,      setLoading]      = useState(true);
+  const [fetchError,   setFetchError]   = useState(false);
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
   const metals = ['Gold', 'Silver', 'Bronze', 'Billon', 'Lead', 'Copper'];
   const queryRef = useRef<NodeJS.Timeout>();
@@ -137,40 +138,42 @@ export default function IslamicPage({ locale }: { locale: string }) {
   }, [isAr]);
 
   // ── Fetch coins ─────────────────────────────────────────────────────────
-  const doFetch = useCallback(() => {
+  useEffect(() => {
     setLoading(true);
+    setFetchError(false);
     const f: IslamicCoinFilters = {};
-    if (query.trim())  f.query          = query.trim();
-    if (denomination)  f.denomination   = denomination;
-    if (dynasty)       f.dyn            = dynasty;
-    if (metal)         f.metal          = metal;
-    if (mint)          f.mint           = mint;
-    if (ruler)         f.ruler          = ruler;
-    if (coinTypeTag)   f.coin_type_tag  = coinTypeTag;
-    if (yahFrom)       f.yah_from       = parseInt(yahFrom);
-    if (yahTo)         f.yah_to         = parseInt(yahTo);
+    if (query.trim())  f.query         = query.trim();
+    if (denomination)  f.denomination  = denomination;
+    if (dynasty)       f.dyn           = dynasty;
+    if (metal)         f.metal         = metal;
+    if (mint)          f.mint          = mint;
+    if (ruler)         f.ruler         = ruler;
+    if (coinTypeTag)   f.coin_type_tag = coinTypeTag;
+    if (yahFrom)       f.yah_from      = parseInt(yahFrom);
+    if (yahTo)         f.yah_to        = parseInt(yahTo);
 
-    getIslamicCoins(f, page, PER_PAGE).then(({ data, count }) => {
-      let sorted = data;
-      if (sort === 'newest') sorted = [...data].sort((a, b) => parseInt(b.yah || '0') - parseInt(a.yah || '0'));
-      else if (sort === 'oldest') sorted = [...data].sort((a, b) => parseInt(a.yah || '9999') - parseInt(b.yah || '9999'));
-      setCoins(sorted);
-      setTotal(count);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    const timer = setTimeout(() => {
+      getIslamicCoins(f, page, PER_PAGE).then(({ data, count }) => {
+        let sorted = data;
+        if (sort === 'newest') sorted = [...data].sort((a, b) => parseInt(b.yah || '0') - parseInt(a.yah || '0'));
+        else if (sort === 'oldest') sorted = [...data].sort((a, b) => parseInt(a.yah || '9999') - parseInt(b.yah || '9999'));
+        setCoins(sorted);
+        setTotal(count);
+        setLoading(false);
+      }).catch(err => {
+        console.error('[Islamic fetch]', err);
+        setFetchError(true);
+        setLoading(false);
+      });
+    }, 300);
+    return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, denomination, dynasty, metal, mint, ruler, coinTypeTag, yahFrom, yahTo, sort, page]);
-
-  useEffect(() => {
-    clearTimeout(queryRef.current);
-    queryRef.current = setTimeout(doFetch, 300);
-    return () => clearTimeout(queryRef.current);
-  }, [doFetch]);
 
   const clearAll = () => {
     setQuery(''); setDenomination(''); setDynasty(''); setMetal('');
     setMint(''); setRuler(''); setCoinTypeTag(''); setYahFrom(''); setYahTo('');
-    setSort('default'); setPage(1);
+    setSort('default'); setPage(1); setFetchError(false);
   };
 
   // PDF download
@@ -459,7 +462,12 @@ export default function IslamicPage({ locale }: { locale: string }) {
               ))}
         </div>
 
-        {!loading && coins.length === 0 && (
+        {!loading && fetchError && (
+          <div className="text-center py-12 text-red-500/70 text-[13px]">
+            {isAr ? 'خطأ في تحميل البيانات — تحقق من الاتصال' : 'Failed to load coins — check your connection'}
+          </div>
+        )}
+        {!loading && !fetchError && coins.length === 0 && (
           <div className="text-center py-12 text-amber-600/60 text-[13px]">
             {isAr ? 'لا توجد نتائج تطابق البحث' : 'No coins match your search'}
           </div>

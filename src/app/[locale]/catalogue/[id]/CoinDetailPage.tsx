@@ -219,8 +219,8 @@ export default function CoinDetailPage({ coin, locale }: Props) {
 
               {/* ── Description ── */}
               {coin.zeno_description && (
-                <div className="mb-6 rounded-xl border border-amber-100 overflow-hidden">
-                  <div className="bg-amber-50 px-4 py-2 border-b border-amber-100">
+                <div className="mb-6 rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
                     <span className="text-[10px] text-amber-600/60 uppercase tracking-widest font-medium">
                       {isAr ? 'وصف العملة' : locale === 'de' ? 'Münzbeschreibung' : 'Coin Description'}
                     </span>
@@ -288,7 +288,7 @@ export default function CoinDetailPage({ coin, locale }: Props) {
                   </h2>
 
                   {mintageData.some(d => d.Mintmark && d.Mintmark !== 'None') && (
-                    <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3 text-[12px] text-amber-800">
+                    <div className="flex items-start gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mb-3 text-[12px] text-gray-600">
                       {isAr ? 'يحتوي على إصدارات بعلامات ضرب مختلفة — تحقق قبل التقييم' : 'Contains mintmark varieties — verify before pricing'}
                     </div>
                   )}
@@ -337,7 +337,7 @@ export default function CoinDetailPage({ coin, locale }: Props) {
 
               {/* Legacy single mintage */}
               {mintageData.length === 0 && coin.mint && (
-                <div className="flex items-center gap-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mb-6">
+                <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 mb-6">
                   <span className="text-[10px] font-mono text-amber-600/60 uppercase tracking-wider">#</span>
                   <div>
                     <div className="text-[9px] text-amber-600/60 uppercase tracking-wider">{isAr ? 'المضروب' : 'Mintage'}</div>

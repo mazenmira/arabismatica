@@ -15,7 +15,7 @@ const BATCH_SIZE = 50;
 const JSON_FILE  = path.join(__dirname, '../src/data/mughal_coins.json');
 
 const supabase = createClient(
-  process.env.SUPABASE_URL,
+  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
 );
 
@@ -39,8 +39,26 @@ async function main() {
   let upserted = 0;
   let errors   = 0;
 
-  for (let i = 0; i < coins.length; i += BATCH_SIZE) {
-    const batch = coins.slice(i, i + BATCH_SIZE);
+  // Map scraped fields to DB column names; drop extras not in schema
+  // Map scraped fields to DB column names; drop extras not in schema
+  const STRING_COLS = ['cc','co','co_ar','dyn','name','nar','km','yce','yah','metal',
+    'nref','nid','type','denomination','mint','mint_ar','ruler','ruler_ar',
+    'obverse_legend','reverse_legend','o','r','coin_type_tag'];
+  const cleaned = coins.map(c => {
+    const r = { id: c.id };
+    for (const k of STRING_COLS) {
+      r[k] = c[k] ?? '';
+    }
+    r.wt  = c.wt  ?? null;
+    r.dia = c.dia ?? null;
+    r.prices      = c.prices      ?? null;
+    r.mintage_data = c.mintageData ?? null;
+    r.auction     = c.auction     ?? null;
+    return r;
+  });
+
+  for (let i = 0; i < cleaned.length; i += BATCH_SIZE) {
+    const batch = cleaned.slice(i, i + BATCH_SIZE);
     const { error } = await supabase
       .from('coins')
       .upsert(batch, { onConflict: 'id' });
@@ -50,11 +68,12 @@ async function main() {
       errors += batch.length;
     } else {
       upserted += batch.length;
-      process.stdout.write(`\r✅ Upserted ${upserted}/${coins.length} coins…`);
+      process.stdout.write(`\r✅ Upserted ${upserted}/${cleaned.length} coins…`);
     }
   }
 
   console.log(`\n\n✅ Migration complete — ${upserted} upserted, ${errors} errors`);
+  if (errors > 0) process.exit(1);
 }
 
 main().catch(err => { console.error(err); process.exit(1); });
