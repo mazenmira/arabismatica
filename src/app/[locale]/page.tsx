@@ -12,10 +12,9 @@ import type { AcademicGroup, CatalogueChip } from '@/lib/catalogues';
 
 const HERO_IMG = 'https://pub-8c6367eeb78947fb9a67f9647334fc7f.r2.dev/wp-content/uploads/2026/05/Arabismatica-Hero.jpg';
 
-const HERO_STATS = [
-  { numAr: '٧١٬٨٣٦', numEn: '71,836', numDe: '71.836',  labelAr: 'عملة مفهرسة',    labelEn: 'coins indexed',     labelDe: 'Münzen' },
-  { numAr: '٥',        numEn: '5',      numDe: '5',       labelAr: 'كتالوجات نشطة', labelEn: 'active catalogues',  labelDe: 'Kataloge' },
-  { numAr: '٢٠+',     numEn: '20+',   numDe: '20+',     labelAr: 'دولة وإمارة',   labelEn: 'countries',          labelDe: 'Länder' },
+const HERO_STATS_STATIC = [
+  { numAr: '٥',    numEn: '5',   numDe: '5',   labelAr: 'كتالوجات نشطة', labelEn: 'active catalogues', labelDe: 'Kataloge' },
+  { numAr: '٢٠+', numEn: '20+', numDe: '20+', labelAr: 'دولة وإمارة',   labelEn: 'countries',         labelDe: 'Länder' },
 ];
 
 type LiveCounts = Record<string, number>;
@@ -152,15 +151,23 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
     o?: string; cc?: string; co?: string; co_ar?: string;
   } | null>(null);
 
-  const [liveCounts, setLiveCounts] = useState<LiveCounts>({});
+  const [liveCounts,  setLiveCounts]  = useState<LiveCounts>({});
+  const [totalCoins,  setTotalCoins]  = useState<number | null>(null);
 
-  // Fetch coin of the day
+  // Fetch coin of the day + live total
   useEffect(() => {
-    const today = new Date();
-    const seed   = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-    const offset = seed % 71836;
-    supabase.from('coins').select('id,name,nar,yce,o,cc,co,co_ar').range(offset, offset)
-      .then(({ data }) => { if (data && data.length > 0) setCoinOfDay(data[0] as typeof coinOfDay); });
+    (async () => {
+      try {
+        const { count } = await supabase.from('coins').select('id', { count: 'exact', head: true });
+        const total = count ?? 0;
+        setTotalCoins(total);
+        const today  = new Date();
+        const seed   = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+        const offset = total > 0 ? seed % total : 0;
+        const { data } = await supabase.from('coins').select('id,name,nar,yce,o,cc,co,co_ar').range(offset, offset);
+        if (data && data.length > 0) setCoinOfDay(data[0] as typeof coinOfDay);
+      } catch (err) { console.error(err); }
+    })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -220,7 +227,19 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
           </p>
 
           <div className="flex items-center gap-8 md:gap-12 flex-wrap justify-center">
-            {HERO_STATS.map((s, i) => (
+            {/* Live total coin count */}
+            <div className="text-center">
+              <div className="font-amiri text-2xl md:text-3xl text-gold-400 font-bold">
+                {totalCoins != null
+                  ? totalCoins.toLocaleString(isAr ? 'ar-EG' : isDe ? 'de-DE' : 'en-US')
+                  : (isAr ? '...' : '...')}
+              </div>
+              <div className="text-[10px] text-amber-300/60 mt-0.5 uppercase tracking-wide">
+                {isAr ? 'عملة مفهرسة' : isDe ? 'Münzen' : 'coins indexed'}
+              </div>
+            </div>
+            {/* Static stats */}
+            {HERO_STATS_STATIC.map((s, i) => (
               <div key={i} className="text-center">
                 <div className="font-amiri text-2xl md:text-3xl text-gold-400 font-bold">
                   {isAr ? s.numAr : isDe ? s.numDe : s.numEn}

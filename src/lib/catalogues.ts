@@ -173,5 +173,6 @@ export const ISLAMIC_DYNASTY_CHIPS = [
   { dyn: 'الأرتقيون',         label_en: 'Artuqid Dynasty',    label_ar: 'الأرتقيون',         count:  1895 },
   { dyn: 'الزنكيون',          label_en: 'Zangid Dynasty',     label_ar: 'الزنكيون',          count:  1715 },
   { dyn: 'البويهيون',         label_en: 'Buyid Dynasty',      label_ar: 'البويهيون',         count:  1174 },
+  { dyn: 'الخلافة الفاطمية', label_en: 'Fatimid Caliphate',  label_ar: 'الخلافة الفاطمية',  count:   596 },
   { dyn: 'الحمدانيون',        label_en: 'Hamdanid Dynasty',   label_ar: 'الحمدانيون',        count:   449 },
 ] as const;
