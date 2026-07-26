@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, ZoomIn, Share2, ChevronDown, ChevronUp, CalendarDays, Landmark, Tag, User, FlaskConical, Layers, Scale, Ruler, Hash, Bookmark, BarChart2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Coin, MintageEntry, CoinPrices } from '@/types/coin';
+import { getCoinById } from '@/lib/coinsApi';
 import { supabase } from '@/lib/supabase';
 import {
   getDiscGradient, getMetalSymbol, COUNTRY_FLAGS,
@@ -232,6 +233,8 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
   const [imageTab,    setImageTab]    = useState<'both' | 'obverse' | 'reverse'>('both');
   const [showMore,    setShowMore]    = useState(false);
   const [shareToast,  setShareToast]  = useState(false);
+  const [detail,      setDetail]      = useState<{ prices?: CoinPrices; obverse_legend?: string; reverse_legend?: string } | null>(null);
+  const [detailLoading, setDetailLoading] = useState(true);
 
   const coinName     = getCoinName(coin, locale);
   const mintageData  = c.mintageData ?? [];
@@ -257,6 +260,14 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
     window.addEventListener('keydown', handler);
     return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', handler); };
   }, [lightbox, onClose]);
+
+  useEffect(() => {
+    setDetailLoading(true);
+    getCoinById(coin.id).then(full => {
+      if (full) setDetail({ prices: full.prices ?? undefined, obverse_legend: full.obverse_legend || undefined, reverse_legend: full.reverse_legend || undefined });
+      setDetailLoading(false);
+    }).catch(() => setDetailLoading(false));
+  }, [coin.id]);
 
   const handleShare = useCallback(() => {
     const url = `${window.location.origin}/${locale}/catalogue/${coin.id}`;
@@ -560,26 +571,34 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
                   {isAr ? 'وصف العملة' : locale === 'de' ? 'Münzbeschreibung' : 'Coin Description'}
                 </div>
 
-                {coin.obverse_legend && (
-                  <div className="mb-1.5">
-                    <span className="text-[10px] font-semibold text-gold-600 me-1">
-                      {isAr ? 'الوجه:' : 'Obverse:'}
-                    </span>
-                    <span className="text-[11px] text-ink/70 font-amiri">
-                      {coin.obverse_legend}
-                    </span>
+                {detailLoading ? (
+                  <div className="h-8 flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 rounded-full border-2 border-gold-400 border-t-transparent animate-spin" />
+                    <span className="text-[10px] text-ink/30">{isAr ? 'جارٍ التحميل…' : 'Loading…'}</span>
                   </div>
-                )}
-
-                {coin.reverse_legend && (
-                  <div className="mb-2">
-                    <span className="text-[10px] font-semibold text-gold-600 me-1">
-                      {isAr ? 'الظهر:' : 'Reverse:'}
-                    </span>
-                    <span className="text-[11px] text-ink/70 font-amiri">
-                      {coin.reverse_legend}
-                    </span>
-                  </div>
+                ) : (
+                  <>
+                    {(detail?.obverse_legend ?? coin.obverse_legend) && (
+                      <div className="mb-1.5">
+                        <span className="text-[10px] font-semibold text-gold-600 me-1">
+                          {isAr ? 'الوجه:' : 'Obverse:'}
+                        </span>
+                        <span className="text-[11px] text-ink/70 font-amiri">
+                          {detail?.obverse_legend ?? coin.obverse_legend}
+                        </span>
+                      </div>
+                    )}
+                    {(detail?.reverse_legend ?? coin.reverse_legend) && (
+                      <div className="mb-2">
+                        <span className="text-[10px] font-semibold text-gold-600 me-1">
+                          {isAr ? 'الظهر:' : 'Reverse:'}
+                        </span>
+                        <span className="text-[11px] text-ink/70 font-amiri">
+                          {detail?.reverse_legend ?? coin.reverse_legend}
+                        </span>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 <p className="text-[12px] text-ink/60 leading-relaxed font-amiri italic mb-2">
@@ -617,7 +636,7 @@ export default function CoinModal({ coin, locale, onClose }: { coin: Coin; local
 
             {/* ── Price Guide ── */}
             <div className="border-t border-gold-700/15 pt-4">
-              <PriceGuide coinId={coin.id} locale={locale} cataloguePrices={coin.prices} />
+              <PriceGuide coinId={coin.id} locale={locale} cataloguePrices={detail?.prices ?? coin.prices} />
             </div>
 
             {/* ── External links ── */}

@@ -206,9 +206,11 @@ export async function getCoins(
   const from = (page - 1) * pageSize;
   const to   = from + pageSize - 1;
 
+  const LIST_COLS = 'id,cc,co,co_ar,dyn,name,nar,km,yce,yah,metal,wt,dia,nref,nid,type,denomination,mint,mint_ar,ruler,ruler_ar,o,r,mintage_data,coin_type_tag,zeno_description';
+
   let qb = db
     .from('coins')
-    .select('*', { count: 'exact' })
+    .select(LIST_COLS, { count: 'exact' })
     .order('id')
     .range(from, to);
 
@@ -486,10 +488,12 @@ export async function getIslamicCoins(
   const from = (page - 1) * pageSize;
   const to   = from + pageSize - 1;
 
+  const LIST_COLS = 'id,cc,co,co_ar,dyn,name,nar,km,yce,yah,metal,wt,dia,nref,nid,type,denomination,mint,mint_ar,ruler,ruler_ar,o,r,mintage_data,coin_type_tag,zeno_description';
+
   // Always force cc = IS; merge caller cc is overridden
   let qb = db
     .from('coins')
-    .select('*', { count: 'exact' })
+    .select(LIST_COLS, { count: 'exact' })
     .eq('cc', 'IS')
     .order('id')
     .range(from, to);
@@ -667,9 +671,11 @@ export async function getMughalCoins(
   const from = (page - 1) * pageSize;
   const to   = from + pageSize - 1;
 
+  const LIST_COLS = 'id,cc,co,co_ar,dyn,name,nar,km,yce,yah,metal,wt,dia,nref,nid,type,denomination,mint,mint_ar,ruler,ruler_ar,o,r,mintage_data,coin_type_tag,zeno_description';
+
   let qb = db
     .from('coins')
-    .select('*', { count: 'exact' })
+    .select(LIST_COLS, { count: 'exact' })
     .eq('cc', 'MG')
     .order('id')
     .range(from, to);
@@ -754,9 +760,11 @@ export async function getDelhiCoins(
   const from = (page - 1) * pageSize;
   const to   = from + pageSize - 1;
 
+  const LIST_COLS = 'id,cc,co,co_ar,dyn,name,nar,km,yce,yah,metal,wt,dia,nref,nid,type,denomination,mint,mint_ar,ruler,ruler_ar,o,r,mintage_data,coin_type_tag,zeno_description';
+
   let qb = db
     .from('coins')
-    .select('*', { count: 'exact' })
+    .select(LIST_COLS, { count: 'exact' })
     .eq('cc', 'DS')
     .order('id')
     .range(from, to);

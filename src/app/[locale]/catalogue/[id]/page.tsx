@@ -3,12 +3,9 @@ export const revalidate = 86400;
 
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import COINS_RAW from '@/data/coins.json';
 import type { Coin } from '@/types/coin';
 import CoinDetailPage from './CoinDetailPage';
 import { getCoinById } from '@/lib/coinsApi';
-
-const ALL_COINS = COINS_RAW as unknown as Coin[];
 
 interface Props {
   params: { locale: string; id: string };
@@ -16,7 +13,8 @@ interface Props {
 
 // ── Dynamic metadata per coin ─────────────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const coin = ALL_COINS.find(c => c.id === params.id);
+  const { default: COINS_RAW } = await import('@/data/coins.json');
+  const coin = (COINS_RAW as unknown as Coin[]).find(c => c.id === params.id);
   if (!coin) return { title: 'Coin Not Found' };
 
   const isAr  = params.locale === 'ar';
@@ -56,7 +54,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ── Page component ─────────────────────────────────────────────────────────────
 export default async function CoinPage({ params }: Props) {
-  const coin = ALL_COINS.find(c => c.id === params.id);
+  const { default: COINS_RAW } = await import('@/data/coins.json');
+  const coin = (COINS_RAW as unknown as Coin[]).find(c => c.id === params.id);
   if (coin) return <CoinDetailPage coin={coin} locale={params.locale} />;
 
   // Not in static JSON — check Supabase (covers MG, DS, IS, SS coins)

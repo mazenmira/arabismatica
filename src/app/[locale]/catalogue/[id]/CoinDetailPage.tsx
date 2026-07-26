@@ -2,23 +2,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowRight, ExternalLink, ZoomIn, Copy, Check, Printer } from 'lucide-react';
 import type { Coin, MintageEntry } from '@/types/coin';
 import {
   COUNTRY_FLAGS, formatMintage,
   isValidImageUrl, getCoinName, getCoinYear,
 } from '@/lib/coins';
-import COINS_RAW from '@/data/coins.json';
-
-const ALL_COINS = COINS_RAW as unknown as Coin[];
-
-// Related coins: same country+metal, exclude self, up to 6
-function getRelated(coin: Coin): Coin[] {
-  return ALL_COINS
-    .filter(c => c.id !== coin.id && c.cc === coin.cc && c.metal === coin.metal)
-    .slice(0, 6);
-}
 
 interface Props { coin: Coin; locale: string; }
 
@@ -96,6 +86,14 @@ export default function CoinDetailPage({ coin, locale }: Props) {
   const coinYear  = getCoinYear(coin, locale);
   const metalLabel = isAr ? (METAL_AR[coin.metal] ?? coin.metal) : coin.metal;
   const flag      = COUNTRY_FLAGS[coin.cc] ?? '';
+
+  const [related, setRelated] = useState<Coin[]>([]);
+  useEffect(() => {
+    import('@/data/coins.json').then(({ default: raw }) => {
+      const all = raw as unknown as Coin[];
+      setRelated(all.filter(c => c.id !== coin.id && c.cc === coin.cc && c.metal === coin.metal).slice(0, 6));
+    });
+  }, [coin.id, coin.cc, coin.metal]);
 
   const mintageData: MintageEntry[] = Array.isArray((coin as unknown as Record<string,unknown>).mintageData)
     ? (coin as unknown as { mintageData: MintageEntry[] }).mintageData
@@ -381,7 +379,6 @@ export default function CoinDetailPage({ coin, locale }: Props) {
 
               {/* ── Related Coins ── */}
               {(() => {
-                const related = getRelated(coin);
                 if (related.length === 0) return null;
                 return (
                   <div className="mb-6">
