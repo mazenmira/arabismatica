@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import type { Metadata } from 'next';
 import MughalMintsPage from '@/components/mughal/MintsPage';
 

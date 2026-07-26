@@ -1,5 +1,4 @@
 // src/app/[locale]/mughal/[id]/page.tsx
-export const dynamic = 'force-dynamic';
 export const revalidate = 86400;
 
 import type { Metadata } from 'next';
