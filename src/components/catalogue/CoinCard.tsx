@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import type { Coin, MintageEntry } from '@/types/coin';
 import {
@@ -188,7 +188,7 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
     );
   }
 
-  // ── Grid view — Classic light style ──────────────────────────────────────
+  // ── Grid view — Dark theme ────────────────────────────────────────────────
   const isZeno       = coin.nref?.startsWith('Z#');
   const denomination = (coin as Coin & { denomination?: string }).denomination;
   const ruler        = (coin as Coin & { ruler?: string; ruler_ar?: string }).ruler;
@@ -196,31 +196,43 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
   const mint_en      = (coin as Coin & { mint?: string; mint_ar?: string }).mint;
   const mint_ar_val  = (coin as Coin & { mint?: string; mint_ar?: string }).mint_ar;
 
+  const DARK_METAL_BADGE: Record<string, React.CSSProperties> = {
+    'Gold':   { background: '#2A1E08', color: '#C9A84C' },
+    'Silver': { background: '#1A1E24', color: '#8A9EAA' },
+    'Bronze': { background: '#2A1A08', color: '#C9844C' },
+    'Copper': { background: '#2A1A08', color: '#C9844C' },
+    'Billon': { background: '#1A1A1E', color: '#7A7A8A' },
+  };
+  const metalStyle = DARK_METAL_BADGE[coin.metal] ?? { background: '#1E1A14', color: '#7A6E5C' };
+
   return (
     <Link
       href={`/${locale}/catalogue/${coin.id}`}
       onClick={(e) => { e.preventDefault(); onClick(); }}
-      className="group w-full bg-parch-cream rounded-xl border border-gold-700/15 hover:border-gold-500 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex flex-col text-right animate-fade-in"
-      style={{ boxShadow: '0 1px 8px rgba(80,50,10,.06)' }}
+      className="group w-full rounded-sm border hover:border-[#C9A84C] hover:shadow-[0_0_0_1px_rgba(201,168,76,0.125)] transition-all cursor-pointer overflow-hidden flex flex-col text-right animate-fade-in"
+      style={{ background: '#120F08', borderColor: '#1E1A12', borderRadius: '4px' }}
     >
-      {/* Metal badge */}
-      <div className="flex justify-between items-center px-2.5 pt-2">
-        <div className="flex items-center gap-1">
-          <span className="text-[10px]">{COUNTRY_FLAGS[coin.cc] ?? ''}</span>
-          <span className="text-[9px] text-ink/40">{isAr ? coin.co_ar : coin.co}</span>
+      {/* Top row: flag + dynasty label + metal badge */}
+      <div className="flex justify-between items-center px-2.5 pt-2.5">
+        <div className="flex items-center gap-1 min-w-0">
+          <span className="text-[10px] shrink-0">{COUNTRY_FLAGS[coin.cc] ?? ''}</span>
+          <span className="text-[9px] truncate" style={{ color: '#5A5040', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            {coin.dyn || (isAr ? coin.co_ar : coin.co)}
+          </span>
         </div>
-        <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${metalBadgeClass}`}>
+        <span className="text-[10px] font-semibold shrink-0 ms-1"
+          style={{ ...metalStyle, padding: '2px 8px', borderRadius: '2px', textTransform: 'uppercase' }}>
           {metaLabel}
         </span>
       </div>
 
-      {/* Coin images */}
+      {/* Coin images — square aspect ratio */}
       {isZeno ? (
-        <div className="flex items-center justify-center bg-parch-dark/20 mx-2 my-1.5 rounded-lg h-[96px]">
+        <div className="flex items-center justify-center mx-2 my-1.5 rounded" style={{ background: '#0A0806', aspectRatio: '1/1', padding: '12px' }}>
           {isValidImageUrl(coin.o) ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={coin.o} alt={coinName}
-              className="max-h-[88px] w-auto max-w-full object-contain group-hover:scale-105 transition-transform duration-300" />
+              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
           ) : (
             <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl"
               style={{ background: getDiscGradient(coin.metal) }}>
@@ -229,91 +241,71 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
           )}
         </div>
       ) : (
-        <div className="flex bg-parch-dark/10 h-[96px] overflow-hidden">
-          <div className="flex-1 flex flex-col items-center justify-center gap-0.5">
+        <div className="flex overflow-hidden mx-2 my-1.5 rounded" style={{ background: '#0A0806', aspectRatio: '1/1', padding: '12px', gap: '8px' }}>
+          <div className="flex-1 flex items-center justify-center">
             <CoinImage src={coin.o} alt={`${coinName} — ${isAr ? 'الوجه' : 'Obverse'}`} metal={coin.metal} side="obverse" />
-            <span className="text-[8px] text-ink/30">{isAr ? 'و' : 'O'}</span>
           </div>
-          <div className="w-px bg-gold-700/15 my-3" />
-          <div className="flex-1 flex flex-col items-center justify-center gap-0.5">
+          <div style={{ width: '1px', background: '#1E1A12', margin: '8px 0' }} />
+          <div className="flex-1 flex items-center justify-center">
             <CoinImage src={coin.r} alt={`${coinName} — ${isAr ? 'الظهر' : 'Reverse'}`} metal={coin.metal} side="reverse" />
-            <span className="text-[8px] text-ink/30">{isAr ? 'ظ' : 'R'}</span>
           </div>
         </div>
       )}
 
       {/* Content */}
-      <div className="px-2.5 pt-1.5 pb-1 flex-1 flex flex-col gap-0.5" dir={isAr ? 'rtl' : 'ltr'}>
+      <div className="px-2.5 pt-1.5 pb-1 flex-1 flex flex-col gap-1" dir={isAr ? 'rtl' : 'ltr'}>
         {/* Name */}
-        <div className="text-[13px] font-amiri text-ink leading-tight line-clamp-2" title={coinName}>
+        <div className="font-amiri leading-tight line-clamp-2" title={coinName}
+          style={{ fontSize: '14px', color: '#E8DCC8', fontWeight: 500, lineHeight: 1.35, marginBottom: '2px' }}>
           {coinName}
         </div>
 
-        {/* Dynasty */}
-        {coin.dyn && (
-          <div className="text-[9px] text-ink/40 truncate">{coin.dyn}</div>
-        )}
-
         {/* Ruler */}
         {ruler && (
-          <div className="text-[9px] text-gold-600/60 truncate">
+          <div className="text-[9px] truncate" style={{ color: '#5A5040' }}>
             {isAr && ruler_ar_val ? ruler_ar_val : ruler}
-          </div>
-        )}
-
-        {/* Mint */}
-        {mint_en && (
-          <div className="text-[9px] text-ink/35 truncate">
-            {isAr && mint_ar_val ? mint_ar_val : mint_en}
           </div>
         )}
 
         {/* Year */}
         {yearRange && (
-          <div className="text-[10px] text-gold-600 font-medium font-amiri">{yearRange}</div>
+          <div className="font-amiri" style={{ color: '#C9A84C', fontSize: '13px', fontStyle: 'italic' }}>{yearRange}</div>
         )}
 
-        {/* Denomination badge for Islamic */}
-        {denomination && (
-          <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border self-start
-            ${denomination === 'Dinar'  ? 'bg-amber-50 border-amber-200 text-amber-700' :
-              denomination === 'Dirham' ? 'bg-sky-50 border-sky-200 text-sky-700' :
-              'bg-parch-dark/20 border-gold-700/20 text-ink/40'}`}>
-            {isAr ? ({Dinar:'دينار',Dirham:'درهم',Fals:'فلس',Fils:'فلس',Other:'أخرى'} as Record<string,string>)[denomination] ?? denomination : denomination}
-          </span>
-        )}
-
-        {/* KM ref */}
-        {(coin.km || coin.nref) && (
-          <div className="text-[8px] text-ink/25 font-mono">
-            {coin.km ? `KM#${coin.km}` : ''}{coin.km && coin.nref ? ' · ' : ''}{coin.nref ?? ''}
+        {/* Mint */}
+        {mint_en && (
+          <div className="truncate" style={{ color: '#7A6E5C', fontSize: '12px' }}>
+            {isAr && mint_ar_val ? mint_ar_val : mint_en}
           </div>
+        )}
+
+        {/* Denomination badge — skip Fals/Fils as it repeats title */}
+        {denomination && denomination !== 'Fals' && denomination !== 'Fils' && (
+          <span className="self-start"
+            style={{
+              fontSize: '10px', fontWeight: 600, padding: '2px 8px', borderRadius: '2px',
+              ...(denomination === 'Dinar'  ? { background: '#2A1E08', color: '#C9A84C' } :
+                  denomination === 'Dirham' ? { background: '#1A1E24', color: '#8A9EAA' } :
+                  { background: '#1E1A14', color: '#5A5040' }),
+            }}>
+            {isAr ? ({Dinar:'دينار',Dirham:'درهم',Other:'أخرى'} as Record<string,string>)[denomination] ?? denomination : denomination}
+          </span>
         )}
 
         <VarietyPill coin={c} locale={locale} />
       </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between px-2.5 py-1.5 border-t border-gold-700/10">
-        <div className="flex items-center gap-1">
-          {totalMintage != null && totalMintage > 0 && (
-            <span className="text-[8px] text-ink/40 flex items-center gap-0.5">
-              {formatMintage(String(totalMintage), locale)}
-            </span>
-          )}
-          <span className={`text-[8px] px-1.5 py-0.5 rounded-full border ${
-            coin.type === 'Commemorative'
-              ? 'border-amber-300/50 text-amber-600'
-              : 'border-gold-700/20 text-ink/30'}`}>
-            {coin.type === 'Commemorative' ? (isAr ? 'تذكارية' : 'Comm.') : (isAr ? 'تداول' : 'Circ.')}
-          </span>
-        </div>
+      {/* Footer action strip */}
+      <div className="flex items-center justify-between px-3.5 py-2.5" style={{ background: '#0E0C08', borderTop: '1px solid #1E1A12' }}>
+        <span className="text-[11px] transition-colors group-hover:text-[#C9A84C]" style={{ color: '#5A5040' }}>
+          {isAr ? 'عرض العملة ←' : 'View coin →'}
+        </span>
         <div className="flex items-center gap-1">
           {onToggleCollection && (
             <button onClick={onToggleCollection}
               title={isAr ? (inCollection ? 'إزالة' : 'أضف للمجموعة') : (inCollection ? 'Remove' : 'Add')}
               className={`text-[10px] transition-all rounded-full w-5 h-5 flex items-center justify-center border
-                ${inCollection ? 'bg-gold-500 border-gold-500 text-ink' : 'border-gold-700/30 text-ink/30 hover:border-gold-500/60 hover:text-gold-500'}`}>
+                ${inCollection ? 'bg-gold-500 border-gold-500 text-ink' : 'border-[#2E2820] text-[#5A5040] hover:border-[#C9A84C] hover:text-[#C9A84C]'}`}>
               {inCollection ? '✓' : '+'}
             </button>
           )}
@@ -321,7 +313,7 @@ export default function CoinCard({ coin, locale, view, onClick, inCollection = f
             <button onClick={onToggleWishlist}
               title={isAr ? (inWishlist ? 'إزالة من الأمنيات' : 'أضف للأمنيات') : (inWishlist ? 'Remove' : 'Wish')}
               className={`text-[10px] transition-all rounded-full w-5 h-5 flex items-center justify-center border
-                ${inWishlist ? 'bg-red-400 border-red-400 text-white' : 'border-gold-700/25 text-ink/25 hover:border-red-300 hover:text-red-400'}`}>
+                ${inWishlist ? 'bg-red-500 border-red-500 text-white' : 'border-[#2E2820] text-[#5A5040] hover:border-red-500 hover:text-red-400'}`}>
               {inWishlist ? '♥' : '♡'}
             </button>
           )}

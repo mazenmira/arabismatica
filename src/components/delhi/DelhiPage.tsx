@@ -135,21 +135,22 @@ export default function DelhiPage({ locale }: { locale: string }) {
       >
 
         {/* ── SEARCH ──────────────────────────────────────────────────────── */}
-        <div className="border-b border-gold-700/15 bg-white/50 py-3">
+        <div className="py-3" style={{ background: '#0A0806', borderBottom: '1px solid #1E1A12' }}>
           <div className="relative">
-            <Search size={15} className="absolute top-1/2 -translate-y-1/2 start-4 text-gold-500/50" />
+            <Search size={15} className="absolute top-1/2 -translate-y-1/2 start-4" style={{ color: '#5A5040' }} />
             <input
               value={query}
               onChange={e => { setQuery(e.target.value); setPage(1); }}
               placeholder={isAr ? 'ابحث عن عملة...' : 'Search coins...'}
-              className="w-full text-[14px] ps-11 pe-4 py-3 rounded-xl border border-gold-700/25 bg-parch-cream outline-none focus:border-gold-500 shadow-sm font-cairo"
+              className="w-full text-[14px] ps-11 pe-4 py-3 outline-none shadow-sm font-cairo focus:border-[#C9A84C] transition-colors"
+              style={{ background: '#120F08', border: '1px solid #1E1A12', color: '#E8DCC8', borderRadius: '3px' }}
             />
           </div>
         </div>
 
         {/* ── FILTER ROW ──────────────────────────────────────────────────── */}
-        <div className="bg-parch sticky top-[167px] z-30 border-b border-gold-700/15 shadow-sm">
-          <div className="max-w-[1440px] mx-auto px-4 py-2 flex items-center gap-2 flex-wrap">
+        <div className="sticky top-[167px] z-30 shadow-sm" style={{ background: '#0A0806', borderBottom: '1px solid #1E1A12' }}>
+          <div className="max-w-[1440px] mx-auto flex items-center gap-2.5 flex-wrap" style={{ padding: '12px 20px' }}>
 
             <ComboFilter
               placeholder={isAr ? 'الحاكم' : 'Ruler'}
@@ -166,7 +167,8 @@ export default function DelhiPage({ locale }: { locale: string }) {
             />
 
             <select value={metal} onChange={e => { setMetal(e.target.value); setPage(1); }}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg border border-gold-700/30 bg-parch-cream text-ink/70 outline-none focus:border-gold-500 cursor-pointer">
+              className="outline-none focus:border-[#C9A84C] cursor-pointer transition-colors"
+              style={{ background: '#120F08', border: `1px solid ${metal ? '#3A2E10' : '#1E1A12'}`, borderRadius: '3px', padding: '8px 32px 8px 12px', color: metal ? '#C9A84C' : '#9A8E7A', fontSize: '13px', appearance: 'none', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A5040' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}>
               <option value="">{isAr ? 'المعدن' : 'Metal'}</option>
               {metals.map(m => <option key={m} value={m}>{isAr ? (METALS_AR[m] ?? m) : m}</option>)}
             </select>

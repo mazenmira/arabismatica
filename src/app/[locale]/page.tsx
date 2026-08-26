@@ -108,25 +108,25 @@ function GroupCard({ group, locale, isAr, counts }: {
   const bg = GROUP_BG[group.id] ?? 'bg-white';
 
   return (
-    <div className={`rounded-2xl border border-[#E8E0D0] p-8 ${bg}`}>
+    <div className="rounded-2xl p-8" style={{ background: '#120F08', border: '1px solid #1E1A12' }}>
       {/* Header row */}
       <div className="flex items-center gap-3 flex-wrap mb-1">
-        <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+        <h3 className="text-xl font-semibold" style={{ color: '#E8DCC8' }}>{title}</h3>
         {group.ottoman && (
-          <span className="text-xs bg-white/60 border border-gray-200 text-gray-400 rounded-full px-2 py-0.5">
+          <span className="text-xs border rounded-full px-2 py-0.5" style={{ background: 'transparent', borderColor: '#2E2820', color: '#5A5040' }}>
             {isAr ? 'في الإعداد' : 'In preparation'}
           </span>
         )}
         {group.period && (
-          <span className="text-xs text-gray-400 bg-white/60 border border-gray-200 rounded-full px-3 py-0.5">
+          <span className="text-xs rounded-full px-3 py-0.5" style={{ background: 'transparent', border: '1px solid #2E2820', color: '#5A5040' }}>
             {group.period}
           </span>
         )}
       </div>
       {/* Description */}
-      <p className="text-sm text-gray-500 mt-1 mb-5 leading-relaxed">{desc}</p>
+      <p className="text-sm mt-1 mb-5 leading-relaxed" style={{ color: '#5A5040' }}>{desc}</p>
       {/* Divider */}
-      <div className="border-t border-[#E8E0D0] mb-5" />
+      <div className="mb-5" style={{ borderTop: '1px solid #1E1A12' }} />
       {/* Chips */}
       {isIslamicGroup && islamicMain ? (
         <IslamicBlock locale={locale} isAr={isAr} counts={counts} dedicatedChips={dedicatedChips} />
@@ -158,7 +158,7 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
   useEffect(() => {
     (async () => {
       try {
-        const { count } = await supabase.from('coins').select('id', { count: 'exact', head: true });
+        const { count } = await supabase.from('coins').select('*', { count: 'exact', head: true });
         const total = count ?? 0;
         setTotalCoins(total);
         const today  = new Date();
@@ -195,7 +195,7 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
   const t = (ar: string, en: string, de: string) => isAr ? ar : isDe ? de : en;
 
   return (
-    <main className="min-h-screen bg-white" dir={isAr ? 'rtl' : 'ltr'}>
+    <main className="min-h-screen" style={{ background: '#0E0C0A' }} dir={isAr ? 'rtl' : 'ltr'}>
       <SiteHeader locale={locale} />
 
       {/* ── HERO ────────────────────────────────────────────────────────── */}
@@ -284,9 +284,9 @@ export default function LandingPage({ params: { locale } }: { params: { locale: 
       )}
 
       {/* ── CATALOGUE INDEX ─────────────────────────────────────────────── */}
-      <div className="catalogue-section bg-[#F7F4EF]">
+      <div className="catalogue-section" style={{ background: '#0E0C0A' }}>
         <div className="max-w-[1440px] mx-auto px-4 py-10">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-8">
+          <h2 className="text-2xl font-semibold mb-8" style={{ color: '#E8DCC8' }}>
             {t('الكتالوجات', 'Catalogues', 'Kataloge')}
           </h2>
 
