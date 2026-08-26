@@ -219,7 +219,7 @@ export async function getCoins(
   const { data, count, error } = await qb;
   if (error) throw new Error(`getCoins: ${error.message}`);
 
-  return { data: (data ?? []) as CoinRow[], count: count ?? 0 };
+  return { data: (data ?? []) as unknown as CoinRow[], count: count ?? 0 };
 }
 
 /**
@@ -515,7 +515,7 @@ export async function getIslamicCoins(
 
   const { data, count, error } = await qb;
   if (error) throw new Error(`getIslamicCoins: ${error.message}`);
-  return { data: (data ?? []) as CoinRow[], count: count ?? 0 };
+  return { data: (data ?? []) as unknown as CoinRow[], count: count ?? 0 };
 }
 
 /**
@@ -607,7 +607,7 @@ export async function getSasanianCoins(
 
   const { data, count, error } = await qb;
   if (error) throw new Error(`getSasanianCoins: ${error.message}`);
-  return { data: (data ?? []) as CoinRow[], count: count ?? 0 };
+  return { data: (data ?? []) as unknown as CoinRow[], count: count ?? 0 };
 }
 
 export async function getSasanianFilters(): Promise<SasanianFilters> {
@@ -696,7 +696,7 @@ export async function getMughalCoins(
 
   const { data, count, error } = await qb;
   if (error) throw new Error(`getMughalCoins: ${error.message}`);
-  return { data: (data ?? []) as CoinRow[], count: count ?? 0 };
+  return { data: (data ?? []) as unknown as CoinRow[], count: count ?? 0 };
 }
 
 export async function getMughalFilters(): Promise<MughalFilters> {
@@ -785,7 +785,7 @@ export async function getDelhiCoins(
 
   const { data, count, error } = await qb;
   if (error) throw new Error(`getDelhiCoins: ${error.message}`);
-  return { data: (data ?? []) as CoinRow[], count: count ?? 0 };
+  return { data: (data ?? []) as unknown as CoinRow[], count: count ?? 0 };
 }
 
 export async function getDelhiFilters(): Promise<DelhiFilters> {
