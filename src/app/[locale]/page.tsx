@@ -105,8 +105,6 @@ function GroupCard({ group, locale, isAr, counts }: {
   const isIslamicGroup = group.id === 'islamic_dynasties';
   const dedicatedChips = group.catalogues.filter(c => c.special !== 'islamic_dynasties');
   const islamicMain    = group.catalogues.find(c => c.special === 'islamic_dynasties');
-  const bg = GROUP_BG[group.id] ?? 'bg-white';
-
   return (
     <div className="rounded-2xl p-8" style={{ background: '#120F08', border: '1px solid #1E1A12' }}>
       {/* Header row */}

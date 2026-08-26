@@ -128,7 +128,6 @@ function CoinImage({
 export default function CoinCard({ coin, locale, view, onClick, inCollection = false, onToggleCollection, inWishlist = false, onToggleWishlist }: CoinCardProps) {
   const c = coin as CoinWithVarieties;
   const isAr = locale === 'ar';
-  const metalBadgeClass = METAL_BADGE_CLASSES[coin.metal] ?? METAL_BADGE_CLASSES.Other;
   const coinName = getCoinName(coin, locale);
   const yearRange = getCardYearRange(c, locale);
 
