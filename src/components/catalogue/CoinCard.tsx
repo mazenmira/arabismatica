@@ -6,7 +6,6 @@ import type { Coin, MintageEntry } from '@/types/coin';
 import {
   getDiscGradient,
   getMetalSymbol,
-  METAL_BADGE_CLASSES,
   COUNTRY_FLAGS,
   formatMintage,
   isValidImageUrl,

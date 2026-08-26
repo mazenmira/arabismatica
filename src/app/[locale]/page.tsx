@@ -19,18 +19,6 @@ const HERO_STATS_STATIC = [
 
 type LiveCounts = Record<string, number>;
 
-const GROUP_BG: Record<string, string> = {
-  modern_arab_states:  'bg-[#FDF8F0]',
-  ottoman_empire:      'bg-[#F5F0E8]',
-  islamic_dynasties:   'bg-[#F0EEE8]',
-  pre_islamic_persia:  'bg-[#F2EDE4]',
-  hellenistic_ancient: 'bg-[#EEF0E8]',
-  rome_arab_world:     'bg-[#F0ECEC]',
-  byzantine_crusader:  'bg-[#EAF0F0]',
-  phoenician_levant:   'bg-[#F5F0E4]',
-  reference_tools:     'bg-[#F0F0EE]',
-};
-
 // ── Live Chip ──────────────────────────────────────────────────────────────────
 function LiveChip({ chip, locale, isAr, counts }: {
   chip: CatalogueChip; locale: string; isAr: boolean; counts: LiveCounts;
